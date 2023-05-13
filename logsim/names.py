@@ -55,15 +55,47 @@ class Names:
 
         If the name string is not present in the names list, return None.
         """
+        if type(name_string) != str:
+            raise TypeError("Incorrect name type")
+
+        if not name_string:
+            raise ValueError("Empty string")
+
+        if name_string in self.names:
+            return self.names.index(name_string)
+        else:
+            return None
 
     def lookup(self, name_string_list):
         """Return a list of name IDs for each name string in name_string_list.
 
         If the name string is not present in the names list, add it.
         """
+        id_list = []
+        for name_string in name_string_list:
+            if type(name_string) != str:
+                raise TypeError("Incorrect name type")
+
+            if not name_string:
+                raise ValueError("Empty string")
+
+            if name_string in self.names:
+                id_list.append(self.names.index(name_string))
+            else:
+                self.names.append(name_string)
+                id_list.append(len(self.names) - 1)
+        return id_list
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
 
         If the name_id is not an index in the names list, return None.
         """
+        if type(name_id) != int:
+            raise TypeError("Incorrect ID type")
+        if name_id < 0:
+            raise ValueError("Incorrect ID value")
+        try:
+            return self.names[name_id]
+        except IndexError:
+            return None
