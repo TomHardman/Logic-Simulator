@@ -113,6 +113,8 @@ class Scanner:
         else:
             self.advance()
 
+        return symbol
+
     def skip_spaces(self):
         """Skips ahead in the file until a non-blank space charcter"""
         while self.current_character.isspace():
