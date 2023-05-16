@@ -40,7 +40,7 @@ class Names:
 
     def __init__(self):
         """Initialise names list."""
-        self.error_code_count = 0  # how many error codes have been declared
+        self.error_code_count = 0  # How many error codes have been declared
         self.name_list = []
 
     def unique_error_codes(self, num_error_codes):
@@ -97,6 +97,6 @@ class Names:
         if name_id < 0:
             raise ValueError("Incorrect ID value")
         try:
-            return self.names[name_id]
+            return self.name_list[name_id]
         except IndexError:
             return None

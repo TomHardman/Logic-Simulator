@@ -35,7 +35,7 @@ class Network:
                     second_port_id): Connects the first device to the second
                                      device.
 
-    check_network(self): Checks if all inputs in the network are connected.
+    check_network(self): Checks if all inputs in  the network are connected.
 
     update_signal(self, signal, target): Updates the signal in the direction of
                                          the target.
