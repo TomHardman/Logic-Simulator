@@ -22,7 +22,7 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
-from gui import Gui
+from gui_skeleton import Gui
 
 
 def main(arg_list):
@@ -48,10 +48,6 @@ def main(arg_list):
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
 
-    '''devices = None
-    network = None
-    monitors = None'''
-
     for option, path in options:
         if option == "-h":  # print the usage message
             print(usage_message)
@@ -63,6 +59,23 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
+
+        elif option == '-su':  # run simulation of UI with artificial network
+            # names, devices, network, monitors =
+
+            # Initialise an instance of the userint.UserInterface() class
+            userint = UserInterface(names, devices, network, monitors)
+            userint.command_interface()
+
+        elif option == '-sg':  # run simulation of GUI with artificial network
+            # names, devices, network, monitors =
+
+            # Initialise an instance of the gui.Gui() class
+            app = wx.App()
+            gui = Gui("Logic Simulator", path, names, devices, network,
+                      monitors)
+            gui.Show(True)
+            app.MainLoop()
 
     if not options:  # no option given, use the graphical user interface
 
