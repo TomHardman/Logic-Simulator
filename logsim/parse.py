@@ -116,7 +116,7 @@ class Parser:
     def device_node(self, device):
         """Takes a device as an input and returns port_id"""
         if (device is not None and self.symbol == self.scanner.NAME and self.symbol.id):
-            if (self.symbol.id in device.inputs or self.symbol.id in device.outputs):
+            if (self.symbol.id in device.inputs or self.symbol.id in device.outputs or (self.names.get_name_string(self.symbol.id) == "O" and None in device.outputs)):
                 return self.symbol.id
         self.error()
 
@@ -174,7 +174,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             no_inputs , device_id = self.number_unamed()
             if not self.error:
-                self.devices.make_gate(device_id, "AND", no_inputs)
+                self.devices.make_gate(device_id, self.devices.AND, no_inputs)
         else:
             self.error()
         return True
@@ -185,7 +185,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             no_inputs , device_id = self.number_unamed()
             if not self.error:
-                self.devices.make_gate(device_id, "NAND", no_inputs)
+                self.devices.make_gate(device_id, self.devices.NAND, no_inputs)
         else:
             self.error()
         return True
@@ -196,7 +196,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             no_inputs , device_id = self.number_unamed()
             if not self.error:
-                self.devices.make_gate(device_id, "OR", no_inputs)
+                self.devices.make_gate(device_id, self.devices.OR, no_inputs)
         else:
             self.error()
         return True
@@ -207,7 +207,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             no_inputs , device_id = self.number_unamed()
             if not self.error:
-                self.devices.make_gate(device_id, "NOR", no_inputs)
+                self.devices.make_gate(device_id, self.devices.NOR, no_inputs)
         else:
             self.error()
         return True
