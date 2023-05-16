@@ -97,6 +97,6 @@ class Names:
         if name_id < 0:
             raise ValueError("Incorrect ID value")
         try:
-            return self.names[name_id]
+            return self.name_list[name_id]
         except IndexError:
             return None

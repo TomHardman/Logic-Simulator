@@ -2,18 +2,19 @@
 
 import pytest
 from names import Names
-from scanner import Scanner
+from scanner import Scanner, Symbol
+
 
 @pytest.fixture
 def new_scanner():
     names = Names()
-    newscanner = Scanner('scan_testinput.txt', names)
+    newscanner = Scanner('/Users/andrew/Documents/IIA Easter term projects/GF2 Software/Logic-Simulator/logsim/scan_testinput.txt', names)
     return newscanner
 
 def test_new_scanner(new_scanner):
 
-    assert type(new_scanner.symbol_type_list) == list
-    assert all(type(new_scanner.keywords_list)) == str
+    assert type(new_scanner.symbol_type_list) == range
+    assert all(isinstance(keyword,str) for keyword in new_scanner.keywords_list)
     assert new_scanner.keywords_list == ["CONNECT", "SWITCH",
                                         "AND", "NAND", "NOR", "DTYPE", "XOR"]
     assert len(new_scanner.symbol_type_list) == 7
@@ -22,12 +23,20 @@ def test_new_scanner(new_scanner):
 
 
 def test_get_position(new_scanner):
-
-    sym = new_scanner.input_file.read(1)
-    while sym:
+    arrows_list = []
+    sym = new_scanner.get_symbol()
+    counter = 1
+    while sym.type != new_scanner.EOF:
         sym = new_scanner.get_symbol()
+        print(sym.type)
+        counter+=1
+        if sym.type == 2:
+            arrows_list.append([sym.linenum, sym.linepos])
 
-    assert new_scanner.names == ['G1', 'SW1', 'SW2']
+    print(counter)
+
+    assert new_scanner.names.name_list == ['CONNECT', 'SWITCH', 'AND', 'NAND', 'NOR', 'DTYPE', 'XOR', 'G1', 'SW1', 'SW2']
+    assert arrows_list == [[4,15], [5,15]]
 
 
 
