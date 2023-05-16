@@ -59,7 +59,7 @@ class Scanner:
         self.keywords_list = ["CONNECT", "SWITCH",
                               "AND", "NAND", "NOR", "DTYPE", "XOR"]
         [self.CONNECT_ID, self.SWITCH_ID, self.AND_ID, self.NAND_ID, self.NOR_ID,
-            self.DTYPE_ID, self.XOR_ID] = self.lookup(self.keywords_list)
+            self.DTYPE_ID, self.XOR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
 
         self.input_file = self.open_file(path)
@@ -73,7 +73,7 @@ class Scanner:
         #   5   NAME
         #   6   EOF
 
-    def open_file(path):
+    def open_file(self, path):
         """Open and return the file specified by path."""
         f = open(path, 'r')
         return f
