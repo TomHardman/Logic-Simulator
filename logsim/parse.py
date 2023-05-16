@@ -65,7 +65,11 @@ class Parser:
             elif self.symbol.id == self.scanner.NOR_ID:
                 self.nor_keyword()
             elif self.symbol.id == self.scanner.SWITCH_ID:
-                self.switch()
+                self.switch_keyword()
+            elif self.symbol.id == self.scanner.XOR_ID:
+                self.xor_keyword()
+            elif self.symbol.id == self.scanner.DTYPE_ID:
+                self.dtype_keyword()
             else:
                 self.error()
             if self.symbol.type != self.scanner.EOF:
@@ -195,7 +199,7 @@ class Parser:
         return True
 
     def nand_keyword(self):
-        """Checks for the NAND keyword and creates and gate"""
+        """Checks for the NAND keyword and creates nand gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.NAND_ID):
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
@@ -206,7 +210,7 @@ class Parser:
         return True
 
     def or_keyword(self):
-        """Checks for the NAND keyword and creates and gate"""
+        """Checks for the OR keyword and creates or gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.OR_ID):
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
@@ -217,7 +221,7 @@ class Parser:
         return True
 
     def nor_keyword(self):
-        """Checks for the NAND keyword and creates and gate"""
+        """Checks for the NOR keyword and creates nor gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.NOR_ID):
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
@@ -227,14 +231,38 @@ class Parser:
             self.error()
         return True
 
-    def switch(self):
-        """Checks for the SWITCH keyword and creates and switch"""
+    def switch_keyword(self):
+        """Checks for the SWITCH keyword and creates switch"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.SWITCH_ID):
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_colon()
             if not self.error_bool:
                 # Default switch is at 0
                 self.devices.make_switch(device_id, 0)
+        else:
+            self.error()
+        return True
+
+    def xor_keyword(self):
+        """Checks for the XOR keyword and creates xor gate"""
+        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.XOR_ID):
+            self.symbol = self.scanner.get_symbol()
+            device_id = self.unnamed_colon()
+            if not self.error_bool:
+                # Default switch is at 0
+                self.devices.make_gate(device_id, self.devices.XOR, 2)
+        else:
+            self.error()
+        return True
+
+    def dtype_keyword(self):
+        """Checks for the XOR keyword and creates xor gate"""
+        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.DTYPE_ID):
+            self.symbol = self.scanner.get_symbol()
+            device_id = self.unnamed_colon()
+            if not self.error_bool:
+                # Default switch is at 0
+                self.devices.make_d_type(device_id)
         else:
             self.error()
         return True
