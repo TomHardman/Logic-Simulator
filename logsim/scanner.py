@@ -1,3 +1,5 @@
+import os
+
 """Read the circuit definition file and translate the characters into symbols.
 
 Used in the Logic Simulator project to read the characters in the definition
@@ -75,7 +77,13 @@ class Scanner:
 
     def open_file(self, path):
         """Open and return the file specified by path."""
+
         f = open(path, 'r')
+        if os.path.getsize(path) == 0: 
+            print('File is empty')
+            raise(OSError)
+            
+        
         return f
     
     def get_position(self, symbol):
