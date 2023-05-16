@@ -40,13 +40,19 @@ class Parser:
         self.device = devices
         self.network = network
         self.monitors = monitors
+        self.error = False
 
     def parse_network(self):
         """Parse the circuit definition file."""
         # For now just return True, so that userint and gui can run in the
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
-
+        
+        # Currently only checks for connect
+        while self.symbol != self.scanner.EOF:
+            self.error = False
+            self.symbol = self.scanner.get_symbol()
+            self.connect()
         return True
 
     def connect(self):
@@ -55,55 +61,67 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             connection = self.connection()
             # Create connection
+            if not self.error:
+                self.network.make_connection(*connection[0], *connection[1])
         else:
             self.error()
         return True
 
     def connection(self):
-        """Checks the symbosl for a valid connection and returns the 2 node points for a connection"""
+        """Checks the symbol for a valid connection and returns the 2 node points for a connection"""
         node1 = self.node()
-        self.symbol = self.scanner.get_symbol()
-        self.arrow()
-        self.symbol = self.scanner.get_symbol()
-        node2 = self.node()
+        node2 = None
+        if not self.error:
+            self.symbol = self.scanner.get_symbol()
+            self.arrow()
+        if not self.error:
+            self.symbol = self.scanner.get_symbol()
+            node2 = self.node()
         return [node1, node2]
 
     def node(self):
-        """Returns the parsed node or calls error() if incorrect"""
-        device = self.device()
-        self.symbol = self.scanner.get_symbol()
-        self.dot()
-        self.symbol = self.scanner.get_symbol()
-        node = self.device_node(device)
-        return node
+        """Returns the device_id and port_id or calls error() if incorrect"""
+        device, device_id = self.device()
+        node_id = None
+        if not self.error:
+            self.symbol = self.scanner.get_symbol()
+            self.dot()
+        if not self.error:
+            self.symbol = self.scanner.get_symbol()
+            node_id = self.device_node(device)
+        return [device_id, node_id]
 
     def device(self):
-        """Checks to see if the symbol corresponds to a valid device and returns a pointer to the device"""
+        """Returns the device and device_id"""
         # Add if clause to check device exists
-        if (self.symbol.type == self.scanner.NAME):
-            # Bugs assosiated with same name as keyword?
-            # Return the device pointer
-            return
+        if (self.symbol.type == self.scanner.NAME and self.symbol.id is not None and self.devies.get_device(self.symbol.id)):
+            return [self.devies.get_device(self.symbol.id), self.symbol.id]
         else:
             self.error()
 
     def device_node(self, device):
-        """Takes a device as an input and checks if the next symbol corresponds to valid node"""
-        return
+        """Takes a device as an input and returns port_id"""
+        if (device is not None and self.symbol == self.scanner.NAME and self.symbol.id):
+            if (self.symbol.id in device.inputs or self.symbol.id in device.outputs):
+                return self.symbol.id
+        self.error()
 
     def arrow(self):
         """Checks if a symbol is an arrow"""
-        if self.symbol == self.scanner.ARROW_ID:
+        if self.symbol == self.scanner.ARROW:
             return
         else:
             self.error()
 
     def dot(self):
         """Checks if a symbol is a dot"""
-        if self.symbol == self.scanner.DOT_ID:
+        if self.symbol == self.scanner.DOT:
             return
         else:
             self.error()
 
     def error(self):
-        return
+        """Adds error to count and skips to next semicolon/EOF"""
+        self.error = True
+        while (self.symbol != self.scanner.SEMICOLON and self.symbol != self.scanner.EOF):
+            self.symbol = self.scanner.get_symbol()
