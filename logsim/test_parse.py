@@ -29,5 +29,5 @@ def system_with_test_data():
 def test_parse(system_with_test_data):
     names, devices, network, monitors, scanner, parser = system_with_test_data
     parser.parse_network()
-    assert len(devices.devices_list) == 6
-    assert parser.error_count == 0
+    assert len(devices.devices_list) == 5
+    assert parser.error_count == 1

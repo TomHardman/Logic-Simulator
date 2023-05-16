@@ -72,8 +72,6 @@ class Parser:
                 self.dtype_keyword()
             else:
                 self.error()
-            if self.symbol.type != self.scanner.EOF:
-                self.symbol = self.scanner.get_symbol()
 
         return True
 
@@ -83,7 +81,6 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             connection = self.connection()
             if not self.error_bool:
-                self.symbol = self.scanner.get_symbol()
                 self.semicolon()
             if not self.error_bool:
                 self.network.make_connection(*connection[0], *connection[1])
@@ -96,45 +93,48 @@ class Parser:
         node1 = self.node()
         node2 = None
         if not self.error_bool:
-            self.symbol = self.scanner.get_symbol()
             self.arrow()
         if not self.error_bool:
-            self.symbol = self.scanner.get_symbol()
             node2 = self.node()
         return [node1, node2]
 
     def node(self):
         """Returns the device_id and port_id or calls error() if incorrect"""
         device, device_id = self.device()
-        node_id = None
-        if not self.error_bool:
+        port_id = None
+        if not self.error_bool and self.symbol.type == self.scanner.DOT:
             self.symbol = self.scanner.get_symbol()
-            self.dot()
-        if not self.error_bool:
-            self.symbol = self.scanner.get_symbol()
-            node_id = self.device_node(device)
-        return [device_id, node_id]
+            port_id = self.device_port(device)
+        elif not self.error_bool and not None in device.outputs:
+            self.error()
+        return [device_id, port_id]
 
     def device(self):
         """Returns the device and device_id"""
         # Add if clause to check device exists
         if (self.symbol.type == self.scanner.NAME and self.symbol.id is not None and self.devices.get_device(self.symbol.id)):
-            return [self.devices.get_device(self.symbol.id), self.symbol.id]
+            device_id = self.symbol.id
+            device = self.devices.get_device(device_id)
+            self.symbol = self.scanner.get_symbol()
+            return [device, device_id]
         else:
             self.error()
             return [None, None]
 
-    def device_node(self, device):
+    def device_port(self, device):
         """Takes a device as an input and returns port_id"""
         if (device is not None and self.symbol.type == self.scanner.NAME and self.symbol.id is not None):
-            if (self.symbol.id in device.inputs or self.symbol.id in device.outputs or (self.names.get_name_string(self.symbol.id) == "O" and None in device.outputs)):
-                return self.symbol.id
+            if (self.symbol.id in device.inputs or self.symbol.id in device.outputs):
+                port_id = self.symbol.id
+                self.symbol = self.scanner.get_symbol()
+                return port_id
         self.error()
         return [None, None]
 
     def arrow(self):
         """Checks if a symbol is an arrow"""
         if self.symbol.type == self.scanner.ARROW:
+            self.symbol = self.scanner.get_symbol()
             return
         else:
             self.error()
@@ -142,6 +142,7 @@ class Parser:
     def dot(self):
         """Checks if a symbol is a dot"""
         if self.symbol.type == self.scanner.DOT:
+            self.symbol = self.scanner.get_symbol()
             return
         else:
             self.error()
@@ -149,6 +150,7 @@ class Parser:
     def semicolon(self):
         """Checks if a symbol is a dot"""
         if self.symbol.type == self.scanner.SEMICOLON:
+            self.symbol = self.scanner.get_symbol()
             return
         else:
             self.error()
@@ -156,14 +158,18 @@ class Parser:
     def number(self):
         """Checks and returns if a symbol is a number"""
         if (self.symbol.type == self.scanner.NUMBER):
-            return self.symbol.id
+            number_val = self.symbol.id
+            self.symbol = self.scanner.get_symbol()
+            return number_val
         else:
             self.error()
 
     def unnamed_device(self):
         """Checks name symbol does not correspond to named device and returns id"""
         if (self.symbol.type == self.scanner.NAME and not self.devices.get_device(self.symbol.id)):
-            return self.symbol.id
+            name_id = self.symbol.id
+            self.symbol = self.scanner.get_symbol()
+            return name_id
         else:
             self.error()
 
@@ -172,10 +178,8 @@ class Parser:
         device_id = None
         no_inputs = self.number()
         if not self.error_bool:
-            self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
         if not self.error_bool:
-            self.symbol = self.scanner.get_symbol()
             self.semicolon()
         return no_inputs, device_id
 
@@ -183,7 +187,6 @@ class Parser:
         """Check for an unnamed device/semicolon and returns ID"""
         device_id = self.unnamed_device()
         if not self.error_bool:
-            self.symbol = self.scanner.get_symbol()
             self.semicolon()
         return device_id
 
@@ -272,4 +275,6 @@ class Parser:
         self.error_bool = True
         self.error_count += 1
         while (self.symbol.type != self.scanner.SEMICOLON and self.symbol.type != self.scanner.EOF):
+            self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != self.scanner.EOF:
             self.symbol = self.scanner.get_symbol()
