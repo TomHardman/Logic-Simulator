@@ -303,20 +303,19 @@ class Gui(wx.Frame):
             main_sizer.Remove(self.side_sizer)
 
             # Recreate the side_sizer with the new configuration
-            side_sizerc = wx.BoxSizer(wx.VERTICAL)
-            side_sizerc.Add(self.text, 1, wx.TOP, 10)
-            side_sizerc.Add(self.spin, 1, wx.ALL, 5)
-            side_sizerc.Add(self.run_button, 1, wx.ALL, 5)
-            side_sizerc.Add(self.cont_button, 1, wx.ALL, 5)
-            side_sizerc.Add(self.text_box, 1, wx.ALL, 5)
+            side_sizer_c = wx.BoxSizer(wx.VERTICAL)
+            side_sizer_c.Add(self.text, 1, wx.TOP, 10)
+            side_sizer_c.Add(self.spin, 1, wx.ALL, 5)
+            side_sizer_c.Add(self.run_button, 1, wx.ALL, 5)
+            side_sizer_c.Add(self.cont_button, 1, wx.ALL, 5)
+            side_sizer_c.Add(self.text_box, 1, wx.ALL, 5)
 
             # Add the updated side_sizer back to main_sizer
-            main_sizer.Add(side_sizerc, 1, wx.ALL, 5)
+            main_sizer.Add(side_sizer_c, 1, wx.ALL, 5)
 
             self.Layout()
 
         self.first_run = True
-
 
     def on_text_box(self, event):
         """Handle the event when the user enters text."""
