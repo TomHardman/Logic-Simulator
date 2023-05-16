@@ -27,6 +27,8 @@ class Symbol:
         """Initialise symbol properties."""
         self.type = None
         self.id = None
+        self.linenum = None
+        self.linepos = None 
 
 
 class Scanner:
@@ -75,6 +77,18 @@ class Scanner:
         """Open and return the file specified by path."""
         f = open(path, 'r')
         return f
+    
+    def get_position(symbol, self):
+        """Gets position of symbol which file object is currently pointing at"""
+        position = self.input_file.tell()
+        self.input_file.seek(0)
+
+        contents = self.input_file.read(position)
+        linenum = contents.count('\n') + 1
+        linepos = position - contents.rfind('\n') - 1
+        
+        symbol.linenum = linenum
+        symbol.linepos = linepos
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
