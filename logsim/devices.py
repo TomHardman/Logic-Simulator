@@ -10,6 +10,7 @@ Devices - makes and stores all the devices in the logic network.
 """
 import random
 
+#test
 
 class Device:
 
