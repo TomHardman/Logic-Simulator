@@ -62,7 +62,7 @@ class Scanner:
             self.DTYPE_ID, self.XOR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
 
-        self.input_file = self.open_file(path)
+        self.current_character = self.input_file.read(1)
 
         # SYMBOLS
         #   0   .   - DOT

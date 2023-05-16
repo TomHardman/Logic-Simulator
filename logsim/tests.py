@@ -26,7 +26,7 @@ def test_get_position(new_scanner):
 
 def new_scanner():
     names = Names()
-    newscanner = Scanner('/Users/andrew/Documents/IIA Easter term projects/GF2 Software/Logic-Simulator/logsim/scan_testinput.txt', names)
+    newscanner = Scanner('logsim\scan_testinput.txt', names)
     return newscanner
 
 new_scannertest = new_scanner()

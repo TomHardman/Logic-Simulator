@@ -40,7 +40,7 @@ class Names:
 
     def __init__(self):
         """Initialise names list."""
-        self.error_code_count = 0  # how many error codes have been declared
+        self.error_code_count = 0  # How many error codes have been declared
         self.name_list = []
 
     def unique_error_codes(self, num_error_codes):
