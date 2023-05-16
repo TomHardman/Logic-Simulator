@@ -60,7 +60,9 @@ class Parser:
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.CONNECT_ID):
             self.symbol = self.scanner.get_symbol()
             connection = self.connection()
-            # Create connection
+            if not self.error:
+                self.symbol = self.scanner.get_symbol()
+                self.semicolon()
             if not self.error:
                 self.network.make_connection(*connection[0], *connection[1])
         else:
@@ -119,6 +121,48 @@ class Parser:
             return
         else:
             self.error()
+
+    def semicolon(self):
+        """Checks if a symbol is a dot"""
+        if self.symbol == self.scanner.SEMICOLON:
+            return
+        else:
+            self.error()
+
+    def number(self):
+        """Checks and returns if a symbol is a number"""
+        if (self.symbol.type == self.scanner.NUMBER):
+            return self.symbol.id
+        else:
+            self.error()
+
+    def unnamed_device(self):
+        """Checks name symbol does not correspond to named device and returns id"""
+        if (self.symbol.type == self.scanner.NAME and not self.devies.get_device(self.symbol.id)):
+            return self.symbol.id
+        else:
+            self.error()
+
+
+    def and_keyword(self):
+        """Checks for the AND keyword and creates and gate"""
+        if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.AND_ID):
+            self.symbol = self.scanner.get_symbol()
+            no_inputs = self.number()
+            if not self.error:
+                self.symbol = self.scanner.get_symbol()
+                device_id =  self.unnamed_device()
+            if not self.error:
+                self.symbol = self.scanner.get_symbol()
+                self.semicolon()
+            if not self.error:
+                self.devices.make_gate(device_id, "AND", no_inputs)
+        else:
+            self.error()
+        return True
+
+
+    
 
     def error(self):
         """Adds error to count and skips to next semicolon/EOF"""
