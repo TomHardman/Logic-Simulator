@@ -156,7 +156,7 @@ class Parser:
             self.error()
     
     def number_unnamed(self):
-        """Check for a number/unamed device/semicolon and returns value and ID"""
+        """Check for a number/unnamed device/semicolon and returns value and ID"""
         device_id = None
         no_inputs = self.number()
         if not self.error:
@@ -166,13 +166,20 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             self.semicolon()
         return no_inputs, device_id
-
+    
+    def unnamed_colon(self):
+        """Check for an unnamed device/semicolon and returns ID"""
+        device_id =  self.unnamed_device()
+        if not self.error:
+            self.symbol = self.scanner.get_symbol()
+            self.semicolon()
+        return  device_id
 
     def and_keyword(self):
         """Checks for the AND keyword and creates and gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.AND_ID):
             self.symbol = self.scanner.get_symbol()
-            no_inputs , device_id = self.number_unamed()
+            no_inputs , device_id = self.number_unnamed()
             if not self.error:
                 self.devices.make_gate(device_id, self.devices.AND, no_inputs)
         else:
@@ -183,7 +190,7 @@ class Parser:
         """Checks for the NAND keyword and creates and gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.NAND_ID):
             self.symbol = self.scanner.get_symbol()
-            no_inputs , device_id = self.number_unamed()
+            no_inputs , device_id = self.number_unnamed()
             if not self.error:
                 self.devices.make_gate(device_id, self.devices.NAND, no_inputs)
         else:
@@ -194,7 +201,7 @@ class Parser:
         """Checks for the NAND keyword and creates and gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.OR_ID):
             self.symbol = self.scanner.get_symbol()
-            no_inputs , device_id = self.number_unamed()
+            no_inputs , device_id = self.number_unnamed()
             if not self.error:
                 self.devices.make_gate(device_id, self.devices.OR, no_inputs)
         else:
@@ -205,9 +212,21 @@ class Parser:
         """Checks for the NAND keyword and creates and gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.NOR_ID):
             self.symbol = self.scanner.get_symbol()
-            no_inputs , device_id = self.number_unamed()
+            no_inputs , device_id = self.number_unnamed()
             if not self.error:
                 self.devices.make_gate(device_id, self.devices.NOR, no_inputs)
+        else:
+            self.error()
+        return True
+    
+    def switch(self):
+        """Checks for the SWITCH keyword and creates and switch"""
+        if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.SWITCH_ID):
+            self.symbol = self.scanner.get_symbol()
+            device_id = self.unnamed_colon()
+            if not self.error:
+                # Default switch is at 0
+                self.devices.make_switch(device_id, 0)
         else:
             self.error()
         return True
