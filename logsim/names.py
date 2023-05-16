@@ -41,6 +41,7 @@ class Names:
     def __init__(self):
         """Initialise names list."""
         self.error_code_count = 0  # how many error codes have been declared
+        self.name_list = []
 
     def unique_error_codes(self, num_error_codes):
         """Return a list of unique integer error codes."""
@@ -61,8 +62,8 @@ class Names:
         if not name_string:
             raise ValueError("Empty string")
 
-        if name_string in self.names:
-            return self.names.index(name_string)
+        if name_string in self.name_list:
+            return self.name_list.index(name_string)
         else:
             return None
 
@@ -79,11 +80,11 @@ class Names:
             if not name_string:
                 raise ValueError("Empty string")
 
-            if name_string in self.names:
-                id_list.append(self.names.index(name_string))
+            if name_string in self.name_list:
+                id_list.append(self.name_list.index(name_string))
             else:
-                self.names.append(name_string)
-                id_list.append(len(self.names) - 1)
+                self.name_list.append(name_string)
+                id_list.append(len(self.name_list) - 1)
         return id_list
 
     def get_name_string(self, name_id):
