@@ -54,8 +54,8 @@ class Scanner:
     def __init__(self, path, names):
         """Open specified file and initialise reserved words and IDs."""
         self.names = names
-        self.symbol_type_list = [self.DOT, self.SEMICOLON, self.ARROW,
-                                 self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(7)
+        self.symbol_type_list = [self.DOT, self.SEMICOLON, self.ARROW, self.COMMA,
+                                 self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(8)
         self.keywords_list = ["CONNECT", "SWITCH",
                               "AND", "NAND", "OR", "NOR", "DTYPE", "XOR"]
         [self.CONNECT_ID, self.SWITCH_ID, self.AND_ID, self.NAND_ID, self.OR_ID, self.NOR_ID,
@@ -63,6 +63,9 @@ class Scanner:
         self.current_character = ""
         self.input_file = self.open_file(path)
         self.current_character = self.input_file.read(1)
+
+        self.temp_queue = []
+        self.priority_queue = []
 
         # SYMBOLS
         #   0   .   - DOT
@@ -96,6 +99,9 @@ class Scanner:
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
 
+        if self.priority_queue:
+            return self.priority_queue.pop(0)
+
         symbol = Symbol()
         self.skip_spaces()
 
@@ -122,6 +128,9 @@ class Scanner:
 
         elif self.current_character == ".":
             symbol.type = self.DOT
+            self.advance()
+        elif self.current_character == ",":
+            symbol.type = self.COMMA
             self.advance()
 
         elif self.current_character == "":
