@@ -49,7 +49,7 @@ class Parser:
         # errors in the circuit definition file.
         
         # Currently only checks for connect
-        while self.symbol != self.scanner.EOF:
+        '''while self.symbol != self.scanner.EOF:
             self.error = False
             self.symbol = self.scanner.get_symbol()
             if self.symbol.id == self.scanner.CONNECT_ID:
@@ -63,7 +63,7 @@ class Parser:
             elif self.symbol.id == self.scanner.NOR_ID:
                 self.nor_keyword()
             else:
-                self.error()
+                self.error()'''
 
         return True
 

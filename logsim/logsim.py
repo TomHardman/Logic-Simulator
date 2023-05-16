@@ -23,6 +23,7 @@ from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
 from gui_skeleton import Gui
+from network_fixture import create_network_fixture
 
 
 def main(arg_list):
@@ -36,7 +37,7 @@ def main(arg_list):
                      "Command line user interface: logsim.py -c <file path>\n"
                      "Graphical user interface: logsim.py <file path>")
     try:
-        options, arguments = getopt.getopt(arg_list, "hc:")
+        options, arguments = getopt.getopt(arg_list, "hcug:")
     except getopt.GetoptError:
         print("Error: invalid command line arguments\n")
         print(usage_message)
@@ -60,15 +61,15 @@ def main(arg_list):
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
 
-        elif option == '-su':  # run simulation of UI with artificial network
-            # names, devices, network, monitors =
+        elif option == '-u':  # run simulation of UI with artificial network
+            names, devices, network, monitors = create_network_fixture()
 
             # Initialise an instance of the userint.UserInterface() class
             userint = UserInterface(names, devices, network, monitors)
             userint.command_interface()
 
-        elif option == '-sg':  # run simulation of GUI with artificial network
-            # names, devices, network, monitors =
+        elif option == '-g':  # run simulation of GUI with artificial network
+            names, devices, network, monitors = create_network_fixture()
 
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
