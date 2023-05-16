@@ -52,7 +52,19 @@ class Parser:
         while self.symbol != self.scanner.EOF:
             self.error = False
             self.symbol = self.scanner.get_symbol()
-            self.connect()
+            if self.symbol.id == self.scanner.CONNECT_ID:
+                self.connect()
+            elif self.symbol.id == self.scanner.AND_ID:
+                self.and_keyword()
+            elif self.symbol.id == self.scanner.NAND_ID:
+                self.nand_keyword()
+            elif self.symbol.id == self.scanner.OR_ID:
+                self.or_keyword()
+            elif self.symbol.id == self.scanner.NOR_ID:
+                self.nor_keyword()
+            else:
+                self.error()
+
         return True
 
     def connect(self):
@@ -142,26 +154,63 @@ class Parser:
             return self.symbol.id
         else:
             self.error()
+    
+    def number_unnamed(self):
+        """Check for a number/unamed device/semicolon and returns value and ID"""
+        device_id = None
+        no_inputs = self.number()
+        if not self.error:
+            self.symbol = self.scanner.get_symbol()
+            device_id =  self.unnamed_device()
+        if not self.error:
+            self.symbol = self.scanner.get_symbol()
+            self.semicolon()
+        return no_inputs, device_id
 
 
     def and_keyword(self):
         """Checks for the AND keyword and creates and gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.AND_ID):
             self.symbol = self.scanner.get_symbol()
-            no_inputs = self.number()
-            if not self.error:
-                self.symbol = self.scanner.get_symbol()
-                device_id =  self.unnamed_device()
-            if not self.error:
-                self.symbol = self.scanner.get_symbol()
-                self.semicolon()
+            no_inputs , device_id = self.number_unamed()
             if not self.error:
                 self.devices.make_gate(device_id, "AND", no_inputs)
         else:
             self.error()
         return True
-
-
+    
+    def nand_keyword(self):
+        """Checks for the NAND keyword and creates and gate"""
+        if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.NAND_ID):
+            self.symbol = self.scanner.get_symbol()
+            no_inputs , device_id = self.number_unamed()
+            if not self.error:
+                self.devices.make_gate(device_id, "NAND", no_inputs)
+        else:
+            self.error()
+        return True
+    
+    def or_keyword(self):
+        """Checks for the NAND keyword and creates and gate"""
+        if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.OR_ID):
+            self.symbol = self.scanner.get_symbol()
+            no_inputs , device_id = self.number_unamed()
+            if not self.error:
+                self.devices.make_gate(device_id, "OR", no_inputs)
+        else:
+            self.error()
+        return True
+    
+    def nor_keyword(self):
+        """Checks for the NAND keyword and creates and gate"""
+        if (self.symbol.type == self.scanner.KEYWORD and self.symbol_ID == self.scanner.NOR_ID):
+            self.symbol = self.scanner.get_symbol()
+            no_inputs , device_id = self.number_unamed()
+            if not self.error:
+                self.devices.make_gate(device_id, "NOR", no_inputs)
+        else:
+            self.error()
+        return True
     
 
     def error(self):
