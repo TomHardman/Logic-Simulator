@@ -61,7 +61,7 @@ class Scanner:
         [self.CONNECT_ID, self.SWITCH_ID, self.AND_ID, self.NAND_ID, self.NOR_ID,
             self.DTYPE_ID, self.XOR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
-
+        self.input_file = self.open_file(path)
         self.current_character = self.input_file.read(1)
 
         # SYMBOLS
@@ -78,14 +78,14 @@ class Scanner:
         f = open(path, 'r')
         return f
     
-    def get_position(symbol, self):
+    def get_position(self, symbol):
         """Gets position of symbol which file object is currently pointing at"""
         position = self.input_file.tell()
         self.input_file.seek(0)
 
         contents = self.input_file.read(position)
         linenum = contents.count('\n') + 1
-        linepos = position - contents.rfind('\n') - 1
+        linepos = position - contents.rfind('\n') - 2
         
         symbol.linenum = linenum
         symbol.linepos = linepos
