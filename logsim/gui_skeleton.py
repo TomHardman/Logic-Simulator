@@ -240,6 +240,9 @@ class Gui(wx.Frame):
         self.Centre()
         self.SetMenuBar(menuBar)
 
+        #Initial attributes
+        self.first_run = False
+
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self, devices, monitors)
 
@@ -247,6 +250,7 @@ class Gui(wx.Frame):
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
+        self.cont_button = wx.Button(self, wx.ID_ANY, "Continue")
         self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER)
         #self.panel = wx.Panel(self, wx.ID_ANY)
@@ -259,15 +263,15 @@ class Gui(wx.Frame):
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        side_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.side_sizer = wx.BoxSizer(wx.VERTICAL)
 
         main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
-        main_sizer.Add(side_sizer, 1, wx.ALL, 5)
+        main_sizer.Add(self.side_sizer, 1, wx.ALL, 5)
 
-        side_sizer.Add(self.text, 1, wx.TOP, 10)
-        side_sizer.Add(self.spin, 1, wx.ALL, 5)
-        side_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        side_sizer.Add(self.text_box, 1, wx.ALL, 5)
+        self.side_sizer.Add(self.text, 1, wx.TOP, 10)
+        self.side_sizer.Add(self.spin, 1, wx.ALL, 5)
+        self.side_sizer.Add(self.run_button, 1, wx.ALL, 5)
+        self.side_sizer.Add(self.text_box, 1, wx.ALL, 5)
 
         self.SetSizeHints(600, 600)
         self.SetSizer(main_sizer)
@@ -291,6 +295,28 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the run button."""
         text = "Run button pressed."
         self.canvas.render(text)
+
+        if not self.first_run:
+            main_sizer = self.GetSizer()  # Get the parent sizer
+
+            # Remove the existing side_sizer from main_sizer
+            main_sizer.Remove(self.side_sizer)
+
+            # Recreate the side_sizer with the new configuration
+            side_sizerc = wx.BoxSizer(wx.VERTICAL)
+            side_sizerc.Add(self.text, 1, wx.TOP, 10)
+            side_sizerc.Add(self.spin, 1, wx.ALL, 5)
+            side_sizerc.Add(self.run_button, 1, wx.ALL, 5)
+            side_sizerc.Add(self.cont_button, 1, wx.ALL, 5)
+            side_sizerc.Add(self.text_box, 1, wx.ALL, 5)
+
+            # Add the updated side_sizer back to main_sizer
+            main_sizer.Add(side_sizerc, 1, wx.ALL, 5)
+
+            self.Layout()
+
+        self.first_run = True
+
 
     def on_text_box(self, event):
         """Handle the event when the user enters text."""

@@ -49,10 +49,10 @@ class Parser:
         # errors in the circuit definition file.
         
         # Currently only checks for connect
-        while self.symbol != self.scanner.EOF:
+        '''while self.symbol != self.scanner.EOF:
             self.error = False
             self.symbol = self.scanner.get_symbol()
-            self.connect()
+            self.connect()'''
         return True
 
     def connect(self):

@@ -43,14 +43,10 @@ def main(arg_list):
         sys.exit()
 
     # Initialise instances of the four inner simulator classes
-    # names = Names()
-    # devices = Devices(names)
-    # network = Network(names, devices)
-    # monitors = Monitors(names, devices, network)
-    names = None
-    devices = None
-    network = None
-    monitors = None
+    names = Names()
+    devices = Devices(names)
+    network = Network(names, devices)
+    monitors = Monitors(names, devices, network)
 
     for option, path in options:
         if option == "-h":  # print the usage message
@@ -63,6 +59,23 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
+
+        elif option == '-su':  # run simulation of UI with artificial network
+            # names, devices, network, monitors =
+
+            # Initialise an instance of the userint.UserInterface() class
+            userint = UserInterface(names, devices, network, monitors)
+            userint.command_interface()
+
+        elif option == '-sg':  # run simulation of GUI with artificial network
+            # names, devices, network, monitors =
+
+            # Initialise an instance of the gui.Gui() class
+            app = wx.App()
+            gui = Gui("Logic Simulator", path, names, devices, network,
+                      monitors)
+            gui.Show(True)
+            app.MainLoop()
 
     if not options:  # no option given, use the graphical user interface
 
