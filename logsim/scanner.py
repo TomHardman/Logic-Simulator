@@ -30,7 +30,7 @@ class Symbol:
         self.type = None
         self.id = None
         self.linenum = None
-        self.linepos = None 
+        self.linepos = None
 
 
 class Scanner:
@@ -59,8 +59,8 @@ class Scanner:
         self.symbol_type_list = [self.DOT, self.SEMICOLON, self.ARROW,
                                  self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(7)
         self.keywords_list = ["CONNECT", "SWITCH",
-                              "AND", "NAND", "NOR", "DTYPE", "XOR"]
-        [self.CONNECT_ID, self.SWITCH_ID, self.AND_ID, self.NAND_ID, self.NOR_ID,
+                              "AND", "NAND", "OR", "NOR", "DTYPE", "XOR"]
+        [self.CONNECT_ID, self.SWITCH_ID, self.AND_ID, self.NAND_ID, self.OR_ID, self.NOR_ID,
             self.DTYPE_ID, self.XOR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
         self.input_file = self.open_file(path)
@@ -85,7 +85,10 @@ class Scanner:
             
         
         return f
-    
+
+    def blank_symbol(self):
+        return Symbol()
+
     def get_position(self, symbol):
         """Gets position of symbol which file object is currently pointing at"""
         position = self.input_file.tell()
@@ -94,7 +97,7 @@ class Scanner:
         contents = self.input_file.read(position)
         linenum = contents.count('\n') + 1
         linepos = position - contents.rfind('\n') - 2
-        
+
         symbol.linenum = linenum
         symbol.linepos = linepos
 
@@ -156,11 +159,11 @@ class Scanner:
 
     def get_number(self):
         """Returns number following on from current charcter"""
-        if not self.current_character.isnum():
+        if not self.current_character.isdigit():
             raise ValueError("Charcter is not a digit")
 
         num_string = ""
-        while self.current_character.digit():
+        while self.current_character.isdigit():
             num_string += self.current_character
             self.current_character = self.input_file.read(1)
 

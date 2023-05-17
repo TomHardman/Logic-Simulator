@@ -1,4 +1,4 @@
-#tests for scanner functions
+# tests for scanner functions
 
 import pytest
 from names import Names
@@ -8,18 +8,19 @@ from scanner import Scanner, Symbol
 @pytest.fixture
 def new_scanner():
     names = Names()
-    newscanner = Scanner('/Users/andrew/Documents/IIA Easter term projects/GF2 Software/Logic-Simulator/logsim/scan_testinput.txt', names)
+    newscanner = Scanner('logsim\scan_test_input.txt', names)
     return newscanner
+
 
 def test_new_scanner(new_scanner):
 
     assert type(new_scanner.symbol_type_list) == range
-    assert all(isinstance(keyword,str) for keyword in new_scanner.keywords_list)
+    assert all(isinstance(keyword, str)
+               for keyword in new_scanner.keywords_list)
     assert new_scanner.keywords_list == ["CONNECT", "SWITCH",
-                                        "AND", "NAND", "NOR", "DTYPE", "XOR"]
+                                         "AND", "NAND", "NOR", "DTYPE", "XOR"]
     assert len(new_scanner.symbol_type_list) == 7
     assert new_scanner.current_character == 'N'
-
 
 
 def test_get_position(new_scanner):
