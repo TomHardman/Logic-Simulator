@@ -8,22 +8,26 @@ from parse import Parser
 from scanner import Scanner
 from monitors import Monitors
 
+
 @pytest.fixture
-def network_with_devices():
+def system_with_test_data():
     """Return a Network class instance with three devices in the network."""
     names = Names()
     devices = Devices(names)
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
 
-    [SW1_ID, SW2_ID, OR1_ID] = names.lookup(["Sw1", "Sw2", "Or1"])
+    path = "logsim\parse_test_input.txt"
 
-    # Add devices
-    devices.make_device(SW1_ID, devices.SWITCH, 0)
-    devices.make_device(SW2_ID, devices.SWITCH, 0)
-    devices.make_device(OR1_ID, devices.OR, 2)
+    scanner = Scanner(path, names)
+    parser = Parser(names, devices, network, monitors, scanner)
 
-    return new_network
+    return [names, devices, network, monitors, scanner, parser]
 
 
-
+# @pytest.mark.timeout(5)
+def test_parse(system_with_test_data):
+    names, devices, network, monitors, scanner, parser = system_with_test_data
+    parser.parse_network()
+    assert len(devices.devices_list) == 5
+    assert parser.error_count == 2
