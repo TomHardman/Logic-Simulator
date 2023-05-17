@@ -12,6 +12,7 @@ import wx
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 
+
 from names import Names
 from devices import Devices
 from network import Network
@@ -204,8 +205,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GLUT.glutBitmapCharacter(font, ord(character))
 
 
-
-class Gui(wx.Frame):
+class Gui_skeleton(wx.Frame):
     """Configure the main window and all the widgets.
 
     This class provides a graphical user interface for the Logic Simulator and
@@ -241,7 +241,7 @@ class Gui(wx.Frame):
         self.Centre()
         self.SetMenuBar(menuBar)
 
-        #Initial attributes
+        # Initial attributes
         self.first_run = False
 
         # Canvas for drawing signals
@@ -254,19 +254,21 @@ class Gui(wx.Frame):
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
         self.cont_button = wx.Button(self, wx.ID_ANY, "Continue")
-        #self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    #style=wx.TE_PROCESS_ENTER)
+        # self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
+        # style=wx.TE_PROCESS_ENTER)
 
         self.text2 = wx.StaticText(self, wx.ID_ANY, "Configure Switches")
-        self.switch_selector = wx.ComboBox(self, choices=choices, style=wx.CB_READONLY, name='Switch')  # widgets for setting switches
-        self.checkbox = wx.CheckBox(self, label="Switch High", style=wx.CHK_UNCHECKED)
+        self.switch_selector = wx.ComboBox(
+            self, choices=choices, style=wx.CB_READONLY, name='Switch')  # widgets for setting switches
+        self.checkbox = wx.CheckBox(
+            self, label="Switch High", style=wx.CHK_UNCHECKED)
         self.checkbox.Enable(True)
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
-        #self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
+        # self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -278,7 +280,7 @@ class Gui(wx.Frame):
         self.side_sizer.Add(self.text, 1, wx.TOP, 10)
         self.side_sizer.Add(self.spin, 1, wx.ALL, 5)
         self.side_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        #self.side_sizer.Add(self.text_box, 1, wx.ALL, 5)
+        # self.side_sizer.Add(self.text_box, 1, wx.ALL, 5)
 
         self.side_sizer.Add(self.text2, 1, wx.ALL, 5)
         self.side_sizer.Add(self.switch_selector, 1, wx.ALL, 5)

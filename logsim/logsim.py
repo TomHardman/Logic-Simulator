@@ -23,7 +23,7 @@ from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
 from gui import Gui
-from gui_exp import Gui_exp
+from gui_skeleton import Gui_skeleton
 from network_fixture import create_network_fixture
 
 
@@ -38,7 +38,7 @@ def main(arg_list):
                      "Command line user interface: logsim.py -c <file path>\n"
                      "Graphical user interface: logsim.py <file path>")
     try:
-        options, arguments = getopt.getopt(arg_list, "hcug:")
+        options, arguments = getopt.getopt(arg_list, "hcugt:")
     except getopt.GetoptError:
         print("Error: invalid command line arguments\n")
         print(usage_message)
@@ -76,6 +76,15 @@ def main(arg_list):
             app = wx.App()
             gui = Gui("Logic Simulator", path, names, devices, network,
                       monitors)
+            gui.Show(True)
+            app.MainLoop()
+        elif option == '-t':  # Run simulation of Drag and drop
+            names, devices, network, monitors = create_network_fixture()
+
+            # Initialise an instance of the gui.Gui() class
+            app = wx.App()
+            gui = Gui_skeleton("Logic Simulator", path, names, devices, network,
+                               monitors)
             gui.Show(True)
             app.MainLoop()
 

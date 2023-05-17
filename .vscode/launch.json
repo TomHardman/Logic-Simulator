@@ -13,6 +13,16 @@
                 "-v",
                 "logsim/test_parse.py"
             ]
+        },
+        {
+            "name": "Run GUI",
+            "type": "python",
+            "request": "launch",
+            "program": "logsim\\logsim.py",
+            "args": [
+                "-t",
+                "avhaava"
+            ]
         }
     ]
 }

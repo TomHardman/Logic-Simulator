@@ -376,7 +376,6 @@ class Parser:
 
     def monitor_keyword(self):
         """Checks for MONITOR keyword and creates monitor"""
-        # Possible error if port is an input
         self.scanner.temp_queue.append(self.symbol)
         self.symbol = self.scanner.get_symbol()
         device_id, port_id = self.node()
