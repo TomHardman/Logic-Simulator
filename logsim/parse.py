@@ -329,7 +329,7 @@ class Parser:
         return True
 
     def dtype_keyword(self):
-        """Checks for the XOR keyword and creates xor gate"""
+        """Checks for the DTYPE keyword and creates Dtype gate"""
         if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.DTYPE_ID):
             self.scanner.temp_queue.append(self.symbol)
             self.symbol = self.scanner.get_symbol()
