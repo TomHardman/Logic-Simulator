@@ -18,8 +18,8 @@ def test_get_position(new_scanner):
             arrows_list.append([sym.linenum, sym.linepos])
 
        
-    print(counter)
-    print(arrows_list)
+    #print(counter)
+    #print(arrows_list)
 
 def new_scanner():
     names = Names()
@@ -28,7 +28,7 @@ def new_scanner():
 
 new_scannertest = new_scanner()
 
-print(test_get_position(new_scannertest))
+#print(test_get_position(new_scannertest))
 #print(new_scannertest.input_file.read())
 
 
@@ -43,3 +43,33 @@ def get_position(self, symbol):
     
     symbol.linenum = linenum
     symbol.linepos = linepos
+
+def testquery(new_scanner):
+
+    seen = {}
+    sym = new_scanner.get_symbol()
+    verdict = True
+    while sym.type != new_scanner.EOF:
+        sym = new_scanner.get_symbol()
+
+        if new_scanner.current_character.isalpha():
+       
+            symname = new_scanner.get_name()
+            if symname not in new_scanner.keywords_list:
+                sym.type = new_scanner.NAME
+                [sym.id] = new_scanner.names.lookup([symname])
+            if sym.type == new_scanner.NAME:
+                if symname not in seen:
+                    seen[symname] = sym.id
+                
+                elif symname in seen:
+                    if seen[symname] != new_scanner.names.query(symname):
+                        verdict = False
+                    print(symname)
+                print(symname, new_scanner.names.query(symname))  
+            
+        print(seen)
+            
+    return verdict
+
+print(testquery(new_scannertest))
