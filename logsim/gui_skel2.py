@@ -204,6 +204,26 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GLUT.glutBitmapCharacter(font, ord(character))
 
 
+class ToggleButtonPanel(wx.ScrolledWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Create a sizer to hold the toggle buttons
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Add toggle buttons to the sizer
+        for i in range(5):
+            toggle_button = wx.ToggleButton(self, label=f"Toggle Button {i+1}")
+            self.sizer.Add(toggle_button, 0, wx.ALL, 5)
+
+        # Set the sizer for the panel
+        self.SetSizer(self.sizer)
+        self.SetScrollRate(0, 20)  # Set scrolling rate for both directions
+
+        # Fit the panel contents and update scrollbars
+        self.sizer.Fit(self)
+        self.SetVirtualSize(self.sizer.GetMinSize())
+
 
 class Gui(wx.Frame):
     """Configure the main window and all the widgets.
@@ -247,26 +267,21 @@ class Gui(wx.Frame):
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self, devices, monitors)
 
-        choices = ['SW1', 'SW2', 'SW3']
-
         # Configure the widgets
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
         self.cont_button = wx.Button(self, wx.ID_ANY, "Continue")
-        #self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    #style=wx.TE_PROCESS_ENTER)
+        self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
+                                    style=wx.TE_PROCESS_ENTER)
+        self.toggle_button_panel = ToggleButtonPanel()
 
-        self.text2 = wx.StaticText(self, wx.ID_ANY, "Configure Switches")
-        self.switch_selector = wx.ComboBox(self, choices=choices, style=wx.CB_READONLY, name='Switch')  # widgets for setting switches
-        self.checkbox = wx.CheckBox(self, label="Switch High", style=wx.CHK_UNCHECKED)
-        self.checkbox.Enable(True)
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
-        #self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
+        self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -278,11 +293,8 @@ class Gui(wx.Frame):
         self.side_sizer.Add(self.text, 1, wx.TOP, 10)
         self.side_sizer.Add(self.spin, 1, wx.ALL, 5)
         self.side_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        #self.side_sizer.Add(self.text_box, 1, wx.ALL, 5)
-
-        self.side_sizer.Add(self.text2, 1, wx.ALL, 5)
-        self.side_sizer.Add(self.switch_selector, 1, wx.ALL, 5)
-        self.side_sizer.Add(self.checkbox, 1, wx.ALL, 5)
+        self.side_sizer.Add(self.text_box, 1, wx.ALL, 5)
+        #self.side_sizer.Add(self.toggle_button_panel)
 
         self.SetSizeHints(600, 600)
         self.SetSizer(main_sizer)
@@ -319,9 +331,7 @@ class Gui(wx.Frame):
             side_sizer_c.Add(self.spin, 1, wx.ALL, 5)
             side_sizer_c.Add(self.run_button, 1, wx.ALL, 5)
             side_sizer_c.Add(self.cont_button, 1, wx.ALL, 5)
-            side_sizer_c.Add(self.text2, 1, wx.ALL, 5)
-            side_sizer_c.Add(self.switch_selector, 1, wx.ALL, 5)
-            side_sizer_c.Add(self.checkbox, 1, wx.ALL, 5)
+            side_sizer_c.Add(self.text_box, 1, wx.ALL, 5)
 
             # Add the updated side_sizer back to main_sizer
             main_sizer.Add(side_sizer_c, 1, wx.ALL, 5)
@@ -335,3 +345,5 @@ class Gui(wx.Frame):
         text_box_value = self.text_box.GetValue()
         text = "".join(["New text box value: ", text_box_value])
         self.canvas.render(text)
+
+

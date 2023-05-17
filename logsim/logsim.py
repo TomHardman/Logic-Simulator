@@ -22,7 +22,8 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
-from gui_skeleton import Gui
+from gui_skel2 import Gui
+from gui_exp import Gui_exp
 from network_fixture import create_network_fixture
 
 
@@ -73,7 +74,7 @@ def main(arg_list):
 
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
-            gui = Gui("Logic Simulator", path, names, devices, network,
+            gui = Gui_exp("Logic Simulator", path, names, devices, network,
                       monitors)
             gui.Show(True)
             app.MainLoop()
