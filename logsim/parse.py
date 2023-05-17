@@ -43,6 +43,9 @@ class Parser:
         self.error_bool = False
         self.error_count = 0
 
+        [self.NAME_EXPECTED, self.SEMICOLON_EXPECTED, self.KEYWORD_EXPECTED,
+            self.NUMBER_EXPECTED] = self.names.unique_error_codes(4)
+
     def parse_network(self):
         """Parse the circuit definition file."""
         # For now just return True, so that userint and gui can run in the
@@ -69,6 +72,10 @@ class Parser:
                 self.xor_keyword()
             elif self.symbol.id == self.scanner.DTYPE_ID:
                 self.dtype_keyword()
+            elif self.symbol.id == self.scanner.MONITOR_ID:
+                self.monitor_keyword()
+            elif self.symbol.id == self.scanner.CLOCK_ID:
+                self.clock_keyword()
             else:
                 self.error()
 
@@ -343,6 +350,31 @@ class Parser:
         else:
             self.error()
         return True
+
+    def monitor_keyword(self):
+        """Checks for MONITOR keyword and creates monitor"""
+        # Possible error if port is an input
+        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.MONITOR_ID):
+            self.scanner.temp_queue.append(self.symbol)
+            self.symbol = self.scanner.get_symbol()
+            device_id, port_id = self.node()
+            if not self.error_bool:
+                self.monitors.make_monitor(device_id, port_id)
+
+            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
+                self.symbol = self.scanner.get_symbol()
+                device_id, port_id = self.node()
+                if not self.error_bool:
+                    self.monitors.make_monitor(device_id, port_id)
+
+            if not self.error_bool:
+                self.semicolon()
+        else:
+            self.error()
+        return True
+
+    def clock_keyword(self):
+        pass
 
     def error(self,):
         """Adds error to count and skips to next semicolon/EOF"""
