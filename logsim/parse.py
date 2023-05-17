@@ -44,7 +44,7 @@ class Parser:
         self.error_count = 0
 
         [self.NAME_EXPECTED, self.SEMICOLON_EXPECTED, self.KEYWORD_EXPECTED,
-            self.NUMBER_EXPECTED, self.ARROW_EXPECTED] = self.names.unique_error_codes(4)
+            self.NUMBER_EXPECTED, self.ARROW_EXPECTED] = self.names.unique_error_codes(5)
 
     def parse_network(self):
         """Parse the circuit definition file."""
@@ -79,7 +79,10 @@ class Parser:
             else:
                 self.error(self.KEYWORD_EXPECTED)
 
-        return True
+        if self.error_count == 0:
+            return True
+        else:
+            return False
 
     def connection(self):
         """Checks the symbol for a valid connection and returns the 2 node points for a connection"""
@@ -138,7 +141,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             return
         else:
-            self.error(self.ARROW_EXPEXTED)
+            self.error(self.ARROW_EXPECTED)
 
     def semicolon(self):
         """Checks if a symbol is a dot"""
@@ -183,14 +186,19 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         connection = self.connection()
         if not self.error_bool:
-            self.network.make_connection(*connection[0], *connection[1])
+            error_type = self.network.make_connection(
+                *connection[0], *connection[1])
+            if error_type != self.network.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             connection = self.connection()
             if not self.error_bool:
-                self.network.make_connection(
+                error_type = self.network.make_connection(
                     *connection[0], *connection[1])
+                if error_type != self.network.NO_ERROR:
+                    self.error(error_type)
 
         if not self.error_bool:
             self.semicolon()
@@ -202,14 +210,19 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         no_inputs, device_id = self.number_unnamed()
         if not self.error_bool:
-            self.devices.make_gate(device_id, self.devices.AND, no_inputs)
+            error_type = self.devices.make_device(
+                device_id, self.devices.AND, no_inputs)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_gate(
+                error_type = self.devices.make_device(
                     device_id, self.devices.AND, no_inputs)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
         return True
@@ -220,14 +233,19 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         no_inputs, device_id = self.number_unnamed()
         if not self.error_bool:
-            self.devices.make_gate(device_id, self.devices.NAND, no_inputs)
+            error_type = self.devices.make_device(
+                device_id, self.devices.NAND, no_inputs)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_gate(
+                error_type = self.devices.make_device(
                     device_id, self.devices.NAND, no_inputs)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
         return True
@@ -238,14 +256,19 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         no_inputs, device_id = self.number_unnamed()
         if not self.error_bool:
-            self.devices.make_gate(device_id, self.devices.OR, no_inputs)
+            error_type = self.devices.make_device(
+                device_id, self.devices.OR, no_inputs)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_gate(
+                error_type = self.devices.make_device(
                     device_id, self.devices.OR, no_inputs)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
 
@@ -257,14 +280,19 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         no_inputs, device_id = self.number_unnamed()
         if not self.error_bool:
-            self.devices.make_gate(device_id, self.devices.NOR, no_inputs)
+            error_type = self.devices.make_device(
+                device_id, self.devices.NOR, no_inputs)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_gate(
+                error_type = self.devices.make_device(
                     device_id, self.devices.NOR, no_inputs)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
         return True
@@ -273,17 +301,23 @@ class Parser:
         """Checks for the SWITCH keyword and creates switch"""
         self.scanner.temp_queue.append(self.symbol)
         self.symbol = self.scanner.get_symbol()
-        device_id = self.unnamed_device()
+        state, device_id = self.number_unnamed()
         if not self.error_bool:
             # Default switch is at 0
-            self.devices.make_switch(device_id, 0)
+            error_type = self.devices.make_device(
+                device_id, self.devices.SWITCH, state)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
-            device_id = self.unnamed_device()
+            state, device_id = self.number_unnamed()
             if not self.error_bool:
                 # Default switch is at 0
-                self.devices.make_switch(device_id, 0)
+                error_type = self.devices.make_device(
+                    device_id, self.devices.SWITCH, state)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
 
@@ -296,14 +330,19 @@ class Parser:
         device_id = self.unnamed_device()
         if not self.error_bool:
             # Default switch is at 0
-            self.devices.make_gate(device_id, self.devices.XOR, 2)
+            error_type = self.devices.make_device(device_id, self.devices.XOR)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
             if not self.error_bool:
                 # Default switch is at 0
-                self.devices.make_gate(device_id, self.devices.XOR, 2)
+                error_type = self.devices.make_device(
+                    device_id, self.devices.XOR)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
 
@@ -316,14 +355,20 @@ class Parser:
         device_id = self.unnamed_device()
         if not self.error_bool:
             # Default switch is at 0
-            self.devices.make_d_type(device_id)
+            error_type = self.devices.make_device(
+                device_id, self.devices.DTYPE)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
             if not self.error_bool:
                 # Default switch is at 0
-                self.devices.make_d_type(device_id)
+                error_type = self.devices.make_device(
+                    device_id, self.devices.DTYPE)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
 
         if not self.error_bool:
             self.semicolon()
@@ -336,13 +381,17 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         device_id, port_id = self.node()
         if not self.error_bool:
-            self.monitors.make_monitor(device_id, port_id)
+            error_type = self.monitors.make_monitor(device_id, port_id)
+            if error_type != self.monitors.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             device_id, port_id = self.node()
             if not self.error_bool:
-                self.monitors.make_monitor(device_id, port_id)
+                error_type = self.monitors.make_monitor(device_id, port_id)
+                if error_type != self.monitors.NO_ERROR:
+                    self.error(error_type)
 
         if not self.error_bool:
             self.semicolon()
@@ -354,13 +403,15 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         half_period, device_id = self.number_unnamed()
         if not self.error_bool:
-            self.devices.make_clock(device_id, half_period)
+            self.devices.make_device(
+                device_id, self.devices.CLOCK, half_period)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             half_period, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_clock(device_id, half_period)
+                self.devices.make_device(
+                    device_id, self.devices.CLOCK, half_period)
         if not self.error_bool:
             self.semicolon()
         return True
