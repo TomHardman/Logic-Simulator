@@ -1,5 +1,6 @@
 """Test the parse module."""
 import pytest
+import os
 
 from names import Names
 from devices import Devices
@@ -7,7 +8,6 @@ from network import Network
 from parse import Parser
 from scanner import Scanner
 from monitors import Monitors
-
 
 @pytest.fixture
 def system_with_test_data():
@@ -17,7 +17,8 @@ def system_with_test_data():
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
 
-    path = "logsim\parse_test_input.txt"
+    path = 'logsim/parse_test_input.txt'
+
 
     scanner = Scanner(path, names)
     parser = Parser(names, devices, network, monitors, scanner)

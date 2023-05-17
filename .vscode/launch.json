@@ -13,7 +13,7 @@
                 "-s",
                 "-v",
                 "-x",
-                "logsim\\test_parse.py"
+                "logsim/test_parse.py"
             ]
         }
     ]
