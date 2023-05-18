@@ -21,6 +21,18 @@ from scanner import Scanner
 from parse import Parser
 
 
+def draw_circle(r, x, y, color):
+    num_segments = 100
+    GL.glColor3f(*color)
+    GL.glBegin(GL.GL_TRIANGLE_FAN)
+    GL.glVertex2f(x, y)
+    for angle in np.linspace(0, 2 * np.pi, num_segments):
+        dx = r * np.cos(angle)
+        dy = r * np.sin(angle)
+        GL.glVertex2f(x + dx, y + dy)
+    GL.glEnd()
+
+
 class And_gate:
     """Creates an AND gate for animation"""
 
@@ -28,32 +40,51 @@ class And_gate:
         self.x = x
         self.y = y
         self.clicked = False
+        self.inputs = 6
 
     def render(self):
+
+        box_width = 45
+        box_half_height = 30
+        port_radius = 7
+
         GL.glColor3f(0.212, 0.271, 0.310)
-        GL.glBegin(GL.GL_QUADS)
-        GL.glVertex2f(self.x - 10, self.y-10)
-        GL.glVertex2f(self.x - 10, self.y+10)
-        GL.glVertex2f(self.x + 5, self.y + 10)
-        GL.glVertex2f(self.x + 5, self.y - 10)
-        GL.glEnd()
+        GL.glBegin(GL.GL_TRIANGLE_FAN)
+        GL.glVertex2f(self.x, self.y)
+
+        GL.glVertex2f(self.x + box_width / 3, self.y -
+                      box_half_height*self.inputs/2)
+        GL.glVertex2f(self.x - box_width * 2/3, self.y -
+                      box_half_height*(1 + (self.inputs - 2)/2))
+        GL.glVertex2f(self.x - box_width * 2/3, self.y +
+                      box_half_height*(1 + (self.inputs - 2)/2))
+        GL.glVertex2f(self.x + box_width / 3, self.y +
+                      box_half_height*(1 + (self.inputs - 2)/2))
 
         # Draw the arc for the AND gate
-        radius = 10
-        num_segments = 100
-        angle_start = -np.pi/2
-        angle_end = np.pi/2
-        angle_step = (angle_end - angle_start) / num_segments
-        GL.glBegin(GL.GL_POLYGON)
-        for i in range(num_segments + 1):
-            angle = angle_start + i * angle_step
-            dx = radius * np.cos(angle)
-            dy = radius * np.sin(angle)
-            GL.glVertex2f(self.x + 5 + dx, self.y + dy)
+        num_segments = 50
+        for angle in np.linspace(np.pi*0.5, 0, num_segments):
+            dx = box_half_height * np.cos(angle)
+            dy = box_half_height * np.sin(angle)
+            GL.glVertex2f(self.x + box_width/3.0 + dx, self.y +
+                          box_half_height * (self.inputs - 2.0)/2.0 + dy)
+        for angle in np.linspace(0, -0.5*np.pi, num_segments):
+            dx = box_half_height * np.cos(angle)
+            dy = box_half_height * np.sin(angle)
+            GL.glVertex2f(self.x + box_width/3.0 + dx, self.y -
+                          box_half_height * (self.inputs - 2.0)/2.0 + dy)
         GL.glEnd()
 
+        draw_circle(port_radius, self.x + box_width/3.0 +
+                    box_half_height, self.y, (0.0, 0.0, 0.0))
+
+        for i in range(self.inputs):
+            y = box_half_height * (i + 0.5 - self.inputs*0.5) + self.y
+            draw_circle(port_radius, self.x - box_width *
+                        2/3.0, y, (0.0, 0.0, 0.0))
+
     def is_clicked(self, mouse_x, mouse_y):
-        click_radius = 20
+        click_radius = 30
         if (mouse_x - self.x)**2 + (mouse_y - self.y)**2 < click_radius**2:
             return True
         else:
@@ -113,7 +144,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
-        self.objects = [And_gate(50, 50)]
+        self.objects = [And_gate(50, 50), And_gate(300, 50)]
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -191,6 +222,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 if ob.is_clicked(ox, oy):
                     ob.clicked = True
                     self.object_clicked = True
+                    break
 
         if event.ButtonUp():
             text = "".join(["Mouse button released at: ", str(event.GetX()),
@@ -260,11 +292,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def render_grid(self):
 
-        grid_spacing = 20
-        GL.glMatrixMode(GL.GL_MODELVIEW)
+        grid_spacing = 50
         GL.glLoadIdentity()
-        GL.glTranslated((self.pan_x * self.zoom) % grid_spacing, (self.pan_y / self.zoom) %
-                        grid_spacing, 0.0)
+        GL.glTranslated(self.pan_x % grid_spacing,
+                        self.pan_y % grid_spacing, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
         width, height = self.GetSize()
@@ -273,7 +304,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glColor3f(0.7, 0.7, 0.7)
         GL.glBegin(GL.GL_LINES)
         while x < width/self.zoom:
-            if abs(x - self.pan_x) < 8:
+            if abs(x - grid_spacing * self.pan_x//grid_spacing) < 8:
                 GL.glColor3f(0.7, 0, 0)
             GL.glVertex2f(x, -grid_spacing)
             GL.glVertex2f(x, height/self.zoom)
@@ -283,8 +314,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         GL.glBegin(GL.GL_LINES)
         y = 0
-        while y < height/self.zoom:
-            GL.glVertex2f(0, y)
+        while y < grid_spacing + height/self.zoom:
+            GL.glVertex2f(-grid_spacing, y)
             GL.glVertex2f(width/self.zoom, y)
             y += grid_spacing
         GL.glEnd()
