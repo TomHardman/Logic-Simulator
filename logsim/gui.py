@@ -59,12 +59,14 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
 
-        # Initialise attributes
+        # Initialise instance variables
         self.devices = devices
         self.names = names
         self.monitors = monitors
         self.network = network
         self.first_run = True
+        self.cycles = 10
+        self.cycles_completed = 0
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -93,7 +95,7 @@ class Gui(wx.Frame):
 
         splitter.SplitVertically(monitor_ui, sidebar)
         splitter.SetSashGravity(0.7)
-        splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_changing)
+        splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
 
         # Set up panels for sidebar
         # bg colour is set to that of parent panel so only the painted on rounded panel shape is visible
@@ -120,7 +122,7 @@ class Gui(wx.Frame):
         font_ct = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         cycle_text.SetFont(font_ct)
 
-        cycle_spin = wx.SpinCtrl(panel_control, wx.ID_ANY, "10")
+        cycle_spin = wx.SpinCtrl(panel_control, wx.ID_ANY, str(self.cycles))
         font_cs = wx.Font(12, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
         cycle_spin.SetFont(font_cs)
 
@@ -145,6 +147,7 @@ class Gui(wx.Frame):
 
         # Bind control panel widgets
         run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
+        cycle_spin.Bind(wx.EVT_SPINCTRL, self.on_cycle_spin)
 
         # Widgets and sizers for switch panel
         switch_title = wx.StaticText(panel_switch, wx.ID_ANY, "Switch Configuration:")
@@ -226,9 +229,9 @@ class Gui(wx.Frame):
             pass
 
     def on_run_button(self, event):
-        """Handles the event when the user presses the run button"""
-        Id = event.GetId()
-        button = self.FindWindowById(Id)
+        """Handles the event when the user presses the run button - on first run it causes the continue
+        button to appear in the GUI - on all runs it runs the simulation from scratch for the specified
+        number of cycles"""
 
         if self.first_run:  # adds continue button to GUI after first run has been executed
             self.first_run = False
@@ -240,8 +243,22 @@ class Gui(wx.Frame):
             run_sizer.Add(cont_button, 1, wx.ALL, 5)
             panel_control.Layout()
 
-    def on_sash_position_changing(self, event):
-        """Handles the event where the sash position of the window is changing - this
+        if self.cycles is not None:  # if the number of cycles provided is valid
+            self.cycles_completed = 0
+            self.monitors.reset_monitors()
+            self.devices.cold_startup()
+
+            for i in range(self.cycles):  # executes run for specified no. cycles
+                if self.network.execute_network():
+                    self.monitors.record_signals()
+                    self.cycles_completed += 1
+                    print(self.cycles_completed)
+
+                else:  # need to implement error event here
+                    pass
+
+    def on_sash_position_change(self, event):
+        """Handles the event where the sash position of the window changes - this
         is used to implement an upper size limit on the sidebar"""
         Id = event.GetId()
         window = self.FindWindowById(Id)
@@ -258,4 +275,9 @@ class Gui(wx.Frame):
         if current_position > max_sash_pos or current_position == 2:  # places min size on sidebar
             window.SetSashPosition(max_sash_pos)
 
+    def on_cycle_spin(self, event):
+        """Handle the event when the user changes the no. cycles"""
+        Id = event.GetId()
+        widget = self.FindWindowById(Id)
+        self.cycles = widget.GetValue()
         event.Skip()
