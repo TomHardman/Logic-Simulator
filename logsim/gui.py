@@ -2,47 +2,26 @@ import wx
 from canvas import MyGLCanvas
 
 
-class RoundedPanel(wx.Panel):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
-        self.Bind(wx.EVT_PAINT, self.OnPaint)
-
-    def OnPaint(self, event):
-        dc = wx.AutoBufferedPaintDC(self)
-        dc.Clear()
-        rect = self.GetClientRect()
-        x, y, width, height = rect
-
-        w = 2
-        x += w/2
-        y += w/2
-        width -= w
-        height -= w
-
-        # Draw filled rounded background
-        radius = 10  # Adjust the radius for desired roundness
-        background_color = wx.WHITE
-        brush = wx.Brush(background_color)
-        dc.SetBrush(brush)
-        dc.SetPen(wx.TRANSPARENT_PEN)
-        dc.DrawRoundedRectangle(x, y, width, height, radius)
-
-        # Draw rounded border
-        border_color = wx.Colour(72, 50, 168)  # Adjust the border colour as needed
-        pen = wx.Pen(border_color, width=w)  # Adjust the border width as needed
-        dc.SetPen(pen)
-        dc.SetBrush(wx.TRANSPARENT_BRUSH)
-        dc.DrawRoundedRectangle(x, y, width, height, radius)
-
-        event.Skip()
-
-
 class RoundedScrollWindow(wx.ScrolledWindow):
+    """ Class that inherits from the wx.ScrolledWindow class to be used as a scrollable panel,
+    however the OnPaint method has been rewritten to paint a rounded rectangular panel and
+    hence display the panel as such. This needs the initial background colour of the panel
+    to be set to that of its parent panel which can be done externally in the main GUI
+    class
+
+    Also contains method to set a border on the panel, however this is not very compatible
+    with windows OS when resizing"""
     def __init__(self, parent):
         super().__init__(parent)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Panel_Border = False
+
+    def set_border(self, border):
+        if type(border) == bool:
+            self.Panel_Border = border
+        else:
+            raise AttributeError(f"'border' must be type bool but got type {type(border)}")
 
     def OnPaint(self, event):
         dc = wx.AutoBufferedPaintDC(self)
@@ -64,12 +43,12 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         dc.SetPen(wx.TRANSPARENT_PEN)
         dc.DrawRoundedRectangle(x, y, width, height, radius)
 
-        # Draw rounded border
-        border_color = wx.Colour(72, 50, 168)  # Adjust the border colour as needed
-        pen = wx.Pen(border_color, width=w)  # Adjust the border width as needed
-        dc.SetPen(pen)
-        dc.SetBrush(wx.TRANSPARENT_BRUSH)
-        dc.DrawRoundedRectangle(x, y, width, height, radius)
+        if self.Panel_Border:  # Draw rounded border if set_border(True) has been called
+            border_color = wx.Colour(72, 50, 168)  # Adjust the border colour as needed
+            pen = wx.Pen(border_color, width=w)  # Adjust the border width as needed
+            dc.SetPen(pen)
+            dc.SetBrush(wx.TRANSPARENT_BRUSH)
+            dc.DrawRoundedRectangle(x, y, width, height, radius)
 
         event.Skip()
 
@@ -80,13 +59,19 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
 
+        # Initialise attributes
+        self.devices = devices
+        self.names = names
+        self.monitors = monitors
+        self.network = network
+
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
+        fileMenu.Append(wx.ID_ABOUT, "&About")
         menuBar.Append(fileMenu, "&File")
-        self.Centre()
+        self.SetMenuBar(menuBar)
 
         # Configure sizers for top level layout structure
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -105,19 +90,24 @@ class Gui(wx.Frame):
         monitor_ui.SetSizer(monitor_ui_sizer)
 
         splitter.SplitVertically(monitor_ui, sidebar)
-        splitter.SetSashGravity(0.2)
+        splitter.SetSashGravity(0.7)
 
         # Set up panels for sidebar
-        panel_run = RoundedPanel(sidebar)
+        # bg colour is set to that of parent panel so only the painted on rounded panel shape is visible
+        panel_run = RoundedScrollWindow(sidebar)
+        panel_run.SetScrollRate(10, 0)
+        panel_run.SetBackgroundColour(panel_run.GetParent().GetBackgroundColour())
         run_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_run.SetSizer(run_sizer)
 
         panel_switch = RoundedScrollWindow(sidebar)
+        panel_switch.SetBackgroundColour(panel_switch.GetParent().GetBackgroundColour())
         panel_switch.SetScrollRate(0, 10)
         switch_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_switch.SetSizer(switch_sizer)
 
         panel_monitors = RoundedScrollWindow(sidebar)
+        panel_monitors.SetBackgroundColour(panel_monitors.GetParent().GetBackgroundColour())
         panel_monitors.SetScrollRate(0, 10)
         monitor_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_monitors.SetSizer(monitor_sizer)
@@ -158,11 +148,13 @@ class Gui(wx.Frame):
             font_sw_txt = wx.Font(12, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
             switch_txt.SetFont(font_sw_txt)
 
-            switch_button = wx.ToggleButton(panel_switch, id, label='Off', size=(60, 20))
-            switch_config_sizer.Add(switch_txt, 2, wx.ALL, 5)
-            switch_config_sizer.Add(switch_button, 1, wx.ALL, 5)
+            switch_button = wx.ToggleButton(panel_switch, id, label='Off')
+            switch_button.Bind(wx.EVT_TOGGLEBUTTON, self.on_toggle_switch)
+            switch_config_sizer.Add(switch_txt, 1, wx.ALL, 5)
+            switch_config_sizer.Add(switch_button, 1, wx.ALL, 2)
 
             switch_sizer.Add(switch_config_sizer, 1, wx.ALL, 5)
+
 
         # Add panels to sidebar sizer
         sidebar_sizer.Add(panel_run, 1, wx.EXPAND | wx.ALL, 10)
@@ -178,3 +170,48 @@ class Gui(wx.Frame):
         # Configure main sizer layout
         main_sizer.Add(splitter, 1, wx.EXPAND)
         self.SetSizer(main_sizer)
+        self.Bind(wx.EVT_SIZE, self.on_size)
+        self.Bind(wx.EVT_MENU, self.on_menu)
+        self.Centre()
+
+        # Event handling:
+
+    def on_size(self, event):
+        """Handle resize events"""
+        # Ensure the splitter adjusts to the frame size
+        self.GetSizer().Layout()
+        event.Skip()
+
+    def on_menu(self, event):
+        """Handle the event when the user selects a menu item."""
+        Id = event.GetId()
+        if Id == wx.ID_EXIT:
+            self.Close(True)
+        if Id == wx.ID_ABOUT:
+            wx.MessageBox("Logic Simulator\nCreated by bd432, al2008, th624\n2023",
+                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
+
+    def on_toggle_switch(self, event):
+        """Handle the event when the user toggles a switch button"""
+        Id = event.GetId()
+        toggle_button = self.FindWindowById(Id)
+        button_state = toggle_button.GetValue()  # Gets button state: True means button is currently toggled off
+
+        if button_state:
+            switch_state = 1  # Button currently toggled off means new switch state is to be set as 1
+        else:
+            switch_state = 0
+
+        if self.devices.set_switch(Id, switch_state):  # Attempts to set switches to new state
+            if button_state:
+                toggle_button.SetLabel("On")
+
+            if not button_state:
+                toggle_button.SetLabel("Off")
+
+        else:  # unfinished but should display error message on window
+            pass
+
+
+
+    #def on_run_button(self, event):
