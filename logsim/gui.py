@@ -64,6 +64,7 @@ class Gui(wx.Frame):
         self.names = names
         self.monitors = monitors
         self.network = network
+        self.first_run = True
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -84,6 +85,7 @@ class Gui(wx.Frame):
         sidebar = wx.Panel(splitter)
         sidebar.SetBackgroundColour(wx.Colour(200, 200, 200))
         sidebar.SetSizer(sidebar_sizer)
+        sidebar.SetMaxSize((100, -1))
 
         monitor_ui = wx.Panel(splitter)
         monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
@@ -91,14 +93,15 @@ class Gui(wx.Frame):
 
         splitter.SplitVertically(monitor_ui, sidebar)
         splitter.SetSashGravity(0.7)
+        splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_changing)
 
         # Set up panels for sidebar
         # bg colour is set to that of parent panel so only the painted on rounded panel shape is visible
-        panel_run = RoundedScrollWindow(sidebar)
-        panel_run.SetScrollRate(10, 0)
-        panel_run.SetBackgroundColour(panel_run.GetParent().GetBackgroundColour())
-        run_sizer = wx.BoxSizer(wx.VERTICAL)
-        panel_run.SetSizer(run_sizer)
+        panel_control = RoundedScrollWindow(sidebar)
+        panel_control.SetScrollRate(10, 0)
+        panel_control.SetBackgroundColour(panel_control.GetParent().GetBackgroundColour())
+        control_sizer = wx.BoxSizer(wx.VERTICAL)
+        panel_control.SetSizer(control_sizer)
 
         panel_switch = RoundedScrollWindow(sidebar)
         panel_switch.SetBackgroundColour(panel_switch.GetParent().GetBackgroundColour())
@@ -112,16 +115,16 @@ class Gui(wx.Frame):
         monitor_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_monitors.SetSizer(monitor_sizer)
 
-        # Widgets and sizers for run panel
-        cycle_text = wx.StaticText(panel_run, wx.ID_ANY, "Cycles:")
+        # Widgets and sizers for control panel
+        cycle_text = wx.StaticText(panel_control, wx.ID_ANY, "Cycles:")
         font_ct = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         cycle_text.SetFont(font_ct)
 
-        cycle_spin = wx.SpinCtrl(panel_run, wx.ID_ANY, "10")
+        cycle_spin = wx.SpinCtrl(panel_control, wx.ID_ANY, "10")
         font_cs = wx.Font(12, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
         cycle_spin.SetFont(font_cs)
 
-        run_button = wx.Button(panel_run, wx.ID_ANY, "Run")
+        run_button = wx.Button(panel_control, wx.ID_ANY, "Run")
         font_rb = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         run_button.SetFont(font_rb)
 
@@ -129,8 +132,19 @@ class Gui(wx.Frame):
         cycle_sizer.Add(cycle_text, 1, wx.ALL, 5)
         cycle_sizer.Add(cycle_spin, 1, wx.ALL, 5)
 
-        run_sizer.Add(cycle_sizer, 1, wx.ALL, 5)
+        run_sizer = wx.BoxSizer(wx.HORIZONTAL)
         run_sizer.Add(run_button, 1, wx.ALL, 5)
+        self.run_sizer = run_sizer  # creates sizer as instance variable so it can be accessed by methods
+
+        control_sizer.Add(cycle_sizer, 1, wx.ALL, 5)
+        control_sizer.Add(run_sizer, 1, wx.ALL, 5)
+
+        # Set some panels and sizers as instance variables to make them accessible to on_run_button method
+        self.panel_control = panel_control
+        self.run_sizer = run_sizer
+
+        # Bind control panel widgets
+        run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
 
         # Widgets and sizers for switch panel
         switch_title = wx.StaticText(panel_switch, wx.ID_ANY, "Switch Configuration:")
@@ -138,14 +152,14 @@ class Gui(wx.Frame):
         switch_title.SetFont(font_st)
         switch_sizer.Add(switch_title, 1, wx.ALL, 10)
 
-        switches = devices.find_devices(device_kind = devices.SWITCH)  # create array of switch IDs
+        switches = devices.find_devices(device_kind=devices.SWITCH)  # create array of switch IDs
 
         for id in switches:  # Add list of switch names with corresponding toggle buttons to panel
             name = names.get_name_string(id)
             switch_config_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
             switch_txt = wx.StaticText(panel_switch, wx.ID_ANY, f'Switch {name}:')
-            font_sw_txt = wx.Font(12, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
+            font_sw_txt = wx.Font(12, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
             switch_txt.SetFont(font_sw_txt)
 
             switch_button = wx.ToggleButton(panel_switch, id, label='Off')
@@ -155,9 +169,8 @@ class Gui(wx.Frame):
 
             switch_sizer.Add(switch_config_sizer, 1, wx.ALL, 5)
 
-
         # Add panels to sidebar sizer
-        sidebar_sizer.Add(panel_run, 1, wx.EXPAND | wx.ALL, 10)
+        sidebar_sizer.Add(panel_control, 1, wx.EXPAND | wx.ALL, 10)
         sidebar_sizer.Add(panel_switch, 2, wx.EXPAND | wx.ALL, 10)
         sidebar_sizer.Add(panel_monitors, 2, wx.EXPAND | wx.ALL, 10)
 
@@ -212,6 +225,37 @@ class Gui(wx.Frame):
         else:  # unfinished but should display error message on window
             pass
 
+    def on_run_button(self, event):
+        """Handles the event when the user presses the run button"""
+        Id = event.GetId()
+        button = self.FindWindowById(Id)
 
+        if self.first_run:  # adds continue button to GUI after first run has been executed
+            self.first_run = False
+            run_sizer = self.run_sizer
+            panel_control = self.panel_control
+            cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
+            font_cb = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+            cont_button.SetFont(font_cb)
+            run_sizer.Add(cont_button, 1, wx.ALL, 5)
+            panel_control.Layout()
 
-    #def on_run_button(self, event):
+    def on_sash_position_changing(self, event):
+        """Handles the event where the sash position of the window is changing - this
+        is used to implement an upper size limit on the sidebar"""
+        Id = event.GetId()
+        window = self.FindWindowById(Id)
+        current_width = self.GetSize().GetWidth()
+        current_position = window.GetSashPosition()
+
+        min_sash_pos = current_width - 280
+        max_sash_pos = current_width - 10
+        current_position = event.GetSashPosition()
+
+        if current_position < min_sash_pos:  # places max size on sidebar
+            window.SetSashPosition(min_sash_pos)
+
+        if current_position > max_sash_pos or current_position == 2:  # places min size on sidebar
+            window.SetSashPosition(max_sash_pos)
+
+        event.Skip()
