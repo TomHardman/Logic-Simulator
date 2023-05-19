@@ -329,6 +329,4 @@ class Gui_mac(wx.Frame):
     def error_sound(self):  # method that plays an error sound to be used when displaying error messages
         filename = self.error_sound_path
         wave_obj = sa.WaveObject.from_wave_file(filename)
-        if wave_obj:
-            print('bruh')
         play_obj = wave_obj.play()
