@@ -11,17 +11,27 @@
             "module": "pytest",
             "args": [
                 "-v",
-                "logsim/test_parse.py"
+                "logsim/test_scanner.py"
             ]
         },
         {
-            "name": "Run GUI",
+            "name": "Run GUI Interactive",
             "type": "python",
             "request": "launch",
             "program": "logsim/logsim.py",
             "args": [
                 "-t",
                 "avhaava"
+            ],
+        },
+        {
+            "name": "Run GUI Linux",
+            "type": "python",
+            "request": "launch",
+            "program": "logsim/logsim.py",
+            "args": [
+                "-l",
+                "snide.txt"
             ],
         }
     ]
