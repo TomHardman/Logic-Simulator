@@ -7,8 +7,14 @@ logic network.
 Classes
 -------
 Parser - parses the definition file and builds the logic network.
-"""
 
+Format - Underlines parts of text to show general location of error
+"""
+class Format:
+    def __init__(self):
+        self.end = '\033[0m'
+        self.red = '\033[91m'
+        self.underline = '\033[4m'
 
 class Parser:
 
@@ -420,6 +426,7 @@ class Parser:
         stopping_symbol = self.scanner.COMMA
         self.error_bool = True
         self.error_count += 1
+        self.display_error(error_code)
         while (self.symbol.type != self.scanner.SEMICOLON and self.symbol.type != self.scanner.EOF and self.symbol.type != stopping_symbol):
             self.symbol = self.scanner.get_symbol()
         if self.symbol.type == stopping_symbol:
@@ -429,3 +436,82 @@ class Parser:
 
         if self.symbol.type != self.scanner.EOF:
             self.symbol = self.scanner.get_symbol()
+
+    def display_error(self, error_code):
+        '''
+        def underline_text(text, index):
+            underline = ''
+            for i, char in enumerate(text):
+                if i == index:
+                    underline += '\033[31;4m{}\033[0m'.format(char)
+                else:
+                    underline += char
+            return (underline)
+
+        def highlight_error(symbol):
+            print(symbol.linenum,len(self.scanner.input_file.readlines()))
+            position = self.scanner.input_file.tell()
+            self.scanner.input_file.seek(0)
+            lines = self.scanner.input_file.readlines()
+            line = lines[symbol.linenum]
+            self.scanner.input_file.seek(position)
+            return underline_text(line, symbol.linepos)
+
+        print(highlight_error(self.symbol))
+        '''
+        if error_code == self.NAME_EXPECTED:
+            print('Error: Expected a Name')
+        
+        if error_code == self.SEMICOLON_EXPECTED:
+            print('Error: Expected a Semicolon')
+
+        if error_code == self.KEYWORD_EXPECTED:
+            print('Error: Expected a Keyword')
+
+        if error_code == self.NUMBER_EXPECTED:
+            print('Error: Expected a Number')
+
+        if error_code == self.ARROW_EXPECTED:
+            print('Error: Expected a Arrow')
+
+        if error_code == self.devices.INVALID_QUALIFIER:
+            print('Error: Invalid Qualifer')
+
+        if error_code == self.devices.NO_QUALIFIER:
+            print('Error: No Qualifer')
+
+        if error_code == self.devices.BAD_DEVICE:
+            print('Error: Bad Device')
+
+        if error_code == self.devices.QUALIFIER_PRESENT:
+            print('Error: Qualifier Present')
+
+        if error_code == self.devices.DEVICE_PRESENT:
+            print('Error: Device Present')
+
+        if error_code == self.monitors.NOT_OUTPUT:
+            print('Error: Not an output')
+
+        if error_code == self.monitors.MONITOR_PRESENT:
+            print('Error: Monitor Present')
+
+        if error_code == self.network.INPUT_TO_INPUT:
+            print('Error: Connecting an input to input')
+
+        if error_code == self.network.OUTPUT_TO_OUTPUT:
+            print('Error: Connecting an output to output')
+
+        if error_code == self.network.INPUT_CONNECTED:
+            print('Error: Input connected')
+
+        if error_code == self.network.PORT_ABSENT:
+            print('Error: Port Absent')
+
+        if error_code == self.network.DEVICE_ABSENT:
+            print('Error: Device Absent')
+
+        
+
+
+            
+
