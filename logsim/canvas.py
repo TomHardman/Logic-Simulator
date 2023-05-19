@@ -203,26 +203,3 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glRasterPos2f(x_pos, y_pos)
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
-
-
-class ToggleButtonPanel(wx.ScrolledWindow):
-    def __init__(self):
-        super().__init__()
-
-        # Create a sizer to hold the toggle buttons
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-
-        # Add toggle buttons to the sizer
-        for i in range(5):
-            toggle_button = wx.ToggleButton(self, label=f"Toggle Button {i+1}")
-            self.sizer.Add(toggle_button, 0, wx.ALL, 5)
-
-        # Set the sizer for the panel
-        self.SetSizer(self.sizer)
-        self.SetScrollRate(0, 20)  # Set scrolling rate for both directions
-
-        # Fit the panel contents and update scrollbars
-        self.sizer.Fit(self)
-        self.SetVirtualSize(self.sizer.GetMinSize())
-
-
