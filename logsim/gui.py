@@ -174,7 +174,7 @@ class Gui(wx.Frame):
                 switch_button = wx.ToggleButton(panel_switch, id, label='Off')
             else:
                 switch_button = wx.ToggleButton(panel_switch, id, label='On')
-                switch_button.SetValue(False)
+                switch_button.SetValue(True)
 
             switch_button.Bind(wx.EVT_TOGGLEBUTTON, self.on_toggle_switch)
             switch_config_sizer.Add(switch_txt, 1, wx.ALL, 5)
@@ -269,7 +269,7 @@ class Gui(wx.Frame):
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
-                                   "Error", wx.OK | wx.ICON_ERROR | 0x40)
+                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
             dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
             dlg.ShowModal()
             dlg.Destroy()
@@ -312,7 +312,7 @@ class Gui(wx.Frame):
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
-                                   "Error", wx.OK | wx.ICON_ERROR | 0x40)
+                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
             dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
             dlg.ShowModal()
             dlg.Destroy()
