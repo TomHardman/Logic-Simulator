@@ -44,7 +44,7 @@ class Parser:
         self.error_count = 0
 
         [self.NAME_EXPECTED, self.SEMICOLON_EXPECTED, self.KEYWORD_EXPECTED,
-            self.NUMBER_EXPECTED] = self.names.unique_error_codes(4)
+            self.NUMBER_EXPECTED, self.ARROW_EXPECTED] = self.names.unique_error_codes(5)
 
     def parse_network(self):
         """Parse the circuit definition file."""
@@ -77,9 +77,12 @@ class Parser:
             elif self.symbol.id == self.scanner.CLOCK_ID:
                 self.clock_keyword()
             else:
-                self.error()
+                self.error(self.KEYWORD_EXPECTED)
 
-        return True
+        if self.error_count == 0:
+            return True
+        else:
+            return False
 
     def connection(self):
         """Checks the symbol for a valid connection and returns the 2 node points for a connection"""
@@ -99,29 +102,37 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             port_id = self.device_port(device)
         elif not self.error_bool and not None in device.outputs:
-            self.error()
+            self.error(self.network.PORT_ABSENT)
         return [device_id, port_id]
 
     def device(self):
         """Returns the device and device_id"""
         # Add if clause to check device exists
-        if (self.symbol.type == self.scanner.NAME and self.symbol.id is not None and self.devices.get_device(self.symbol.id)):
+        if (self.symbol.type == self.scanner.NAME and self.devices.get_device(self.symbol.id)):
             device_id = self.symbol.id
             device = self.devices.get_device(device_id)
             self.symbol = self.scanner.get_symbol()
             return [device, device_id]
         else:
-            self.error()
+            if self.symbol.type == self.scanner.NAME:
+                self.error(self.network.DEVICE_ABSENT)
+            else:
+                self.error(self.NAME_EXPECTED)
             return [None, None]
 
     def device_port(self, device):
         """Takes a device as an input and returns port_id"""
-        if (device is not None and self.symbol.type == self.scanner.NAME and self.symbol.id is not None):
+        if (device is not None and self.symbol.type == self.scanner.NAME):
             if (self.symbol.id in device.inputs or self.symbol.id in device.outputs):
                 port_id = self.symbol.id
                 self.symbol = self.scanner.get_symbol()
                 return port_id
-        self.error()
+            else:
+                self.error(self.network.PORT_ABSENT)
+        elif device is None:
+            self.error(self.network.DEVICE_ABSENT)
+        else:
+            self.error(self.NAME_EXPECTED)
         return [None, None]
 
     def arrow(self):
@@ -130,15 +141,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             return
         else:
-            self.error()
-
-    def dot(self):
-        """Checks if a symbol is a dot"""
-        if self.symbol.type == self.scanner.DOT:
-            self.symbol = self.scanner.get_symbol()
-            return
-        else:
-            self.error()
+            self.error(self.ARROW_EXPECTED)
 
     def semicolon(self):
         """Checks if a symbol is a dot"""
@@ -147,7 +150,7 @@ class Parser:
             self.scanner.temp_queue = []
             return
         else:
-            self.error()
+            self.error(self.SEMICOLON_EXPECTED)
 
     def number(self):
         """Checks and returns if a symbol is a number"""
@@ -156,7 +159,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             return number_val
         else:
-            self.error()
+            self.error(self.NUMBER_EXPECTED)
 
     def unnamed_device(self):
         """Checks name symbol does not correspond to named device and returns id"""
@@ -164,8 +167,10 @@ class Parser:
             name_id = self.symbol.id
             self.symbol = self.scanner.get_symbol()
             return name_id
+        elif self.devices.get_device(self.symbol.id):
+            self.error(self.devices.DEVICE_PRESENT)
         else:
-            self.error()
+            self.error(self.NAME_EXPECTED)
 
     def number_unnamed(self):
         """Check for a number/unnamed device and returns value and ID"""
@@ -177,206 +182,241 @@ class Parser:
 
     def connect_keyword(self):
         """Checks for the CONNECT keyword and a valid connection label and attatches the 2 nodes"""
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.CONNECT_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        connection = self.connection()
+        if not self.error_bool:
+            error_type = self.network.make_connection(
+                *connection[0], *connection[1])
+            if error_type != self.network.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             connection = self.connection()
             if not self.error_bool:
-                self.network.make_connection(*connection[0], *connection[1])
+                error_type = self.network.make_connection(
+                    *connection[0], *connection[1])
+                if error_type != self.network.NO_ERROR:
+                    self.error(error_type)
 
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                connection = self.connection()
-                if not self.error_bool:
-                    self.network.make_connection(
-                        *connection[0], *connection[1])
-
-            if not self.error_bool:
-                self.semicolon()
-        else:
-            self.error()
+        if not self.error_bool:
+            self.semicolon()
         return True
 
     def and_keyword(self):
         """Checks for the AND keyword and creates and gate"""
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.AND_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        no_inputs, device_id = self.number_unnamed()
+        if not self.error_bool:
+            error_type = self.devices.make_device(
+                device_id, self.devices.AND, no_inputs)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_gate(device_id, self.devices.AND, no_inputs)
-
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                no_inputs, device_id = self.number_unnamed()
-                if not self.error_bool:
-                    self.devices.make_gate(
-                        device_id, self.devices.AND, no_inputs)
-            if not self.error_bool:
-                self.semicolon()
-        else:
-            self.error()
+                error_type = self.devices.make_device(
+                    device_id, self.devices.AND, no_inputs)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
+        if not self.error_bool:
+            self.semicolon()
         return True
 
     def nand_keyword(self):
         """Checks for the NAND keyword and creates nand gate"""
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.NAND_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        no_inputs, device_id = self.number_unnamed()
+        if not self.error_bool:
+            error_type = self.devices.make_device(
+                device_id, self.devices.NAND, no_inputs)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_gate(device_id, self.devices.NAND, no_inputs)
-
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                no_inputs, device_id = self.number_unnamed()
-                if not self.error_bool:
-                    self.devices.make_gate(
-                        device_id, self.devices.NAND, no_inputs)
-            if not self.error_bool:
-                self.semicolon()
-        else:
-            self.error()
+                error_type = self.devices.make_device(
+                    device_id, self.devices.NAND, no_inputs)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
+        if not self.error_bool:
+            self.semicolon()
         return True
 
     def or_keyword(self):
         """Checks for the OR keyword and creates or gate"""
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.OR_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        no_inputs, device_id = self.number_unnamed()
+        if not self.error_bool:
+            error_type = self.devices.make_device(
+                device_id, self.devices.OR, no_inputs)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_gate(device_id, self.devices.OR, no_inputs)
+                error_type = self.devices.make_device(
+                    device_id, self.devices.OR, no_inputs)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
+        if not self.error_bool:
+            self.semicolon()
 
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                no_inputs, device_id = self.number_unnamed()
-                if not self.error_bool:
-                    self.devices.make_gate(
-                        device_id, self.devices.OR, no_inputs)
-            if not self.error_bool:
-                self.semicolon()
-
-        else:
-            self.error()
         return True
 
     def nor_keyword(self):
         """Checks for the NOR keyword and creates nor gate"""
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.NOR_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        no_inputs, device_id = self.number_unnamed()
+        if not self.error_bool:
+            error_type = self.devices.make_device(
+                device_id, self.devices.NOR, no_inputs)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             no_inputs, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_gate(device_id, self.devices.NOR, no_inputs)
-
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                no_inputs, device_id = self.number_unnamed()
-                if not self.error_bool:
-                    self.devices.make_gate(
-                        device_id, self.devices.NOR, no_inputs)
-            if not self.error_bool:
-                self.semicolon()
-        else:
-            self.error()
+                error_type = self.devices.make_device(
+                    device_id, self.devices.NOR, no_inputs)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
+        if not self.error_bool:
+            self.semicolon()
         return True
 
     def switch_keyword(self):
         """Checks for the SWITCH keyword and creates switch"""
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.SWITCH_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        state, device_id = self.number_unnamed()
+        if not self.error_bool:
+            # Default switch is at 0
+            error_type = self.devices.make_device(
+                device_id, self.devices.SWITCH, state)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
-            device_id = self.unnamed_device()
+            state, device_id = self.number_unnamed()
             if not self.error_bool:
                 # Default switch is at 0
-                self.devices.make_switch(device_id, 0)
+                error_type = self.devices.make_device(
+                    device_id, self.devices.SWITCH, state)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
+        if not self.error_bool:
+            self.semicolon()
 
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                device_id = self.unnamed_device()
-                if not self.error_bool:
-                    # Default switch is at 0
-                    self.devices.make_switch(device_id, 0)
-            if not self.error_bool:
-                self.semicolon()
-
-        else:
-            self.error()
         return True
 
     def xor_keyword(self):
         """Checks for the XOR keyword and creates xor gate"""
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.XOR_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        device_id = self.unnamed_device()
+        if not self.error_bool:
+            # Default switch is at 0
+            error_type = self.devices.make_device(device_id, self.devices.XOR)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
             if not self.error_bool:
                 # Default switch is at 0
-                self.devices.make_gate(device_id, self.devices.XOR, 2)
+                error_type = self.devices.make_device(
+                    device_id, self.devices.XOR)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
+        if not self.error_bool:
+            self.semicolon()
 
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                device_id = self.unnamed_device()
-                if not self.error_bool:
-                    # Default switch is at 0
-                    self.devices.make_gate(device_id, self.devices.XOR, 2)
-            if not self.error_bool:
-                self.semicolon()
-
-        else:
-            self.error()
         return True
 
     def dtype_keyword(self):
-        """Checks for the DTYPE keyword and creates Dtype gate"""
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.DTYPE_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        """Checks for the XOR keyword and creates xor gate"""
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        device_id = self.unnamed_device()
+        if not self.error_bool:
+            # Default switch is at 0
+            error_type = self.devices.make_device(
+                device_id, self.devices.DTYPE)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
             if not self.error_bool:
                 # Default switch is at 0
-                self.devices.make_d_type(device_id)
+                error_type = self.devices.make_device(
+                    device_id, self.devices.DTYPE)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
 
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                device_id = self.unnamed_device()
-                if not self.error_bool:
-                    # Default switch is at 0
-                    self.devices.make_d_type(device_id)
-
-            if not self.error_bool:
-                self.semicolon()
-        else:
-            self.error()
+        if not self.error_bool:
+            self.semicolon()
         return True
 
     def monitor_keyword(self):
         """Checks for MONITOR keyword and creates monitor"""
         # Possible error if port is an input
-        if (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == self.scanner.MONITOR_ID):
-            self.scanner.temp_queue.append(self.symbol)
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        device_id, port_id = self.node()
+        if not self.error_bool:
+            error_type = self.monitors.make_monitor(device_id, port_id)
+            if error_type != self.monitors.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             device_id, port_id = self.node()
             if not self.error_bool:
-                self.monitors.make_monitor(device_id, port_id)
+                error_type = self.monitors.make_monitor(device_id, port_id)
+                if error_type != self.monitors.NO_ERROR:
+                    self.error(error_type)
 
-            while not self.error_bool and self.symbol.type == self.scanner.COMMA:
-                self.symbol = self.scanner.get_symbol()
-                device_id, port_id = self.node()
-                if not self.error_bool:
-                    self.monitors.make_monitor(device_id, port_id)
-
-            if not self.error_bool:
-                self.semicolon()
-        else:
-            self.error()
+        if not self.error_bool:
+            self.semicolon()
         return True
 
     def clock_keyword(self):
-        pass
+        """Checks for the CLOCK keyword and creates clock with specified half period"""
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        half_period, device_id = self.number_unnamed()
+        if not self.error_bool:
+            self.devices.make_device(
+                device_id, self.devices.CLOCK, half_period)
 
-    def error(self,):
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
+            self.symbol = self.scanner.get_symbol()
+            half_period, device_id = self.number_unnamed()
+            if not self.error_bool:
+                self.devices.make_device(
+                    device_id, self.devices.CLOCK, half_period)
+        if not self.error_bool:
+            self.semicolon()
+        return True
+
+    def error(self, error_code):
         """Adds error to count and skips to next semicolon/EOF"""
         stopping_symbol = self.scanner.COMMA
         self.error_bool = True
