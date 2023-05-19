@@ -221,10 +221,10 @@ class Gui(wx.Frame):
         """Handle the event when the user toggles a switch button"""
         Id = event.GetId()
         toggle_button = self.FindWindowById(Id)
-        button_state = toggle_button.GetValue()  # Gets button state: True means button is currently toggled off
+        button_state = toggle_button.GetValue()  # Gets button state: True means button is currently toggled on
 
         if button_state:
-            switch_state = 1  # Button currently toggled off means new switch state is to be set as 1
+            switch_state = 1  # Button toggled on means new switch state is to be set as 1
         else:
             switch_state = 0
 
