@@ -270,7 +270,6 @@ class Gui_mac(wx.Frame):
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
-                    print(self.cycles_completed)
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
@@ -315,7 +314,6 @@ class Gui_mac(wx.Frame):
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
-                    print(self.cycles_completed)
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
