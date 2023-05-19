@@ -33,59 +33,91 @@ def draw_circle(r, x, y, color):
     GL.glEnd()
 
 
+class Connection_GL:
+    def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
+        self.input_device_GL = input_device_GL
+        self.output_device_GL = output_device_GL
+        self.input_port_id = input_port_id
+        self.output_port_id = output_port_id
+    
+    def render(self):
+        in_x, in_y = self.input_device_GL.get_port_coor(self.input_port_id)
+        out_x, out_y = self.output_device_GL.get_port_coor(self.output_port_id)
+
+        GL.glBegin(GL.GL_LINE_STRIP)
+        GL.glVertex2f(in_x, in_y)
+        GL.glVertex2f(out_x, out_y)
+        GL.glEnd()
+    
+
 class Device_GL:
-    def __init__(self, x, y):
+    def __init__(self, x, y, device, names):
         self.x = x
         self.y = y
         self.clicked = False
-        self.inputs = 4
+        self.device = device
+        self.inputs = len(device.inputs.keys())
+        self.id = device.device_id
+        self.names = names
+    
+    def create_connections(self, devices, GL_devices_list):
+        """Creates and returns a list of Connections() """
+        connection_list = []
+        for input_id, o in self.device.inputs.items():
+            if o is None:
+                continue
+            output_device_id, output_port_id = o
+            if output_device_id is not None:
+                [output_device_GL] = [i for i in GL_devices_list if i.id == output_device_id]
+                input_device_GL = self
+                connection_list.append(Connection_GL(input_device_GL, output_device_GL, input_id, output_port_id))
+        return connection_list
 
 class And_gate(Device_GL):
     """Creates an AND gate for animation"""
 
-    def __init__(self, x, y):
-        super().__init__(x, y)
+    def __init__(self, x, y, device, names):
+        super().__init__(x, y, device, names)
+
+        self.box_width = 45
+        self.input_height = 30
+        self.port_radius = 7
+        self.x_CoM = self.box_width*2/3
 
     def render(self):
-
-        box_width = 45
-        input_height = 30
-        port_radius = 7
 
         GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2f(self.x, self.y)
 
-        GL.glVertex2f(self.x + box_width / 3, self.y -
-                      input_height*self.inputs/2)
-        GL.glVertex2f(self.x - box_width * 2/3, self.y -
-                      input_height*(1 + (self.inputs - 2)/2))
-        GL.glVertex2f(self.x - box_width * 2/3, self.y +
-                      input_height*(1 + (self.inputs - 2)/2))
-        GL.glVertex2f(self.x + box_width / 3, self.y +
-                      input_height*(1 + (self.inputs - 2)/2))
+        GL.glVertex2f(self.x + self.box_width  - self.x_CoM, self.y - self.input_height*self.inputs/2)
+        GL.glVertex2f(self.x - self.x_CoM, self.y -
+                      self.input_height*self.inputs/2)
+        GL.glVertex2f(self.x - self.x_CoM, self.y +
+                      self.input_height*self.inputs/2)
+        GL.glVertex2f(self.x + self.box_width - self.x_CoM, self.y +
+                      self.input_height*self.inputs/2)
 
         # Draw the arc for the AND gate
         num_segments = 50
         for angle in np.linspace(np.pi*0.5, 0, num_segments):
-            dx = input_height * np.cos(angle)
-            dy = input_height * np.sin(angle)
-            GL.glVertex2f(self.x + box_width/3.0 + dx, self.y +
-                          input_height * (self.inputs - 2.0)/2.0 + dy)
+            dx = self.input_height * np.cos(angle)
+            dy = self.input_height * np.sin(angle)
+            GL.glVertex2f(self.x - self.x_CoM + self.box_width + dx, self.y +
+                          self.input_height * (self.inputs - 2.0)/2.0 + dy)
         for angle in np.linspace(0, -0.5*np.pi, num_segments):
-            dx = input_height * np.cos(angle)
-            dy = input_height * np.sin(angle)
-            GL.glVertex2f(self.x + box_width/3.0 + dx, self.y -
-                          input_height * (self.inputs - 2.0)/2.0 + dy)
+            dx = self.input_height * np.cos(angle)
+            dy = self.input_height * np.sin(angle)
+            GL.glVertex2f(self.x +self.box_width - self.x_CoM + dx, self.y -
+                          self.input_height * (self.inputs - 2.0)/2.0 + dy)
         GL.glEnd()
 
-        draw_circle(port_radius, self.x + box_width/3.0 +
-                    input_height, self.y, (0.0, 0.0, 0.0))
+        draw_circle(self.port_radius, self.x +self.box_width - self.x_CoM +
+                    self.input_height, self.y, (0.0, 0.0, 0.0))
 
         for i in range(self.inputs):
-            y = input_height * (i + 0.5 - self.inputs*0.5) + self.y
-            draw_circle(port_radius, self.x - box_width *
-                        2/3.0, y, (0.0, 0.0, 0.0))
+            y = self.input_height * (i + 0.5 - self.inputs*0.5) + self.y
+            draw_circle(self.port_radius, self.x - self.x_CoM, y, (0.0, 0.0, 0.0))
 
     def is_clicked(self, mouse_x, mouse_y):
         click_radius = 30
@@ -93,6 +125,20 @@ class And_gate(Device_GL):
             return True
         else:
             return False
+    
+    def get_port_coor(self, port_id):
+        if port_id is None:
+            x = self.x + self.box_width/3 + self.input_height
+            y = self.y
+        elif self.device.inputs:
+            input_ids = self.names.lookup(["I" + str(i) for i in range(1, self.inputs + 1)])
+            index = input_ids.index(port_id)
+            x = self.x - self.x_CoM
+            y = self.y + self.input_height* (self.inputs/2 - 0.5) - self.input_height * index
+        else:
+            raise IndexError("Port not in device")
+
+        return [x,y]
 
 
 class Or_gate(Device_GL):
@@ -171,7 +217,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors):
+    def __init__(self, parent, devices, monitors, names):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
@@ -196,9 +242,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
-        #self.init_objects(devices)
+        self.init_objects(devices, names)
 
-        self.objects = [And_gate(50, 50), And_gate(300, 50), Or_gate(500, 50)]
+        #self.objects = [And_gate(50, 50), And_gate(300, 50), Or_gate(500, 50)]
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -215,9 +261,26 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
     
-    def init_objects(self, devices):
+    def init_objects(self, devices, names):
         self.objects = []
-        pass
+        self.devices_GL_list = []
+        self.connections = []
+
+        and_gate_ids = devices.find_devices(devices.AND)
+        x = 100
+        y = 100
+
+        for id in and_gate_ids:
+            device = devices.get_device(id)
+            and_gate = And_gate(x, y, device, names)
+            x += 200
+            self.objects.append(and_gate)
+            self.devices_GL_list.append(and_gate)
+        for device_GL in self.devices_GL_list:
+            connections = device_GL.create_connections(devices, self.devices_GL_list)
+            self.connections += connections
+            self.objects += connections
+
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -276,7 +339,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             text = "".join(["Mouse button pressed at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
 
-            for ob in self.objects:
+            for ob in self.devices_GL_list:
                 if ob.is_clicked(ox, oy):
                     ob.clicked = True
                     self.object_clicked = True
@@ -287,7 +350,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                             ", ", str(event.GetY())])
             if self.object_clicked:
                 self.object_clicked = False
-                for ob in self.objects:
+                for ob in self.devices_GL_list:
                     ob.clicked = False
 
         if event.Leaving():
@@ -295,11 +358,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                             ", ", str(event.GetY())])
             if self.object_clicked:
                 self.object_clicked = False
-                for ob in self.objects:
+                for ob in self.devices_GL_list:
                     ob.clicked = False
         if event.Dragging():
             if self.object_clicked:
-                for ob in self.objects:
+                for ob in self.devices_GL_list:
                     if ob.clicked:
                         ob.x += (event.GetX() - self.last_mouse_x) / self.zoom
                         ob.y -= (event.GetY() - self.last_mouse_y) / self.zoom
@@ -424,7 +487,7 @@ class Gui_interactive(wx.Frame):
         self.first_run = False
 
         # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, devices, monitors)
+        self.canvas = MyGLCanvas(self, devices, monitors, names)
 
         choices = ['SW1', 'SW2', 'SW3']
 
