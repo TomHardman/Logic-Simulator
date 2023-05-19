@@ -73,7 +73,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
-        self.Bind(wx.EVT_KEY_UP, self.on_key_up)
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -190,11 +189,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.Refresh()  # triggers the paint event
 
     def on_key_down(self, event):
-        self.pan_y -= 100
-        self.init = False
+        keycode = event.GetKeyCode()
 
-    def on_key_up(self, event):
-        self.pan_y += 100
+        if keycode == wx.WXK_DOWN:
+            self.pan_y -= 100
+        elif keycode == wx.WXK_UP:
+            self.pan_y += 100
+        
         self.init = False
 
     def render_text(self, text, x_pos, y_pos):
