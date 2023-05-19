@@ -1,5 +1,6 @@
 import wx
 from canvas import MyGLCanvas
+import simpleaudio as sa
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
@@ -54,7 +55,7 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         event.Skip()
 
 
-class Gui(wx.Frame):
+class Gui_mac(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
@@ -65,9 +66,13 @@ class Gui(wx.Frame):
         self.names = names
         self.monitors = monitors
         self.network = network
+
         self.first_run = True
         self.cycles = 10
         self.cycles_completed = 0
+
+        self.error_sound_path = 'error_sounds/bruh_sound.wav'
+        self.play_error_sound = True
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -271,6 +276,8 @@ class Gui(wx.Frame):
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
                       "Error", wx.OK | wx.ICON_ERROR | 0x40)
             dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+            if self.play_error_sound:
+                self.error_sound()  # plays error sound
             dlg.ShowModal()
             dlg.Destroy()
 
@@ -314,5 +321,14 @@ class Gui(wx.Frame):
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
                       "Error", wx.OK | wx.ICON_ERROR | 0x40)
             dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+            if self.play_error_sound:
+                self.error_sound()  # plays error sound
             dlg.ShowModal()
             dlg.Destroy()
+
+    def error_sound(self):  # method that plays an error sound to be used when displaying error messages
+        filename = self.error_sound_path
+        wave_obj = sa.WaveObject.from_wave_file(filename)
+        if wave_obj:
+            print('bruh')
+        play_obj = wave_obj.play()
