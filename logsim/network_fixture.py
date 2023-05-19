@@ -5,7 +5,7 @@ from names import Names
 
 
 def create_network_fixture():
-    """Creates a network fixture of 1 AND gate and 2 switches"""
+    """Creates a network fixture of 1 AND gate and 6 switches"""
     names = Names()
     devices = Devices(names)
     network = Network(names, devices)

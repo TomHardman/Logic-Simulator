@@ -11,7 +11,7 @@ Gui - configures the main window and all the widgets.
 import wx
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
-
+import numpy as np
 
 from names import Names
 from devices import Devices
@@ -19,6 +19,76 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
+
+
+def draw_circle(r, x, y, color):
+    num_segments = 100
+    GL.glColor3f(*color)
+    GL.glBegin(GL.GL_TRIANGLE_FAN)
+    GL.glVertex2f(x, y)
+    for angle in np.linspace(0, 2 * np.pi, num_segments):
+        dx = r * np.cos(angle)
+        dy = r * np.sin(angle)
+        GL.glVertex2f(x + dx, y + dy)
+    GL.glEnd()
+
+
+class And_gate:
+    """Creates an AND gate for animation"""
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.clicked = False
+        self.inputs = 6
+
+    def render(self):
+
+        box_width = 45
+        box_half_height = 30
+        port_radius = 7
+
+        GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glBegin(GL.GL_TRIANGLE_FAN)
+        GL.glVertex2f(self.x, self.y)
+
+        GL.glVertex2f(self.x + box_width / 3, self.y -
+                      box_half_height*self.inputs/2)
+        GL.glVertex2f(self.x - box_width * 2/3, self.y -
+                      box_half_height*(1 + (self.inputs - 2)/2))
+        GL.glVertex2f(self.x - box_width * 2/3, self.y +
+                      box_half_height*(1 + (self.inputs - 2)/2))
+        GL.glVertex2f(self.x + box_width / 3, self.y +
+                      box_half_height*(1 + (self.inputs - 2)/2))
+
+        # Draw the arc for the AND gate
+        num_segments = 50
+        for angle in np.linspace(np.pi*0.5, 0, num_segments):
+            dx = box_half_height * np.cos(angle)
+            dy = box_half_height * np.sin(angle)
+            GL.glVertex2f(self.x + box_width/3.0 + dx, self.y +
+                          box_half_height * (self.inputs - 2.0)/2.0 + dy)
+        for angle in np.linspace(0, -0.5*np.pi, num_segments):
+            dx = box_half_height * np.cos(angle)
+            dy = box_half_height * np.sin(angle)
+            GL.glVertex2f(self.x + box_width/3.0 + dx, self.y -
+                          box_half_height * (self.inputs - 2.0)/2.0 + dy)
+        GL.glEnd()
+
+        draw_circle(port_radius, self.x + box_width/3.0 +
+                    box_half_height, self.y, (0.0, 0.0, 0.0))
+
+        for i in range(self.inputs):
+            y = box_half_height * (i + 0.5 - self.inputs*0.5) + self.y
+            draw_circle(port_radius, self.x - box_width *
+                        2/3.0, y, (0.0, 0.0, 0.0))
+
+    def is_clicked(self, mouse_x, mouse_y):
+        click_radius = 30
+        if (mouse_x - self.x)**2 + (mouse_y - self.y)**2 < click_radius**2:
+            return True
+        else:
+            return False
 
 
 class MyGLCanvas(wxcanvas.GLCanvas):
@@ -64,6 +134,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.pan_y = 0
         self.last_mouse_x = 0  # previous mouse x position
         self.last_mouse_y = 0  # previous mouse y position
+        self.object_clicked = False
 
         # Initialise variables for zooming
         self.zoom = 1
@@ -72,6 +143,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+
+        self.objects = [And_gate(50, 50), And_gate(300, 50)]
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -98,23 +171,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        self.render_grid()
 
         # Draw specified text at position (10, 10)
         self.render_text(text, 10, 10)
 
         # Draw a sample signal trace
-        GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
-        GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(10):
-            x = (i * 20) + 10
-            x_next = (i * 20) + 30
-            if i % 2 == 0:
-                y = 75
-            else:
-                y = 100
-            GL.glVertex2f(x, y)
-            GL.glVertex2f(x_next, y)
-        GL.glEnd()
+        for ob in self.objects:
+            ob.render()
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -153,15 +217,37 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.last_mouse_y = event.GetY()
             text = "".join(["Mouse button pressed at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
+
+            for ob in self.objects:
+                if ob.is_clicked(ox, oy):
+                    ob.clicked = True
+                    self.object_clicked = True
+                    break
+
         if event.ButtonUp():
             text = "".join(["Mouse button released at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
+            if self.object_clicked:
+                self.object_clicked = False
+                for ob in self.objects:
+                    ob.clicked = False
+
         if event.Leaving():
             text = "".join(["Mouse left canvas at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
+            if self.object_clicked:
+                self.object_clicked = False
+                for ob in self.objects:
+                    ob.clicked = False
         if event.Dragging():
-            self.pan_x += event.GetX() - self.last_mouse_x
-            self.pan_y -= event.GetY() - self.last_mouse_y
+            if self.object_clicked:
+                for ob in self.objects:
+                    if ob.clicked:
+                        ob.x += (event.GetX() - self.last_mouse_x) / self.zoom
+                        ob.y -= (event.GetY() - self.last_mouse_y) / self.zoom
+            else:
+                self.pan_x += event.GetX() - self.last_mouse_x
+                self.pan_y -= event.GetY() - self.last_mouse_y
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
             self.init = False
@@ -204,8 +290,43 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
+    def render_grid(self):
 
-class Gui_skeleton(wx.Frame):
+        grid_spacing = 50
+        GL.glLoadIdentity()
+        GL.glTranslated(self.pan_x % grid_spacing,
+                        self.pan_y % grid_spacing, 0.0)
+        GL.glScaled(self.zoom, self.zoom, self.zoom)
+
+        width, height = self.GetSize()
+        x = 0
+
+        GL.glColor3f(0.7, 0.7, 0.7)
+        GL.glBegin(GL.GL_LINES)
+        while x < width/self.zoom:
+            if abs(x - grid_spacing * self.pan_x//grid_spacing) < 8:
+                GL.glColor3f(0.7, 0, 0)
+            GL.glVertex2f(x, -grid_spacing)
+            GL.glVertex2f(x, height/self.zoom)
+            x += grid_spacing
+            GL.glColor3f(0.7, 0.7, 0.7)
+        GL.glEnd()
+
+        GL.glBegin(GL.GL_LINES)
+        y = 0
+        while y < grid_spacing + height/self.zoom:
+            GL.glVertex2f(-grid_spacing, y)
+            GL.glVertex2f(width/self.zoom, y)
+            y += grid_spacing
+        GL.glEnd()
+
+        GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glLoadIdentity()
+        GL.glTranslated(self.pan_x, self.pan_y, 0.0)
+        GL.glScaled(self.zoom, self.zoom, self.zoom)
+
+
+class Gui_interactive(wx.Frame):
     """Configure the main window and all the widgets.
 
     This class provides a graphical user interface for the Logic Simulator and
@@ -254,8 +375,8 @@ class Gui_skeleton(wx.Frame):
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
         self.cont_button = wx.Button(self, wx.ID_ANY, "Continue")
-        # self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-        # style=wx.TE_PROCESS_ENTER)
+        self.text_box = wx.TextCtrl(
+            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
 
         self.text2 = wx.StaticText(self, wx.ID_ANY, "Configure Switches")
         self.switch_selector = wx.ComboBox(
@@ -268,7 +389,7 @@ class Gui_skeleton(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_menu)
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
-        # self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
+        self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)

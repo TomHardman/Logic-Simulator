@@ -57,6 +57,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GLUT.glutInit()
         self.init = False
         self.context = wxcanvas.GLContext(self)
+        self.SetSize(500, 500)
 
         # Initialise variables for panning
         self.pan_x = 0
@@ -223,127 +224,5 @@ class ToggleButtonPanel(wx.ScrolledWindow):
         # Fit the panel contents and update scrollbars
         self.sizer.Fit(self)
         self.SetVirtualSize(self.sizer.GetMinSize())
-
-
-class Gui(wx.Frame):
-    """Configure the main window and all the widgets.
-
-    This class provides a graphical user interface for the Logic Simulator and
-    enables the user to change the circuit properties and run simulations.
-
-    Parameters
-    ----------
-    title: title of the window.
-
-    Public methods
-    --------------
-    on_menu(self, event): Event handler for the file menu.
-
-    on_spin(self, event): Event handler for when the user changes the spin
-                           control value.
-
-    on_run_button(self, event): Event handler for when the user clicks the run
-                                button.
-
-    on_text_box(self, event): Event handler for when the user enters text.
-    """
-
-    def __init__(self, title, path, names, devices, network, monitors):
-        """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(800, 600))
-
-        # Configure the file menu
-        fileMenu = wx.Menu()
-        menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, "&About")
-        fileMenu.Append(wx.ID_EXIT, "&Exit")
-        menuBar.Append(fileMenu, "&File")
-        self.Centre()
-        self.SetMenuBar(menuBar)
-
-        #Initial attributes
-        self.first_run = False
-
-        # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, devices, monitors)
-
-        # Configure the widgets
-        self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
-        self.run_button = wx.Button(self, wx.ID_ANY, "Run")
-        self.cont_button = wx.Button(self, wx.ID_ANY, "Continue")
-        self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    style=wx.TE_PROCESS_ENTER)
-        self.toggle_button_panel = ToggleButtonPanel()
-
-
-        # Bind events to widgets
-        self.Bind(wx.EVT_MENU, self.on_menu)
-        self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
-        self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
-        self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
-
-        # Configure sizers for layout
-        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.side_sizer = wx.BoxSizer(wx.VERTICAL)
-
-        main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
-        main_sizer.Add(self.side_sizer, 1, wx.ALL, 5)
-
-        self.side_sizer.Add(self.text, 1, wx.TOP, 10)
-        self.side_sizer.Add(self.spin, 1, wx.ALL, 5)
-        self.side_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        self.side_sizer.Add(self.text_box, 1, wx.ALL, 5)
-        #self.side_sizer.Add(self.toggle_button_panel)
-
-        self.SetSizeHints(600, 600)
-        self.SetSizer(main_sizer)
-
-    def on_menu(self, event):
-        """Handle the event when the user selects a menu item."""
-        Id = event.GetId()
-        if Id == wx.ID_EXIT:
-            self.Close(True)
-        if Id == wx.ID_ABOUT:
-            wx.MessageBox("Logic Simulator\nCreated by bd432, al2008, th624\n2023",
-                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
-
-    def on_spin(self, event):
-        """Handle the event when the user changes the spin control value."""
-        spin_value = self.spin.GetValue()
-        text = "".join(["New spin control value: ", str(spin_value)])
-        self.canvas.render(text)
-
-    def on_run_button(self, event):
-        """Handle the event when the user clicks the run button."""
-        text = "Run button pressed."
-        self.canvas.render(text)
-
-        if not self.first_run:
-            main_sizer = self.GetSizer()  # Get the parent sizer
-
-            # Remove the existing side_sizer from main_sizer
-            main_sizer.Remove(self.side_sizer)
-
-            # Recreate the side_sizer with the new configuration
-            side_sizer_c = wx.BoxSizer(wx.VERTICAL)
-            side_sizer_c.Add(self.text, 1, wx.TOP, 10)
-            side_sizer_c.Add(self.spin, 1, wx.ALL, 5)
-            side_sizer_c.Add(self.run_button, 1, wx.ALL, 5)
-            side_sizer_c.Add(self.cont_button, 1, wx.ALL, 5)
-            side_sizer_c.Add(self.text_box, 1, wx.ALL, 5)
-
-            # Add the updated side_sizer back to main_sizer
-            main_sizer.Add(side_sizer_c, 1, wx.ALL, 5)
-
-            self.Layout()
-
-        self.first_run = True
-
-    def on_text_box(self, event):
-        """Handle the event when the user enters text."""
-        text_box_value = self.text_box.GetValue()
-        text = "".join(["New text box value: ", text_box_value])
-        self.canvas.render(text)
 
 
