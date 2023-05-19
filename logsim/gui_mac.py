@@ -1,6 +1,6 @@
 import wx
 from canvas import MyGLCanvas
-import simpleaudio as sa
+#import simpleaudio as sa
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
