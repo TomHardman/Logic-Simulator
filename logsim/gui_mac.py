@@ -54,7 +54,7 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         event.Skip()
 
 
-class Gui(wx.Frame):
+class Gui_mac(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
