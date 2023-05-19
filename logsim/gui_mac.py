@@ -1,5 +1,7 @@
 import wx
 from canvas import MyGLCanvas
+import simpleaudio as sa
+from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
 class RoundedScrollWindow(wx.ScrolledWindow):
@@ -53,7 +55,7 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         event.Skip()
 
 
-class Gui(wx.Frame):
+class Gui_mac(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
@@ -64,9 +66,13 @@ class Gui(wx.Frame):
         self.names = names
         self.monitors = monitors
         self.network = network
+
         self.first_run = True
         self.cycles = 10
         self.cycles_completed = 0
+
+        self.error_sound_path = 'error_sounds/bruh_sound.wav'
+        self.play_error_sound = True
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -161,11 +167,20 @@ class Gui(wx.Frame):
             name = names.get_name_string(id)
             switch_config_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-            switch_txt = wx.StaticText(panel_switch, wx.ID_ANY, f'Switch {name}:')
+            switch_dev = self.devices.get_device(id)
+            state = switch_dev.switch_state  # Read state of current switch
+
+            switch_txt = wx.StaticText(panel_switch, wx.ID_ANY, f'Switch {name}:')   # Text to go left of button
             font_sw_txt = wx.Font(12, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
             switch_txt.SetFont(font_sw_txt)
 
-            switch_button = wx.ToggleButton(panel_switch, id, label='Off')
+            # Set up toggle button for each switch depending on current state
+            if state == 0:
+                switch_button = wx.ToggleButton(panel_switch, id, label='Off')
+            else:
+                switch_button = wx.ToggleButton(panel_switch, id, label='On')
+                switch_button.SetValue(True)
+
             switch_button.Bind(wx.EVT_TOGGLEBUTTON, self.on_toggle_switch)
             switch_config_sizer.Add(switch_txt, 1, wx.ALL, 5)
             switch_config_sizer.Add(switch_button, 1, wx.ALL, 2)
@@ -211,10 +226,10 @@ class Gui(wx.Frame):
         """Handle the event when the user toggles a switch button"""
         Id = event.GetId()
         toggle_button = self.FindWindowById(Id)
-        button_state = toggle_button.GetValue()  # Gets button state: True means button is currently toggled off
+        button_state = toggle_button.GetValue()  # Gets button state: True means button is currently toggled on
 
         if button_state:
-            switch_state = 1  # Button currently toggled off means new switch state is to be set as 1
+            switch_state = 1  # Button toggled on means new switch state is to be set as 1
         else:
             switch_state = 0
 
@@ -233,17 +248,20 @@ class Gui(wx.Frame):
         button to appear in the GUI - on all runs it runs the simulation from scratch for the specified
         number of cycles"""
 
-        if self.first_run:  # adds continue button to GUI after first run has been executed
-            self.first_run = False
-            run_sizer = self.run_sizer
-            panel_control = self.panel_control
-            cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
-            font_cb = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
-            cont_button.SetFont(font_cb)
-            run_sizer.Add(cont_button, 1, wx.ALL, 5)
-            panel_control.Layout()
+        if self.cycles is not None and self.cycles > 0:  # if the number of cycles provided is valid
+            if self.first_run:  # adds continue button to GUI after first run has been executed
+                self.first_run = False
+                run_sizer = self.run_sizer
+                panel_control = self.panel_control
 
-        if self.cycles is not None:  # if the number of cycles provided is valid
+                cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
+                font_cb = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+                cont_button.SetFont(font_cb)
+                cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
+
+                run_sizer.Add(cont_button, 1, wx.ALL, 5)
+                panel_control.Layout()
+
             self.cycles_completed = 0
             self.monitors.reset_monitors()
             self.devices.cold_startup()
@@ -254,8 +272,14 @@ class Gui(wx.Frame):
                     self.cycles_completed += 1
                     print(self.cycles_completed)
 
-                else:  # need to implement error event here
-                    pass
+        else:  # show error dialogue box if cycle no. is not valid
+            dlg = GMD(None, "Please select valid number of cycles greater than zero ",
+                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
+            dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+            if self.play_error_sound:
+                self.error_sound()  # plays error sound
+            dlg.ShowModal()
+            dlg.Destroy()
 
     def on_sash_position_change(self, event):
         """Handles the event where the sash position of the window changes - this
@@ -267,7 +291,6 @@ class Gui(wx.Frame):
 
         min_sash_pos = current_width - 280
         max_sash_pos = current_width - 10
-        current_position = event.GetSashPosition()
 
         if current_position < min_sash_pos:  # places max size on sidebar
             window.SetSashPosition(min_sash_pos)
@@ -281,3 +304,29 @@ class Gui(wx.Frame):
         widget = self.FindWindowById(Id)
         self.cycles = widget.GetValue()
         event.Skip()
+
+    def on_continue_button(self, event):
+        """Handle the event when the user presses the continue button"""
+        if self.cycles_completed == 0: # provide dialogue box error message
+            pass
+
+        if self.cycles > 0:  # if the number of cycles provided is valid
+            for i in range(self.cycles):  # executes run for specified no. cycles
+                if self.network.execute_network():
+                    self.monitors.record_signals()
+                    self.cycles_completed += 1
+                    print(self.cycles_completed)
+
+        else:  # show error dialogue box if cycle no. is not valid
+            dlg = GMD(None, "Please select valid number of cycles greater than zero ",
+                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
+            dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+            if self.play_error_sound:
+                self.error_sound()  # plays error sound
+            dlg.ShowModal()
+            dlg.Destroy()
+
+    def error_sound(self):  # method that plays an error sound to be used when displaying error messages
+        filename = self.error_sound_path
+        wave_obj = sa.WaveObject.from_wave_file(filename)
+        play_obj = wave_obj.play()

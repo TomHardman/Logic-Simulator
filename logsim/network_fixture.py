@@ -17,9 +17,9 @@ def create_network_fixture():
     devices.make_gate(G1_id, devices.AND, 2)
     devices.make_switch(SW1_id, 0)
     devices.make_switch(SW2_id, 0)
-    devices.make_switch(SW3_id, 0)
+    devices.make_switch(SW3_id, 1)
     devices.make_switch(SW4_id, 0)
-    devices.make_switch(SW5_id, 0)
+    devices.make_switch(SW5_id, 1)
     devices.make_switch(SW6_id, 0)
 
     network.make_connection(G1_id, I1_id, SW1_id, None)
