@@ -4,7 +4,7 @@
 This script parses options and arguments specified on the command line, and
 runs either the command line user interface or the graphical user interface.
 
-Usage
+Usage 
 -----
 Show help: logsim.py -h
 Command line user interface: logsim.py -c <file path>
@@ -23,7 +23,7 @@ from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
 from gui import Gui
-from gui_skeleton import Gui_skeleton
+from gui_interactive import Gui_interactive
 from network_fixture import create_network_fixture
 
 
@@ -83,8 +83,8 @@ def main(arg_list):
 
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
-            gui = Gui_skeleton("Logic Simulator", path, names, devices, network,
-                               monitors)
+            gui = Gui_interactive("Logic Simulator", path, names, devices, network,
+                                  monitors)
             gui.Show(True)
             app.MainLoop()
 
