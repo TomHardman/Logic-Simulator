@@ -18,11 +18,11 @@
             "name": "Run GUI",
             "type": "python",
             "request": "launch",
-            "program": "logsim\\logsim.py",
+            "program": "logsim/logsim.py",
             "args": [
                 "-t",
                 "avhaava"
-            ]
+            ],
         }
     ]
 }

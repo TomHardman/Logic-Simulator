@@ -33,21 +33,23 @@ def draw_circle(r, x, y, color):
     GL.glEnd()
 
 
-class Decvice
-
-class And_gate:
-    """Creates an AND gate for animation"""
-
+class Device_GL:
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.clicked = False
-        self.inputs = 14
+        self.inputs = 4
+
+class And_gate(Device_GL):
+    """Creates an AND gate for animation"""
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
 
     def render(self):
 
         box_width = 45
-        box_half_height = 30
+        input_height = 30
         port_radius = 7
 
         GL.glColor3f(0.212, 0.271, 0.310)
@@ -55,35 +57,83 @@ class And_gate:
         GL.glVertex2f(self.x, self.y)
 
         GL.glVertex2f(self.x + box_width / 3, self.y -
-                      box_half_height*self.inputs/2)
+                      input_height*self.inputs/2)
         GL.glVertex2f(self.x - box_width * 2/3, self.y -
-                      box_half_height*(1 + (self.inputs - 2)/2))
+                      input_height*(1 + (self.inputs - 2)/2))
         GL.glVertex2f(self.x - box_width * 2/3, self.y +
-                      box_half_height*(1 + (self.inputs - 2)/2))
+                      input_height*(1 + (self.inputs - 2)/2))
         GL.glVertex2f(self.x + box_width / 3, self.y +
-                      box_half_height*(1 + (self.inputs - 2)/2))
+                      input_height*(1 + (self.inputs - 2)/2))
 
         # Draw the arc for the AND gate
         num_segments = 50
         for angle in np.linspace(np.pi*0.5, 0, num_segments):
-            dx = box_half_height * np.cos(angle)
-            dy = box_half_height * np.sin(angle)
+            dx = input_height * np.cos(angle)
+            dy = input_height * np.sin(angle)
             GL.glVertex2f(self.x + box_width/3.0 + dx, self.y +
-                          box_half_height * (self.inputs - 2.0)/2.0 + dy)
+                          input_height * (self.inputs - 2.0)/2.0 + dy)
         for angle in np.linspace(0, -0.5*np.pi, num_segments):
-            dx = box_half_height * np.cos(angle)
-            dy = box_half_height * np.sin(angle)
+            dx = input_height * np.cos(angle)
+            dy = input_height * np.sin(angle)
             GL.glVertex2f(self.x + box_width/3.0 + dx, self.y -
-                          box_half_height * (self.inputs - 2.0)/2.0 + dy)
+                          input_height * (self.inputs - 2.0)/2.0 + dy)
         GL.glEnd()
 
         draw_circle(port_radius, self.x + box_width/3.0 +
-                    box_half_height, self.y, (0.0, 0.0, 0.0))
+                    input_height, self.y, (0.0, 0.0, 0.0))
 
         for i in range(self.inputs):
-            y = box_half_height * (i + 0.5 - self.inputs*0.5) + self.y
+            y = input_height * (i + 0.5 - self.inputs*0.5) + self.y
             draw_circle(port_radius, self.x - box_width *
                         2/3.0, y, (0.0, 0.0, 0.0))
+
+    def is_clicked(self, mouse_x, mouse_y):
+        click_radius = 30
+        if (mouse_x - self.x)**2 + (mouse_y - self.y)**2 < click_radius**2:
+            return True
+        else:
+            return False
+
+
+class Or_gate(Device_GL):
+    """Creates an AND gate for animation"""
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.inputs = 2
+
+    def render(self):
+
+        box_width = 45
+        indent_width = 10
+        input_height = 30
+        port_radius = 7
+        no_segments = 100
+        x_CoM = 10
+
+        GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glBegin(GL.GL_TRIANGLE_FAN)
+        GL.glVertex2d(self.x + box_width - x_CoM, self.y)
+
+
+        c = self.inputs * input_height/2
+
+        for dy in np.linspace(c, -c, no_segments):
+            dx = box_width*(1 - abs(dy / c)**1.6)
+            GL.glVertex2f(self.x + dx - x_CoM, self.y + dy)
+        
+        for dy in np.linspace(-c, c, no_segments):
+            dx = indent_width*(1 - (dy / c)**2)
+            GL.glVertex2f(self.x + dx - x_CoM, self.y + dy)
+
+        GL.glEnd()
+
+        draw_circle(port_radius, self.x + box_width - x_CoM, self.y, (0.0, 0.0, 0.0))
+
+        for dy in np.linspace(-c + input_height/2, c - input_height/2, self.inputs):
+            dx = indent_width*(1 - (dy / c)**2)
+            draw_circle(port_radius, self.x - x_CoM, self.y + dy, (0.0, 0.0, 0.0))
+
 
     def is_clicked(self, mouse_x, mouse_y):
         click_radius = 30
@@ -146,7 +196,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
-        self.objects = [And_gate(50, 50), And_gate(300, 50)]
+        #self.init_objects(devices)
+
+        self.objects = [And_gate(50, 50), And_gate(300, 50), Or_gate(500, 50)]
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -162,6 +214,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glLoadIdentity()
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
+    
+    def init_objects(self, devices):
+        self.objects = []
+        pass
 
     def render(self, text):
         """Handle all drawing operations."""
