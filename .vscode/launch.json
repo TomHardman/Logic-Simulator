@@ -11,7 +11,7 @@
             "module": "pytest",
             "args": [
                 "-v",
-                "logsim/test_parse.py"
+                "logsim/test_scanner.py"
             ]
         },
         {
