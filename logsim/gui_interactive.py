@@ -33,6 +33,8 @@ def draw_circle(r, x, y, color):
     GL.glEnd()
 
 
+class Decvice
+
 class And_gate:
     """Creates an AND gate for animation"""
 
@@ -40,7 +42,7 @@ class And_gate:
         self.x = x
         self.y = y
         self.clicked = False
-        self.inputs = 6
+        self.inputs = 14
 
     def render(self):
 
