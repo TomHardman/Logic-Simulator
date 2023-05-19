@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 """Parse command line options and arguments for the Logic Simulator.
 
 This script parses options and arguments specified on the command line, and
