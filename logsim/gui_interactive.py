@@ -40,7 +40,7 @@ class And_gate:
         self.x = x
         self.y = y
         self.clicked = False
-        self.inputs = 6
+        self.inputs = 3
 
     def render(self):
 
@@ -55,11 +55,11 @@ class And_gate:
         GL.glVertex2f(self.x + box_width / 3, self.y -
                       box_half_height*self.inputs/2)
         GL.glVertex2f(self.x - box_width * 2/3, self.y -
-                      box_half_height*(1 + (self.inputs - 2)/2))
+                      box_half_height*self.inputs/2)
         GL.glVertex2f(self.x - box_width * 2/3, self.y +
-                      box_half_height*(1 + (self.inputs - 2)/2))
+                      box_half_height*self.inputs/2)
         GL.glVertex2f(self.x + box_width / 3, self.y +
-                      box_half_height*(1 + (self.inputs - 2)/2))
+                      box_half_height*self.inputs/2)
 
         # Draw the arc for the AND gate
         num_segments = 50
