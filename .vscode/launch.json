@@ -10,9 +10,7 @@
             "request": "launch",
             "module": "pytest",
             "args": [
-                "-s",
                 "-v",
-                "-x",
                 "logsim/test_parse.py"
             ]
         }
