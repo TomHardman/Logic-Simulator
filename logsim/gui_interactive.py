@@ -33,6 +33,31 @@ def draw_circle(r, x, y, color):
     GL.glEnd()
 
 
+def line_with_thickness(vertices, t, color):
+
+    i = 0
+    while i < len(vertices) - 1:
+        draw_circle(t/2, *vertices[i], color)
+        v1 = np.array(vertices[i])
+        v2 = np.array(vertices[i+1])
+        delta = v2 - v1
+        dv = t/2 / np.linalg.norm(np.array([-delta[1], delta[0]]))
+        dv *= np.array([-delta[1], delta[0]])
+        p1 = v1 + dv
+        p2 = v2 + dv
+        p3 = v2 - dv
+        p4 = v1 - dv
+        GL.glColor3f(*color)
+        GL.glBegin(GL.GL_POLYGON)
+        GL.glVertex2f(*p1)
+        GL.glVertex2f(*p2)
+        GL.glVertex2f(*p3)
+        GL.glVertex2f(*p4)
+        GL.glEnd()
+        i += 1
+    draw_circle(t/2, *vertices[-1], color)
+
+
 class Connection_GL:
     def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
         self.input_device_GL = input_device_GL
@@ -40,14 +65,66 @@ class Connection_GL:
         self.input_port_id = input_port_id
         self.output_port_id = output_port_id
 
+        self.line_thickness = 3
+
     def render(self):
         in_x, in_y = self.input_device_GL.get_port_coor(self.input_port_id)
         out_x, out_y = self.output_device_GL.get_port_coor(self.output_port_id)
 
+        color = (0.0, 0.0, 0.0)
+        if self.output_device_GL.device.outputs[self.output_port_id]:
+            color = (0.617, 0.0, 0.0)
+            draw_circle(7, in_x, in_y, color)
+            draw_circle(7, out_x, out_y, color)
+
+        GL.glColor3f(*color)
         GL.glBegin(GL.GL_LINE_STRIP)
         GL.glVertex2f(in_x, in_y)
+        vertices = [(in_x, in_y)]
+        if abs(in_x - out_x) > abs(in_y - out_y):
+            if in_x > out_x:
+                vertices.append(
+                    (out_x - (out_x - in_x - abs(out_y - in_y))/2, in_y))
+                vertices.append(
+                    (in_x + (out_x - in_x - abs(out_y - in_y))/2, out_y))
+                GL.glVertex2f(
+                    out_x - (out_x - in_x - abs(out_y - in_y))/2, in_y)
+                GL.glVertex2f(
+                    in_x + (out_x - in_x - abs(out_y - in_y))/2, out_y)
+            else:
+                vertices.append((
+                    in_x + (out_x - in_x - abs(out_y - in_y))/2, in_y))
+                vertices.append((
+                    out_x - (out_x - in_x - abs(out_y - in_y))/2, out_y))
+                GL.glVertex2f(
+                    in_x + (out_x - in_x - abs(out_y - in_y))/2, in_y)
+                GL.glVertex2f(
+                    out_x - (out_x - in_x - abs(out_y - in_y))/2, out_y)
+        else:
+            if in_y > out_y:
+                vertices.append((in_x,
+                                 out_y - (out_y - in_y - abs(out_x - in_x))/2))
+                vertices.append((out_x,
+                                 in_y + (out_y - in_y - abs(out_x - in_x))/2))
+                GL.glVertex2f(in_x,
+                              out_y - (out_y - in_y - abs(out_x - in_x))/2)
+                GL.glVertex2f(out_x,
+                              in_y + (out_y - in_y - abs(out_x - in_x))/2)
+            else:
+                vertices.append((in_x,
+                                 in_y + (out_y - in_y - abs(out_x - in_x))/2))
+                vertices.append((out_x,
+                                 out_y - (out_y - in_y - abs(out_x - in_x))/2))
+                GL.glVertex2f(in_x,
+                              in_y + (out_y - in_y - abs(out_x - in_x))/2)
+                GL.glVertex2f(out_x,
+                              out_y - (out_y - in_y - abs(out_x - in_x))/2)
+
         GL.glVertex2f(out_x, out_y)
         GL.glEnd()
+        vertices.append((out_x, out_y))
+        # Use when rasterisation is fixed
+        line_with_thickness(vertices, self.line_thickness, color)
 
 
 class Device_GL:
@@ -133,7 +210,7 @@ class And_gate(Device_GL):
 
     def get_port_coor(self, port_id):
         if port_id is None:
-            x = self.x + self.box_width/3 + self.input_height
+            x = self.x - self.x_CoM + self.box_width + self.input_height
             y = self.y
         elif self.device.inputs:
             input_ids = self.names.lookup(
@@ -151,42 +228,44 @@ class And_gate(Device_GL):
 class Or_gate(Device_GL):
     """Creates an AND gate for animation"""
 
-    def __init__(self, x, y):
-        super().__init__(x, y)
-        self.inputs = 2
+    def __init__(self, x, y, device, names):
+        super().__init__(x, y, device, names)
+
+        self.box_width = 45
+        self.indent_width = 10
+        self.input_height = 30
+        self.port_radius = 7
+        self.no_segments = 100
+        self.x_CoM = 10
 
     def render(self):
 
-        box_width = 45
-        indent_width = 10
-        input_height = 30
-        port_radius = 7
-        no_segments = 100
-        x_CoM = 10
-
         GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
-        GL.glVertex2d(self.x + box_width - x_CoM, self.y)
+        GL.glVertex2d(self.x + self.box_width - self.x_CoM, self.y)
 
-        c = self.inputs * input_height/2
+        c = self.inputs * self.input_height/2
 
-        for dy in np.linspace(c, -c, no_segments):
-            dx = box_width*(1 - abs(dy / c)**1.6)
-            GL.glVertex2f(self.x + dx - x_CoM, self.y + dy)
+        for dy in np.linspace(c, -c, self.no_segments):
+            dx = self.box_width*(1 - abs(dy / c)**1.6)
+            GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
 
-        for dy in np.linspace(-c, c, no_segments):
-            dx = indent_width*(1 - (dy / c)**2)
-            GL.glVertex2f(self.x + dx - x_CoM, self.y + dy)
+        for dy in np.linspace(-c, c, self.no_segments):
+            dx = self.indent_width*(1 - (dy / c)**2)
+            GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
 
         GL.glEnd()
 
-        draw_circle(port_radius, self.x + box_width -
-                    x_CoM, self.y, (0.0, 0.0, 0.0))
+        draw_circle(self.port_radius, self.x + self.box_width -
+                    self.x_CoM, self.y, (0.0, 0.0, 0.0))
 
-        for dy in np.linspace(-c + input_height/2, c - input_height/2, self.inputs):
-            dx = indent_width*(1 - (dy / c)**2)
-            draw_circle(port_radius, self.x - x_CoM,
+        for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
+            dx = self.indent_width*(1 - (dy / c)**2)
+            draw_circle(self.port_radius, self.x - self.x_CoM,
                         self.y + dy, (0.0, 0.0, 0.0))
+            vertices = [(self.x - self.x_CoM, self.y + dy),
+                        (self.x - self.x_CoM + dx, self.y + dy)]
+            line_with_thickness(vertices, 3, (0.0, 0.0, 0.0))
 
     def is_clicked(self, mouse_x, mouse_y):
         click_radius = 30
@@ -194,6 +273,69 @@ class Or_gate(Device_GL):
             return True
         else:
             return False
+
+    def get_port_coor(self, port_id):
+        if port_id is None:
+            x = self.x - self.x_CoM + self.box_width
+            y = self.y
+        elif self.device.inputs:
+            input_ids = self.names.lookup(
+                ["I" + str(i) for i in range(1, self.inputs + 1)])
+            index = input_ids.index(port_id)
+            x = self.x - self.x_CoM
+            y = self.y + self.input_height * \
+                (self.inputs/2 - 0.5) - self.input_height * index
+        else:
+            raise IndexError("Port not in device")
+
+        return [x, y]
+
+
+class Switch(Device_GL):
+    def __init__(self, x, y, device, names):
+        super().__init__(x, y, device, names)
+        self.inputs = 2
+
+        self.x_CoM = 15
+        self.half_height = 15
+        self.width = 40
+        self.port_radius = 7
+        self.line_thickness = 3
+
+        # Could mess up network execution?
+        self.device.outputs[None] = self.device.switch_state
+
+    def render(self):
+        color = (0.0, 0.0, 0.0)
+        draw_circle(self.port_radius, self.x - self.x_CoM,
+                    self.y - self.half_height, (0.0, 0.0, 0.0))
+        draw_circle(self.port_radius, self.x - self.x_CoM,
+                    self.y + self.half_height, (0.617, 0.0, 0.0))
+        vertices = [(self.x - self.x_CoM +
+                    self.width, self.y)]
+        if self.device.switch_state == 1:
+            color = (0.617, 0.0, 0.0)
+            vertices.append((self.x - self.x_CoM,
+                             self.y + self.half_height))
+        else:
+            vertices.append((self.x - self.x_CoM,
+                             self.y - self.half_height))
+        draw_circle(self.port_radius, self.x - self.x_CoM +
+                    self.width, self.y, color)
+        line_with_thickness(vertices, self.line_thickness, color)
+
+    def is_clicked(self, mouse_x, mouse_y):
+        click_radius = 30
+        if (mouse_x - self.x)**2 + (mouse_y - self.y)**2 < click_radius**2:
+            return True
+        else:
+            return False
+
+    def get_port_coor(self, port_id):
+        if port_id is None:
+            return (self.x - self.x_CoM + self.width, self.y)
+        else:
+            raise IndexError("Port does not exist")
 
 
 class MyGLCanvas(wxcanvas.GLCanvas):
@@ -248,6 +390,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+        self.Bind(wx.EVT_LEFT_DCLICK, self.on_double_click)
 
         self.init_objects(devices, names)
 
@@ -271,11 +414,22 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     def init_objects(self, devices, names):
         self.objects = []
         self.devices_GL_list = []
+        self.switch_GL_list = []
         self.connections = []
 
         and_gate_ids = devices.find_devices(devices.AND)
+        or_gate_ids = devices.find_devices(devices.OR)
+        switch_ids = devices.find_devices(devices.SWITCH)
         x = 100
         y = 100
+
+        for id in switch_ids:
+            device = devices.get_device(id)
+            switch = Switch(x, y, device, names)
+            x += 200
+            self.objects.append(switch)
+            self.devices_GL_list.append(switch)
+            self.switch_GL_list.append(switch)
 
         for id in and_gate_ids:
             device = devices.get_device(id)
@@ -283,6 +437,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             x += 200
             self.objects.append(and_gate)
             self.devices_GL_list.append(and_gate)
+
+        for id in or_gate_ids:
+            device = devices.get_device(id)
+            or_gate = Or_gate(x, y, device, names)
+            x += 200
+            self.objects.append(or_gate)
+            self.devices_GL_list.append(or_gate)
+
         for device_GL in self.devices_GL_list:
             connections = device_GL.create_connections(
                 devices, self.devices_GL_list)
@@ -299,6 +461,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+
+        GL.glEnable(GL.GL_LINE_SMOOTH)
+        GL.glEnable(GL.GL_POLYGON_SMOOTH)
+        GL.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST)
+        GL.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST)
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+
         self.render_grid()
 
         # Draw specified text at position (10, 10)
@@ -404,6 +574,20 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.render(text)
         else:
             self.Refresh()  # triggers the paint event
+
+    def on_double_click(self, event):
+        size = self.GetClientSize()
+        ox = (event.GetX() - self.pan_x) / self.zoom
+        oy = (size.height - event.GetY() - self.pan_y) / self.zoom
+        for switch in self.switch_GL_list:
+            if switch.is_clicked(ox, oy):
+                if switch.device.switch_state:
+                    switch.device.switch_state = 0
+                    switch.device.outputs[None] = 0
+                else:
+                    switch.device.switch_state = 1
+                    switch.device.outputs[None] = 1
+                break
 
     def render_text(self, text, x_pos, y_pos):
         """Handle text drawing operations."""

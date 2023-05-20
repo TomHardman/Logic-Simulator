@@ -1,4 +1,4 @@
- #!/usr/bin/env python3
+#!/usr/bin/env python3
 """Parse command line options and arguments for the Logic Simulator.
 
 This script parses options and arguments specified on the command line, and
@@ -22,7 +22,7 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
-#from gui_mac import Gui_mac
+# from gui_mac import Gui_mac
 from gui_linux import Gui_linux
 from gui_interactive import Gui_interactive
 from network_fixture import create_network_fixture
@@ -75,7 +75,7 @@ def main(arg_list):
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
             gui = Gui_mac("Logic Simulator", path, names, devices, network,
-                      monitors)
+                          monitors)
             gui.Show(True)
             app.MainLoop()
 
@@ -85,9 +85,10 @@ def main(arg_list):
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
             gui = Gui_linux("Logic Simulator", path, names, devices, network,
-                      monitors)
+                            monitors)
             gui.Show(True)
             app.MainLoop()
+            sys.exit()
 
         elif option == '-t':  # Run simulation of Drag and drop
             names, devices, network, monitors = create_network_fixture()
@@ -95,8 +96,11 @@ def main(arg_list):
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
             gui = Gui_interactive("Logic Simulator", path, names, devices, network,
-                                  monitors) 
-                                  
+                                  monitors)
+            gui.Show(True)
+            app.MainLoop()
+            sys.exit()
+
         if len(arguments) != 1:  # wrong number of arguments
             print("Error: one file path required\n")
             print(usage_message)
@@ -109,7 +113,7 @@ def main(arg_list):
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
             gui = Gui_mac("Logic Simulator", path, names, devices, network,
-                      monitors)
+                          monitors)
             gui.Show(True)
             app.MainLoop()
 
