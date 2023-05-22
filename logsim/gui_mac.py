@@ -1,6 +1,6 @@
 import wx
 from canvas import MyGLCanvas
-#import simpleaudio as sa
+import simpleaudio as sa
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
@@ -71,7 +71,7 @@ class Gui_mac(wx.Frame):
         self.cycles = 10
         self.cycles_completed = 0
 
-        self.error_sound_path = 'error_sounds/bruh_sound.wav'
+        self.error_sound_path = 'error_sounds/ph.wav'
         self.play_error_sound = True
 
         # Configure the file menu

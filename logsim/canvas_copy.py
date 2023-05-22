@@ -88,6 +88,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glLoadIdentity()
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, 1.0, 1.0)
+
     def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
@@ -192,15 +193,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         keycode = event.GetKeyCode()
 
         if keycode == wx.WXK_DOWN:
-            self.pan_y -= 100
+            self.pan_y -= 10
             self.init = False
             self.Refresh()
         elif keycode == wx.WXK_UP:
-            self.pan_y += 100
+            self.pan_y += 10
             self.init = False
             self.Refresh()
-        
-        
 
     def render_text(self, text, x_pos, y_pos):
         """Handle text drawing operations."""
