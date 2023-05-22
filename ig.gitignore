@@ -5,4 +5,5 @@
 .idea/
 
 # Ignore cache files
-.pyc
+logsim/__pycache__/
+*.pyc
