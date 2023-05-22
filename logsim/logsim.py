@@ -51,9 +51,11 @@ def main(arg_list):
     monitors = Monitors(names, devices, network)
 
     for option, path in options:
+        print(options)
         if option == "-h":  # print the usage message
             print(usage_message)
             sys.exit()
+
         elif option == "-c":  # use the command line user interface
             scanner = Scanner(path, names)
             parser = Parser(names, devices, network, monitors, scanner)
@@ -61,11 +63,7 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
-
-        elif option == '-u':  # run simulation of UI with artificial network
-            # Initialise an instance of the userint.UserInterface() class
-            userint = UserInterface(names, devices, network, monitors)
-            userint.command_interface()
+            sys.exit()
 
         elif option == '-m':  # run simulation of GUI with artificial network
             names, devices, network, monitors = create_network_fixture()
