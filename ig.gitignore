@@ -3,3 +3,6 @@
 
 # Ignore .idea directory
 .idea/
+
+# Ignore cache files
+.pyc
