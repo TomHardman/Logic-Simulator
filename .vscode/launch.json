@@ -35,7 +35,7 @@
             ],
         },
         {
-            "name": "Run Command line sim",
+            "name": "Run Command Line simulation",
             "type": "python",
             "request": "launch",
             "program": "logsim/logsim.py",
