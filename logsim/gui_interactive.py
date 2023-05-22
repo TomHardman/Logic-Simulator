@@ -386,6 +386,128 @@ class Xor_gate(Device_GL):
 
         return [x, y]
 
+class D_type(Device_GL):
+    """Creates an Dtype device for animation"""
+
+    def __init__(self, x, y, device, names):
+        super().__init__(x, y, device, names)
+
+        self.width = 45
+        self.input_height = 30
+        self.port_radius = 7
+        self.no_segments = 100
+
+    def render(self):
+
+        GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glBegin(GL.GL_POLYGON)
+        GL.glVertex2f(self.x - self.width/2, self.y + self.input_height*2)
+        GL.glVertex2f(self.x + self.width/2, self.y + self.input_height*2)
+        GL.glVertex2f(self.x + self.width/2, self.y - self.input_height*2)
+        GL.glVertex2f(self.x - self.width/2, self.y - self.input_height*2)
+        GL.glEnd()
+
+        vertices = []
+        for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
+            draw_circle(self.port, self.x - self.width/2, self.y + dy, (0.0, 0.0, 0.0))
+        draw_circle(self.port, self.x + self.width/2, self.y + self.input_height/2, (0.0, 0.0, 0.0))
+        draw_circle(self.port, self.x + self.width/2, self.y - self.input_height/2, (0.0, 0.0, 0.0))
+
+    def is_clicked(self, mouse_x, mouse_y):
+        click_radius = 30
+        x_low = self.x - self.width/2
+        x_high = self.x +self.width
+        if x_low <mouse_x< x_high and self.y - self.input_height*2<mouse_y <self.y + 2*self.input_height:
+            return True
+        else:
+            return False
+
+    def get_port_coor(self, port_id):
+        if port_id == self.names.query("CLK"):
+            x = self.x - self.width/2
+            y = self.y + self.input_height * 1.5
+        elif port_id == self.names.query("SET"):
+            x = self.x - self.width/2
+            y = self.y - self.input_height * 0.5
+        elif port_id == self.names.query("CLEAR"):
+            x = self.x - self.width/2
+            y = self.y - self.input_height * 1.5
+        elif port_id == self.names.query("DATA"):
+            x = self.x - self.width/2
+            y = self.y + self.input_height * 1.5
+        elif port_id == self.names.query("Q"):
+            x = self.x + self.width/2
+            y = self.y + self.input_height * 0.5
+        elif port_id == self.names.query("QBAR"):
+            x = self.x + self.width/2
+            y = self.y - self.input_height * 0.5
+        else:
+            raise IndexError("Port not in device")
+
+        return [x, y]
+
+class Clock(Device_GL):
+    """Creates an Clock for animation"""
+
+    def __init__(self, x, y, device, names):
+        super().__init__(x, y, device, names)
+
+        self.width = 45
+        self.half_height = 30
+        self.port_radius = 7
+        self.no_segments = 100
+        self.thickness = 10
+
+    def render(self):
+
+        GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glBegin(GL.GL_POLYGON)
+        GL.glVertex2f(self.x - self.width/2, self.y + self.half_height)
+        GL.glVertex2f(self.x + self.width/2, self.y + self.half_height)
+        GL.glVertex2f(self.x + self.width/2, self.y - self.half_height)
+        GL.glVertex2f(self.x - self.width/2, self.y - self.half_height)
+        GL.glEnd()
+        
+        if self.device.outputs[None]:
+            vGL.glColor3f(0.617, 0.0, 0.0)
+        else:
+            vGL.glColor3f(0.0, 0.0, 0.0)
+        GL.glBegin(GL.GL_POLYGON)
+        GL.glVertex2f(self.x - self.width/4, self.y)
+        GL.glVertex2f(self.x + self.width/4, self.y + self.half_height/2)
+        GL.glVertex2f(self.x + self.thickness/2, self.y + self.half_height/2)
+        GL.glVertex2f(self.x + self.thickness/2, self.y - self.half_height/2 + self.thickness)
+        GL.glVertex2f(self.x - self.thickness + self.width/4, self.y + self.half_height/2)
+        GL.glVertex2f(self.x - self.thickness+ self.width/4, self.y)
+
+        GL.glVertex2f(self.x + self.width/4, self.y)
+        GL.glVertex2f(self.x + self.width/4, self.y - self.half_height/2)
+        GL.glVertex2f(self.x - self.thickness/2, self.y - self.half_height/2)
+        GL.glVertex2f(self.x - self.hickness/2, self.y + self.half_height/2 - self.thickness)
+        GL.glVertex2f(self.x - self.width/4 - self.thickness, self.y + self.half_height/2 - self.thickness)
+        GL.glVertex2f(self.x - self.width/4 - self.thickness, self.y)
+
+        
+        GL.glEnd()
+        draw_circle(self.port_radius, self.x + self.width/2, self.y, (0.0, 0.0, 0.0))
+
+    def is_clicked(self, mouse_x, mouse_y):
+        click_radius = 30
+        x_low = self.x - self.width/2
+        x_high = self.x +self.width
+        if x_low <mouse_x< x_high and self.y - self.half_height<mouse_y <self.y + self.half_height:
+            return True
+        else:
+            return False
+
+    def get_port_coor(self, port_id):
+        if port_id is None:
+            x = self.x + self.width/2
+            y = self.y
+        else:
+            raise ValueError(("Port not valid"))
+
+        return [x, y]
 
 class Switch(Device_GL):
     def __init__(self, x, y, device, names):
@@ -521,6 +643,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         nor_gate_ids = devices.find_devices(devices.NOR)
         switch_ids = devices.find_devices(devices.SWITCH)
         xor_gate_ids = devices.find_devices(devices.XOR)
+        clock_ids = devices.find_devices(devices.CLOCK)
+        dtype_ids = devices.find_devices(devices.D_TYPE)
         x = 100
         y = 100
 
@@ -559,6 +683,20 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             x += 200
             self.objects.append(nor_gate)
             self.devices_GL_list.append(nor_gate)
+        
+        for id in dtype_ids:
+            device = devices.get_device(id)
+            dtype = D_type(x, y, device, names)(x, y, device, names)
+            x += 200
+            self.objects.append(dtype)
+            self.devices_GL_list.append(dtype)
+
+        for id in clock_ids:
+            device = devices.get_device(id)
+            clock = Clock(x, y, device, names)(x, y, device, names)
+            x += 200
+            self.objects.append(clock)
+            self.devices_GL_list.append(clock)
 
         x = 100
         y = 300
