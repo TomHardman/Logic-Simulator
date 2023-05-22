@@ -176,7 +176,7 @@ class Scanner:
             self.current_character = self.input_file.read(1)
 
     def get_name(self):
-        """Returns the name following on from current charcter"""
+        """Returns the name following on from current character"""
         if not self.current_character.isalpha():
             raise ValueError("Charcter is not a letter")
 

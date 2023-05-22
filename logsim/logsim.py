@@ -38,7 +38,8 @@ def main(arg_list):
                      "Command line user interface: logsim.py -c <file path>\n"
                      "Graphical user interface: logsim.py <file path>")
     try:
-        options, arguments = getopt.getopt(arg_list, "hcumtl:")
+        options, arguments = getopt.getopt(arg_list, "hcmtl:")
+        print(getopt.getopt(arg_list, "hcmtl:"))
     except getopt.GetoptError:
         print("Error: invalid command line arguments\n")
         print(usage_message)
@@ -51,13 +52,12 @@ def main(arg_list):
     monitors = Monitors(names, devices, network)
 
     for option, path in options:
-        print(options)
         if option == "-h":  # print the usage message
             print(usage_message)
             sys.exit()
 
         elif option == "-c":  # use the command line user interface
-            scanner = Scanner(path, names)
+            scanner = Scanner(arguments[0], names)
             parser = Parser(names, devices, network, monitors, scanner)
             if parser.parse_network():
                 # Initialise an instance of the userint.UserInterface() class
