@@ -139,7 +139,6 @@ class Scanner:
                 symbol.type = self.KEYWORD
             else:
                 symbol.type = self.NAME
-            print(symbol.id)
             [symbol.id] = self.names.lookup([name_string])
 
         elif self.current_character.isdigit():

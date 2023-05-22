@@ -409,9 +409,9 @@ class D_type(Device_GL):
 
         vertices = []
         for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
-            draw_circle(self.port, self.x - self.width/2, self.y + dy, (0.0, 0.0, 0.0))
-        draw_circle(self.port, self.x + self.width/2, self.y + self.input_height/2, (0.0, 0.0, 0.0))
-        draw_circle(self.port, self.x + self.width/2, self.y - self.input_height/2, (0.0, 0.0, 0.0))
+            draw_circle(self.port_radius, self.x - self.width/2, self.y + dy, (0.0, 0.0, 0.0))
+        draw_circle(self.port_radius, self.x + self.width/2, self.y + self.input_height/2, (0.0, 0.0, 0.0))
+        draw_circle(self.port_radius, self.x + self.width/2, self.y - self.input_height/2, (0.0, 0.0, 0.0))
 
     def is_clicked(self, mouse_x, mouse_y):
         click_radius = 30
@@ -425,7 +425,7 @@ class D_type(Device_GL):
     def get_port_coor(self, port_id):
         if port_id == self.names.query("CLK"):
             x = self.x - self.width/2
-            y = self.y + self.input_height * 1.5
+            y = self.y + self.input_height * 0.5
         elif port_id == self.names.query("SET"):
             x = self.x - self.width/2
             y = self.y - self.input_height * 0.5
@@ -452,11 +452,11 @@ class Clock(Device_GL):
     def __init__(self, x, y, device, names):
         super().__init__(x, y, device, names)
 
-        self.width = 45
-        self.half_height = 30
+        self.width = 60
+        self.half_height = 20
         self.port_radius = 7
         self.no_segments = 100
-        self.thickness = 10
+        self.thickness = 2
 
     def render(self):
 
@@ -468,27 +468,38 @@ class Clock(Device_GL):
         GL.glVertex2f(self.x - self.width/2, self.y - self.half_height)
         GL.glEnd()
         
+
         if self.device.outputs[None]:
-            vGL.glColor3f(0.617, 0.0, 0.0)
+            GL.glColor3f(0.617, 0.0, 0.0)
+            color = (0.617, 0.0,0.0)
         else:
-            vGL.glColor3f(0.0, 0.0, 0.0)
-        GL.glBegin(GL.GL_POLYGON)
+            GL.glColor3f(0.0, 0.0, 0.0)
+            color = (0.0, 0.0,0.0)
+        GL.glBegin(GL.GL_TRIANGLE_STRIP)
         GL.glVertex2f(self.x - self.width/4, self.y)
-        GL.glVertex2f(self.x + self.width/4, self.y + self.half_height/2)
+        GL.glVertex2f(self.x - self.width/4 + self.thickness, self.y)
+
+
+        GL.glVertex2f(self.x - self.width/4, self.y + self.half_height/2)
+        GL.glVertex2f(self.x - self.width/4 + self.thickness, self.y + self.half_height/2 - self.thickness)
+
         GL.glVertex2f(self.x + self.thickness/2, self.y + self.half_height/2)
-        GL.glVertex2f(self.x + self.thickness/2, self.y - self.half_height/2 + self.thickness)
-        GL.glVertex2f(self.x - self.thickness + self.width/4, self.y + self.half_height/2)
-        GL.glVertex2f(self.x - self.thickness+ self.width/4, self.y)
-
-        GL.glVertex2f(self.x + self.width/4, self.y)
-        GL.glVertex2f(self.x + self.width/4, self.y - self.half_height/2)
-        GL.glVertex2f(self.x - self.thickness/2, self.y - self.half_height/2)
-        GL.glVertex2f(self.x - self.hickness/2, self.y + self.half_height/2 - self.thickness)
-        GL.glVertex2f(self.x - self.width/4 - self.thickness, self.y + self.half_height/2 - self.thickness)
-        GL.glVertex2f(self.x - self.width/4 - self.thickness, self.y)
-
+        GL.glVertex2f(self.x - self.thickness/2, self.y + self.half_height/2 - self.thickness)
         
+        GL.glVertex2f(self.x + self.thickness/2, self.y - self.half_height/2 + self.thickness)
+        GL.glVertex2f(self.x - self.thickness/2, self.y - self.half_height/2)
+        
+        GL.glVertex2f(self.x - self.thickness + self.width/4, self.y- self.half_height/2 + self.thickness)
+        GL.glVertex2f(self.x + self.width/4, self.y - self.half_height/2)
+        
+        GL.glVertex2f(self.x - self.thickness+ self.width/4, self.y)
+        GL.glVertex2f(self.x + self.width/4, self.y)
         GL.glEnd()
+
+        draw_circle(self.thickness/2, self.x - self.width/4 + self.thickness/2, self.y, color)
+        draw_circle(self.thickness/2, self.x + self.width/4 - self.thickness/2, self.y, color)
+        
+        
         draw_circle(self.port_radius, self.x + self.width/2, self.y, (0.0, 0.0, 0.0))
 
     def is_clicked(self, mouse_x, mouse_y):
@@ -679,21 +690,21 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         
         for id in nor_gate_ids:
             device = devices.get_device(id)
-            or_gate = Or_gate(x, y, device, names, True)
+            nor_gate = Or_gate(x, y, device, names, True)
             x += 200
             self.objects.append(nor_gate)
             self.devices_GL_list.append(nor_gate)
         
         for id in dtype_ids:
             device = devices.get_device(id)
-            dtype = D_type(x, y, device, names)(x, y, device, names)
+            dtype = D_type(x, y, device, names)
             x += 200
             self.objects.append(dtype)
             self.devices_GL_list.append(dtype)
 
         for id in clock_ids:
             device = devices.get_device(id)
-            clock = Clock(x, y, device, names)(x, y, device, names)
+            clock = Clock(x, y, device, names)
             x += 200
             self.objects.append(clock)
             self.devices_GL_list.append(clock)

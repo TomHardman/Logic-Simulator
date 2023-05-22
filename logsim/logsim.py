@@ -12,6 +12,7 @@ Graphical user interface: logsim.py <file path>
 """
 import getopt
 import sys
+import tempfile
 
 import wx
 
@@ -38,7 +39,7 @@ def main(arg_list):
                      "Command line user interface: logsim.py -c <file path>\n"
                      "Graphical user interface: logsim.py <file path>")
     try:
-        options, arguments = getopt.getopt(arg_list, "hcumtl:")
+        options, arguments = getopt.getopt(arg_list, "hcmtl:")
     except getopt.GetoptError:
         print("Error: invalid command line arguments\n")
         print(usage_message)
@@ -55,7 +56,7 @@ def main(arg_list):
             print(usage_message)
             sys.exit()
         elif option == "-c":  # use the command line user interface
-            scanner = Scanner(path, names)
+            scanner = Scanner(arguments[0], names)
             parser = Parser(names, devices, network, monitors, scanner)
             if parser.parse_network():
                 # Initialise an instance of the userint.UserInterface() class
@@ -88,12 +89,27 @@ def main(arg_list):
             app.MainLoop()
 
         elif option == '-t':  # Run simulation of Drag and drop
-            names, devices, network, monitors = create_network_fixture()
+            #names, devices, network, monitors = create_network_fixture()
+
+            text ='CLOCK 2 G1;SWITCH 1 SW1, 1 SW2;'
+        
+            with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+            # Write the string content to the temporary file
+                temp_file.write(text)
+                # Get the path of the temporary file
+                path_2 = temp_file.name
+            scanner = Scanner(path_2, names)
+            parser = Parser(names, devices, network, monitors, scanner)
+            
 
             # Initialise an instance of the gui.Gui() class
-            app = wx.App()
-            gui = Gui_interactive("Logic Simulator", path, names, devices, network,
-                                  monitors) 
+            if parser.parse_network():
+                app = wx.App()
+                gui = Gui_interactive("Logic Simulator", path, names, devices, network,
+                                    monitors)
+                gui.Show(True)
+                app.MainLoop()
+            sys.exit()
                                   
         if len(arguments) != 1:  # wrong number of arguments
             print("Error: one file path required\n")
