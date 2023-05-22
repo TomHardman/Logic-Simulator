@@ -186,6 +186,10 @@ class And_gate(Device_GL):
             dy = self.input_height * np.sin(angle)
             GL.glVertex2f(self.x - self.x_CoM + self.box_width + dx, self.y +
                           self.input_height * (self.inputs - 2.0)/2.0 + dy)
+            dx = self.input_height * np.cos(angle)
+            dy = self.input_height * np.sin(angle)
+            GL.glVertex2f(self.x - self.x_CoM + self.box_width + dx, self.y +
+                          self.input_height * (self.inputs - 2.0)/2.0 + dy)
         for angle in np.linspace(0, -0.5*np.pi, num_segments):
             dx = self.input_height * np.cos(angle)
             dy = self.input_height * np.sin(angle)
@@ -367,6 +371,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     """
 
     def __init__(self, parent, devices, monitors, names):
+    def __init__(self, parent, devices, monitors, names):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
@@ -517,6 +522,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                             ", ", str(event.GetY())])
 
             for ob in self.devices_GL_list:
+            for ob in self.devices_GL_list:
                 if ob.is_clicked(ox, oy):
                     ob.clicked = True
                     self.object_clicked = True
@@ -528,6 +534,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             if self.object_clicked:
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
+                for ob in self.devices_GL_list:
                     ob.clicked = False
 
         if event.Leaving():
@@ -536,9 +543,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             if self.object_clicked:
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
+                for ob in self.devices_GL_list:
                     ob.clicked = False
         if event.Dragging():
             if self.object_clicked:
+                for ob in self.devices_GL_list:
                 for ob in self.devices_GL_list:
                     if ob.clicked:
                         ob.x += (event.GetX() - self.last_mouse_x) / self.zoom
@@ -678,6 +687,7 @@ class Gui_interactive(wx.Frame):
         self.first_run = False
 
         # Canvas for drawing signals
+        self.canvas = MyGLCanvas(self, devices, monitors, names)
         self.canvas = MyGLCanvas(self, devices, monitors, names)
 
         choices = ['SW1', 'SW2', 'SW3']

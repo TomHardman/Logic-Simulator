@@ -91,7 +91,7 @@ class Scanner:
 
     def blank_symbol(self):
         return Symbol()
-
+    '''
     def get_position(self, symbol):
         """Gets position of symbol which file object is currently pointing at"""
         position = self.input_file.tell()
@@ -103,6 +103,26 @@ class Scanner:
 
         symbol.linenum = linenum
         symbol.linepos = linepos
+        
+    def get_position(self, symbol):
+        position = self.input_file.tell()
+        self.input_file.seek(0)
+
+        contents = self.input_file.read(position)
+        linenum = contents.count('\n')
+        print(self.input_file.readlines(), linenum)
+        self.input_file.seek(0)
+        read_lines = self.input_file.readlines()
+        line = read_lines[linenum]
+        
+        self.input_file.seek(position)
+        char = self.input_file.read(1)
+        linepos = line.rfind(char)-1
+        self.input_file.seek(position)
+        
+        symbol.linenum = linenum
+        symbol.linepos =  linepos
+        '''
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
@@ -147,6 +167,7 @@ class Scanner:
         else:
             self.advance()
 
+        #self.get_position(symbol)
         return symbol
 
     def skip_spaces(self):
