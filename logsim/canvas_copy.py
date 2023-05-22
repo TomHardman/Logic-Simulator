@@ -193,10 +193,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         if keycode == wx.WXK_DOWN:
             self.pan_y -= 100
+            self.init = False
+            self.Refresh()
         elif keycode == wx.WXK_UP:
             self.pan_y += 100
+            self.init = False
+            self.Refresh()
         
-        self.init = False
+        
 
     def render_text(self, text, x_pos, y_pos):
         """Handle text drawing operations."""

@@ -74,8 +74,8 @@ class Connection_GL:
         color = (0.0, 0.0, 0.0)
         if self.output_device_GL.device.outputs[self.output_port_id]:
             color = (0.617, 0.0, 0.0)
-            draw_circle(7, in_x, in_y, color)
-            draw_circle(7, out_x, out_y, color)
+        draw_circle(7, in_x, in_y, color)
+        #draw_circle(7, out_x, out_y, color)
 
         GL.glColor3f(*color)
         GL.glBegin(GL.GL_LINE_STRIP)
@@ -156,13 +156,14 @@ class Device_GL:
 class And_gate(Device_GL):
     """Creates an AND gate for animation"""
 
-    def __init__(self, x, y, device, names):
+    def __init__(self, x, y, device, names, NAND):
         super().__init__(x, y, device, names)
 
         self.box_width = 45
         self.input_height = 30
         self.port_radius = 7
         self.x_CoM = self.box_width*2/3
+        self.NAND = NAND
 
     def render(self):
 
@@ -197,8 +198,9 @@ class And_gate(Device_GL):
                           self.input_height * (self.inputs - 2.0)/2.0 + dy)
         GL.glEnd()
 
-        draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
-                    self.input_height, self.y, (0.0, 0.0, 0.0))
+        if self.NAND:
+            draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
+                        self.input_height, self.y, (0.0, 0.0, 0.0))
 
         for i in range(self.inputs):
             y = self.input_height * (i + 0.5 - self.inputs*0.5) + self.y
@@ -207,7 +209,9 @@ class And_gate(Device_GL):
 
     def is_clicked(self, mouse_x, mouse_y):
         click_radius = 30
-        if (mouse_x - self.x)**2 + (mouse_y - self.y)**2 < click_radius**2:
+        x_low = self.x - self.x_CoM
+        x_high = self.x - self.x_CoM + self.box_width + self.input_height
+        if x_low <mouse_x< x_high and self.y - self.input_height * self.inputs/2 <mouse_y <self.y + self.input_height* self.inputs/2:
             return True
         else:
             return False
@@ -230,17 +234,19 @@ class And_gate(Device_GL):
 
 
 class Or_gate(Device_GL):
-    """Creates an AND gate for animation"""
+    """Creates an OR gate for animation"""
 
-    def __init__(self, x, y, device, names):
+    def __init__(self, x, y, device, names, NOR):
         super().__init__(x, y, device, names)
 
         self.box_width = 45
-        self.indent_width = 10
+        self.indent_width = 15
         self.input_height = 30
         self.port_radius = 7
         self.no_segments = 100
         self.x_CoM = 10
+        self.straight_box_width = 15
+        self.NOR = NOR
 
     def render(self):
 
@@ -251,17 +257,21 @@ class Or_gate(Device_GL):
         c = self.inputs * self.input_height/2
 
         for dy in np.linspace(c, -c, self.no_segments):
-            dx = self.box_width*(1 - abs(dy / c)**1.6)
+            dx = self.box_width*(1 - abs(dy / c)**1.6) + self.straight_box_width
             GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
 
         for dy in np.linspace(-c, c, self.no_segments):
             dx = self.indent_width*(1 - (dy / c)**2)
             GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
 
+        dx = self.straight_box_width
+        GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
+
         GL.glEnd()
 
-        draw_circle(self.port_radius, self.x + self.box_width -
-                    self.x_CoM, self.y, (0.0, 0.0, 0.0))
+        if self.NOR:
+            draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width-
+                        self.x_CoM, self.y, (0.0, 0.0, 0.0))
 
         for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
             dx = self.indent_width*(1 - (dy / c)**2)
@@ -273,20 +283,102 @@ class Or_gate(Device_GL):
 
     def is_clicked(self, mouse_x, mouse_y):
         click_radius = 30
-        if (mouse_x - self.x)**2 + (mouse_y - self.y)**2 < click_radius**2:
+        x_low = self.x - self.x_CoM
+        x_high = self.x - self.x_CoM + self.box_width + self.straight_box_width
+        if x_low <mouse_x< x_high and self.y - self.input_height * self.inputs/2 <mouse_y <self.y + self.input_height* self.inputs/2:
             return True
         else:
             return False
 
     def get_port_coor(self, port_id):
         if port_id is None:
-            x = self.x - self.x_CoM + self.box_width
+            x = self.x - self.x_CoM + self.box_width + self.straight_box_width  
             y = self.y
         elif self.device.inputs:
             input_ids = self.names.lookup(
                 ["I" + str(i) for i in range(1, self.inputs + 1)])
             index = input_ids.index(port_id)
             x = self.x - self.x_CoM
+            y = self.y + self.input_height * \
+                (self.inputs/2 - 0.5) - self.input_height * index
+        else:
+            raise IndexError("Port not in device")
+
+        return [x, y]
+
+class Xor_gate(Device_GL):
+    """Creates an XOR gate for animation"""
+
+    def __init__(self, x, y, device, names):
+        super().__init__(x, y, device, names)
+
+        self.box_width = 45
+        self.indent_width = 15
+        self.input_height = 30
+        self.port_radius = 7
+        self.no_segments = 100
+        self.x_CoM = 10
+        self.straight_box_width = 15
+        self.gap_width = 5
+        self.thickness = 2
+
+    def render(self):
+
+        GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glBegin(GL.GL_TRIANGLE_FAN)
+        GL.glVertex2d(self.x + self.box_width - self.x_CoM, self.y)
+
+        c = self.input_height
+
+        for dy in np.linspace(c, -c, self.no_segments):
+            dx = self.box_width*(1 - abs(dy / c)**1.6) + self.straight_box_width
+            GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
+
+        for dy in np.linspace(-c, c, self.no_segments):
+            dx = self.indent_width*(1 - (dy / c)**2)
+            GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
+
+        dx = self.straight_box_width
+        GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
+
+        GL.glEnd()
+
+        vertices = []
+        for dy in np.linspace(-c, c, self.no_segments):
+            dx = self.indent_width*(1 - (dy / c)**2)
+            vertices.append((self.x + dx - self.x_CoM - self.gap_width, self.y + dy))
+        line_with_thickness(vertices, self.thickness, (0.212, 0.271, 0.310))
+
+        draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width-
+                    self.x_CoM, self.y, (0.0, 0.0, 0.0))
+
+
+        for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
+            dx = self.indent_width*(1 - (dy / c)**2)
+            draw_circle(self.port_radius, self.x - self.x_CoM - self.gap_width,
+                        self.y + dy, (0.0, 0.0, 0.0))
+            vertices = [(self.x - self.x_CoM, self.y + dy),
+                        (self.x - self.x_CoM + dx, self.y + dy)]
+            line_with_thickness(vertices, 3, (0.0, 0.0, 0.0))
+
+    def is_clicked(self, mouse_x, mouse_y):
+        click_radius = 30
+        x_low = self.x - self.x_CoM - self.gap_width
+        x_high = self.x - self.x_CoM + self.box_width + self.straight_box_width
+        if x_low <mouse_x< x_high and self.y - self.input_height<mouse_y <self.y + self.input_height:
+            return True
+        else:
+            return False
+
+    def get_port_coor(self, port_id):
+        if port_id is None:
+            x = self.x - self.x_CoM + self.box_width + self.straight_box_width  
+            y = self.y
+        elif self.device.inputs:
+            input_ids = self.names.lookup(
+                ["I" + str(i) for i in range(1, self.inputs + 1)])
+            index = input_ids.index(port_id)
+            x = self.x - self.x_CoM - self.gap_width 
             y = self.y + self.input_height * \
                 (self.inputs/2 - 0.5) - self.input_height * index
         else:
@@ -329,8 +421,9 @@ class Switch(Device_GL):
         line_with_thickness(vertices, self.line_thickness, color)
 
     def is_clicked(self, mouse_x, mouse_y):
-        click_radius = 30
-        if (mouse_x - self.x)**2 + (mouse_y - self.y)**2 < click_radius**2:
+        x_low = self.x - self.x_CoM
+        x_high = self.x - self.x_CoM + self.width
+        if x_low <mouse_x< x_high and self.y - self.half_height<mouse_y <self.y + self.half_height:
             return True
         else:
             return False
@@ -370,7 +463,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors, names):
     def __init__(self, parent, devices, monitors, names):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
@@ -420,11 +512,15 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.objects = []
         self.devices_GL_list = []
         self.switch_GL_list = []
+        
         self.connections = []
 
         and_gate_ids = devices.find_devices(devices.AND)
+        nand_gate_ids = devices.find_devices(devices.NAND)
         or_gate_ids = devices.find_devices(devices.OR)
+        nor_gate_ids = devices.find_devices(devices.NOR)
         switch_ids = devices.find_devices(devices.SWITCH)
+        xor_gate_ids = devices.find_devices(devices.XOR)
         x = 100
         y = 100
 
@@ -438,17 +534,40 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         for id in and_gate_ids:
             device = devices.get_device(id)
-            and_gate = And_gate(x, y, device, names)
+            and_gate = And_gate(x, y, device, names, False)
             x += 200
             self.objects.append(and_gate)
             self.devices_GL_list.append(and_gate)
+        
+        for id in nand_gate_ids:
+            device = devices.get_device(id)
+            nand_gate = And_gate(x, y, device, names, True)
+            x += 200
+            self.objects.append(nand_gate)
+            self.devices_GL_list.append(nand_gate)
 
         for id in or_gate_ids:
             device = devices.get_device(id)
-            or_gate = Or_gate(x, y, device, names)
+            or_gate = Or_gate(x, y, device, names, False)
             x += 200
             self.objects.append(or_gate)
             self.devices_GL_list.append(or_gate)
+        
+        for id in nor_gate_ids:
+            device = devices.get_device(id)
+            or_gate = Or_gate(x, y, device, names, True)
+            x += 200
+            self.objects.append(nor_gate)
+            self.devices_GL_list.append(nor_gate)
+
+        x = 100
+        y = 300
+        for id in xor_gate_ids:
+            device = devices.get_device(id)
+            xor_gate = Xor_gate(x, y, device, names)
+            x += 200
+            self.objects.append(xor_gate)
+            self.devices_GL_list.append(xor_gate)
 
         for device_GL in self.devices_GL_list:
             connections = device_GL.create_connections(
@@ -466,13 +585,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-
-        GL.glEnable(GL.GL_LINE_SMOOTH)
-        GL.glEnable(GL.GL_POLYGON_SMOOTH)
-        GL.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST)
-        GL.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST)
-        GL.glEnable(GL.GL_BLEND)
-        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
 
         self.render_grid()
 
@@ -522,7 +634,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                             ", ", str(event.GetY())])
 
             for ob in self.devices_GL_list:
-            for ob in self.devices_GL_list:
                 if ob.is_clicked(ox, oy):
                     ob.clicked = True
                     self.object_clicked = True
@@ -534,7 +645,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             if self.object_clicked:
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
-                for ob in self.devices_GL_list:
                     ob.clicked = False
 
         if event.Leaving():
@@ -543,11 +653,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             if self.object_clicked:
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
-                for ob in self.devices_GL_list:
                     ob.clicked = False
         if event.Dragging():
             if self.object_clicked:
-                for ob in self.devices_GL_list:
                 for ob in self.devices_GL_list:
                     if ob.clicked:
                         ob.x += (event.GetX() - self.last_mouse_x) / self.zoom

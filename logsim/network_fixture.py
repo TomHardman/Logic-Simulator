@@ -11,12 +11,13 @@ def create_network_fixture():
     network = Network(names, devices)
     monitor = Monitors(names, devices, network)
 
-    G1_id, G2_id, G3_id, SW1_id, SW2_id, SW3_id, SW4_id, SW5_id, SW6_id, I1_id, I2_id = names.lookup(['G1', 'G2', 'G3', 'SW1', 'SW2',
+    G1_id, G2_id, G3_id,G4_id, SW1_id, SW2_id, SW3_id, SW4_id, SW5_id, SW6_id, I1_id, I2_id = names.lookup(['G1', 'G2', 'G3',"G4", 'SW1', 'SW2',
                                                                                                       'SW3', 'SW4', 'SW5', 'SW6',
                                                                                                      'I1', 'I2'])
     devices.make_gate(G1_id, devices.AND, 2)
     devices.make_gate(G2_id, devices.AND, 2)
-    devices.make_gate(G3_id, devices.OR, 3)
+    devices.make_gate(G3_id, devices.OR, 2)
+    devices.make_gate(G4_id, devices.XOR, 2)
     network.make_connection(G1_id, None, G2_id, I1_id)
     network.make_connection(G3_id, None, G2_id, I2_id)
 
