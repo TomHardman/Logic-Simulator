@@ -91,7 +91,7 @@ class Scanner:
 
     def blank_symbol(self):
         return Symbol()
-    '''
+
     def get_position(self, symbol):
         """Gets position of symbol which file object is currently pointing at"""
         position = self.input_file.tell()
@@ -122,7 +122,7 @@ class Scanner:
         
         symbol.linenum = linenum
         symbol.linepos =  linepos
-        '''
+
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
@@ -139,6 +139,7 @@ class Scanner:
                 symbol.type = self.KEYWORD
             else:
                 symbol.type = self.NAME
+            print(symbol.id)
             [symbol.id] = self.names.lookup([name_string])
 
         elif self.current_character.isdigit():
