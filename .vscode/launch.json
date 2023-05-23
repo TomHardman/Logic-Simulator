@@ -31,7 +31,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-l",
-                "snide.txt"
+                "text_inputs/clock_inp.txt"
             ],
         },
         {

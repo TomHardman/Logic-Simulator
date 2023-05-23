@@ -274,9 +274,9 @@ class Gui_linux(wx.Frame):
                     self.cycles_completed += 1
                     print(self.cycles_completed)
 
-            self.monitor_ui.Refresh()  # call plotting even and pan axes back to zero
-            self.monitor_ui.init = False
             self.monitor_ui.pan_x = 0
+            self.monitor_ui.Refresh()  # call plotting even and pan axes back to zero
+            
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
