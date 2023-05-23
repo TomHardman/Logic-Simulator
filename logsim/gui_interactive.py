@@ -36,7 +36,7 @@ def draw_circle(r, x, y, color):
 def draw_text(x, y, text):
     GL.glRasterPos2f(x, y)
     for char in text:
-        GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_TIMES_ROMAN_24, ord(char))
+        GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_HELVETICA_18, ord(char))
 
 def render_text(text, w, x_pos, y_pos, color):
         """Handle text drawing operations."""
@@ -98,7 +98,7 @@ class Monitor():
         #line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
         draw_circle(self.monitor_radius, x, y, (0,0.3,0.87))
         GL.glColor(1, 1, 1)
-        render_text('M', 4, x-5, y-5)
+        render_text('M', 2, x-5, y-5, (1,1,1))
         GL.glFlush()
         
 
