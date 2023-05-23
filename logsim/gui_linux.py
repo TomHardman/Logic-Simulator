@@ -179,8 +179,8 @@ class Gui_linux(wx.Frame):
         zap_button.SetFont(self.font_buttons)
 
         add_zap_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        add_zap_sizer.Add(add_button_m, 1, wx.ALL, 5)
-        add_zap_sizer.Add(zap_button, 1, wx.ALL, 5)
+        add_zap_sizer.Add(add_button_m, 1, wx.ALL, 10)
+        add_zap_sizer.Add(zap_button, 1, wx.ALL, 10)
 
         monitor_sizer.Add(title_sizer, 1, wx.ALL, 5)
         monitor_sizer.Add(add_zap_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
