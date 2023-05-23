@@ -81,6 +81,7 @@ class Gui_linux(wx.Frame):
         fileMenu.Append(wx.ID_ABOUT, "&About")
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
+        self.Maximize()
 
         # Set up panels to split window into main UI window and adjustable sidebar
         main_splitter = wx.SplitterWindow(self)
@@ -218,10 +219,15 @@ class Gui_linux(wx.Frame):
         self.SetSizer(main_sizer)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MENU, self.on_menu)
+
+        self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Layout()
         self.Centre()
 
         # Event handling:
+    
+    def on_key_down(self, event):
+        print("Key pressed")
 
     def on_size(self, event):
         """Handle resize events"""
