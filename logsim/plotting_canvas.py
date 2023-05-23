@@ -22,6 +22,23 @@ from scanner import Scanner
 from parse import Parser
 
 
+def plot_line(vertices, t, colour):
+    if not vertices:
+        return
+
+    GL.glLineWidth(t)
+    GL.glColor3f(*colour)
+    GL.glBegin(GL.GL_LINE_STRIP)
+
+    for i in range(len(vertices)-1):
+        x, y = vertices[i][0], vertices[i][1]
+        x_next = vertices[i+1][0]
+        GL.glVertex2f(x, y)
+        GL.glVertex2f(x_next, y)
+
+    GL.glEnd()
+
+
 class TraceCanvas(wxcanvas.GLCanvas):
     """Handle all drawing operations.
 
@@ -125,7 +142,6 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
             for i in range(len(signal_list) - 1):
                 x = i * 40
-                x_next = (i+1) * 40
 
                 if signal_list[i] == 1:
                     y = 200 + offset*trace_count
@@ -134,13 +150,12 @@ class TraceCanvas(wxcanvas.GLCanvas):
                     y = 110 + offset*trace_count
 
                 elif signal_list[i] == 4:
-                    line_with_thickness(vertices, 3, self.monitor_colours.get(monitor_name))
+                    plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
                     continue
 
                 vertices.append((x, y))
-                vertices.append((x_next, y))
 
-            line_with_thickness(vertices, 1, self.monitor_colours.get(monitor_name))
+            plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
             trace_count += 1
 
         # We have been drawing to the back buffer, flush the graphics pipeline
