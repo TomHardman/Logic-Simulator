@@ -19,6 +19,7 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
+from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
 def draw_circle(r, x, y, color):
@@ -1109,6 +1110,14 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.objects.append(device_GL)
             self.devices_GL_list.append(device_GL)
         self.Refresh()
+
+    
+    def raise_error(self, string):
+        dlg = GMD(None, "Please select valid number of cycles greater than zero ",
+                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
+        dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+        dlg.ShowModal()
+        dlg.Destroy()
 
 
 class Gui_interactive(wx.Frame):
