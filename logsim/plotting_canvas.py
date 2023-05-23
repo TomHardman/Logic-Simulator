@@ -22,7 +22,7 @@ from scanner import Scanner
 from parse import Parser
 
 
-class MyGLCanvas(wxcanvas.GLCanvas):
+class TraceCanvas(wxcanvas.GLCanvas):
     """Handle all drawing operations.
 
     This class contains functions for drawing onto the canvas. It
