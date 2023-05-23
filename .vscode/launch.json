@@ -11,7 +11,7 @@
             "module": "pytest",
             "args": [
                 "-v",
-                "logsim/test_parse.py"
+                "logsim/test_monitors.py"
             ]
         },
         {
@@ -41,7 +41,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-c",
-                "logsim/scan_test_input.txt"
+                "text_inputsh/clock_inp.txt"
             ],
         }
     ]

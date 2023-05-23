@@ -1,6 +1,6 @@
 import wx
 from plotting_canvas import TraceCanvas
-import simpleaudio as sa
+# import simpleaudio as sa
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
