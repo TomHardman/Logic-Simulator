@@ -39,7 +39,6 @@ def main(arg_list):
                      "Graphical user interface: logsim.py <file path>")
     try:
         options, arguments = getopt.getopt(arg_list, "hcmtl:")
-        print(getopt.getopt(arg_list, "hcmtl:"))
     except getopt.GetoptError:
         print("Error: invalid command line arguments\n")
         print(usage_message)
@@ -65,25 +64,27 @@ def main(arg_list):
                 userint.command_interface()
             sys.exit()
 
-        elif option == '-m':  # run simulation of GUI with artificial network
-            names, devices, network, monitors = create_network_fixture()
+        elif option == '-m':  # start up Mac GUI
+            scanner = Scanner(arguments[0], names)
+            parser = Parser(names, devices, network, monitors, scanner)
+            if parser.parse_network():
+                # Initialise an instance of the gui.Gui() class
+                app = wx.App()
+                gui = Gui_linux("Logic Simulator", path, names, devices, network,
+                                monitors)
+                gui.Show(True)
+                app.MainLoop()
 
-            # Initialise an instance of the gui.Gui() class
-            app = wx.App()
-            gui = Gui_mac("Logic Simulator", path, names, devices, network,
-                      monitors)
-            gui.Show(True)
-            app.MainLoop()
-
-        elif option == '-l':  # run simulation of GUI with artificial network
-            names, devices, network, monitors = create_network_fixture()
-
-            # Initialise an instance of the gui.Gui() class
-            app = wx.App()
-            gui = Gui_linux("Logic Simulator", path, names, devices, network,
-                      monitors)
-            gui.Show(True)
-            app.MainLoop()
+        elif option == '-l':  # start up linux GUI
+            scanner = Scanner(path, names)
+            parser = Parser(names, devices, network, monitors, scanner)
+            if parser.parse_network():
+                # Initialise an instance of the gui.Gui() class
+                app = wx.App()
+                gui = Gui_linux("Logic Simulator", path, names, devices, network,
+                                monitors)
+                gui.Show(True)
+                app.MainLoop()
 
         elif option == '-t':  # Run simulation of Drag and drop
             names, devices, network, monitors = create_network_fixture()
@@ -104,7 +105,7 @@ def main(arg_list):
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
-            gui = Gui_mac("Logic Simulator", path, names, devices, network,
+            gui = Gui_linux("Logic Simulator", path, names, devices, network,
                       monitors)
             gui.Show(True)
             app.MainLoop()

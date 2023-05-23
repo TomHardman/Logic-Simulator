@@ -91,11 +91,11 @@ class Gui_linux(wx.Frame):
         sidebar.SetSizer(sidebar_sizer)
         sidebar.SetMaxSize((100, -1))
 
-        monitor_ui = wx.Panel(splitter)
-        monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
-        monitor_ui.SetSizer(monitor_ui_sizer)
+        self.monitor_ui = wx.Panel(splitter)
+        self.monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
+        self.monitor_ui.SetSizer(monitor_ui_sizer)
 
-        splitter.SplitVertically(monitor_ui, sidebar)
+        splitter.SplitVertically(self.monitor_ui, sidebar)
         splitter.SetSashGravity(0.7)
         splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
 
@@ -151,6 +151,12 @@ class Gui_linux(wx.Frame):
         run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
         cycle_spin.Bind(wx.EVT_SPINCTRL, self.on_cycle_spin)
 
+        # Widgets and sizers for monitor panel
+        monitor_title = wx.StaticText(panel_monitors, wx.ID_ANY, "Monitor Configuration:")
+        font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        monitor_title.SetFont(font_st)
+        monitor_sizer.Add(monitor_title, 1, wx.ALL, 10)
+
         # Widgets and sizers for switch panel
         switch_title = wx.StaticText(panel_switch, wx.ID_ANY, "Switch Configuration:")
         font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
@@ -189,7 +195,7 @@ class Gui_linux(wx.Frame):
         sidebar_sizer.Add(panel_monitors, 2, wx.EXPAND | wx.ALL, 10)
 
         # Define canvas widget for monitor UI
-        canvas = MyGLCanvas(monitor_ui, devices, monitors)
+        canvas = MyGLCanvas(self.monitor_ui, devices, monitors)
 
         # Add widgets for monitor UI
         monitor_ui_sizer.Add(canvas, 2, wx.EXPAND | wx.ALL, 10)
@@ -268,6 +274,10 @@ class Gui_linux(wx.Frame):
                     self.cycles_completed += 1
                     print(self.cycles_completed)
 
+            self.monitor_ui.Refresh()  # call plotting even and pan axes back to zero
+            self.monitor_ui.init = False
+            self.monitor_ui.pan_x = 0
+
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
                       "Error", wx.OK | wx.ICON_ERROR | 0x40)
@@ -309,7 +319,7 @@ class Gui_linux(wx.Frame):
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
-                    print(self.cycles_completed)
+                    self.monitor_ui.Refresh()  # call plotting event
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
