@@ -95,7 +95,7 @@ class Gui_linux(wx.Frame):
 
         main_splitter.SplitVertically(canvas_window, sidebar)
         main_splitter.SetSashGravity(0.7)
-        main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
+        #main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
 
         # Set up panels for splitting canvas UI into circuit display and plotting window
         plotting_ui = wx.Panel(canvas_window)  # panel for plotting traces
