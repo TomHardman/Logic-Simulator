@@ -707,7 +707,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.last_mouse_x = 0  # previous mouse x position
         self.last_mouse_y = 0  # previous mouse y position
         self.object_clicked = False
-        self.connection_made = [True, None, None]
+        self.connection_list = [False, None, None]
         self.temp_connection = None
 
         # Initialise variables for zooming
@@ -892,13 +892,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                     self.object_clicked = True
                     break
 
-            if self.connection_made[0]:
+            if self.connection_list[0]:
                 for ob in self.devices_GL_list:
                     device_id, port_id = ob.is_port_clicked(ox, oy)
                     if device_id is not None:
-                        if self.connection_made[1] is not None:
+                        if self.connection_list[1] is not None:
                             error_code = self.network.make_connection(
-                                *self.connection_made[1:], device_id, port_id)
+                                *self.connection_list[1:], device_id, port_id)
                             if error_code == self.network.NO_ERROR:
                                 # Raise error message otherwise
                                 [device_GL] = [
@@ -912,10 +912,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                 self.objects.append(self.temp_connection)
                                 self.connections.append(self.temp_connection)
                             self.temp_connection = None
-                            self.connection_made = [False, None, None]
+                            self.connection_list = [False, None, None]
                         else:
-                            self.connection_made[1] = device_id
-                            self.connection_made[2] = port_id
+                            self.connection_list[1] = device_id
+                            self.connection_list[2] = port_id
                             [device_GL] = [
                                 i for i in self.devices_GL_list if i.id == device_id]
                             if port_id in device_GL.device.inputs:
@@ -1001,12 +1001,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         if keycode == 67:
             # When c is pressed
-            if self.connection_made[0]:
-                self.connection_made = [False, None, None]
+            if self.connection_list[0]:
+                self.connection_list = [False, None, None]
                 self.temp_connection = None
             else:
-                self.connection_made = [True, None, None]
-            # self.Refresh()
+                self.connection_list = [True, None, None]
+            self.Refresh()
 
     def render_text(self, text, x_pos, y_pos):
         """Handle text drawing operations."""
