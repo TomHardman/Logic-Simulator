@@ -33,22 +33,15 @@ def draw_circle(r, x, y, color):
     GL.glEnd()
 
 
-def render_stroke_character_with_width(ch, width):
-    GL.glLineWidth(width)
-    GL.glBegin(GL.GL_LINE_LOOP)
-    for vertex in ch:
-        GL.glVertex2f(*vertex)
-    GL.glEnd()
-
-def render_text(text,w,  x_pos, y_pos):
+def render_text(text, w, x_pos, y_pos, color):
         """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glPushMatrix()
         GL.glTranslatef(x_pos, y_pos, 0.0)
         GL.glScalef(0.1, 0.1, 0.1)  # Scale down the text
 
-        GL.glLineWidth(2.0)
-        GL.glColor3f(1.0, 1.0, 1.0) 
+        GL.glLineWidth(w)
+        GL.glColor3f(*color) 
         for c in text:
             GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
 
@@ -255,7 +248,7 @@ class And_gate(Device_GL):
             draw_circle(self.port_radius, self.x -
                         self.x_CoM, y, (0.0, 0.0, 0.0))
 
-        render_text(self.name_string, 2, self.x, self.y)
+        render_text(self.name_string, 1, self.x - 3, self.y - 5, (1.0, 1.0,1.0))
 
 
     def is_clicked(self, mouse_x, mouse_y):
@@ -963,6 +956,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                                     self.temp_connection.output_port_id = port_id
                                 self.objects.append(self.temp_connection)
                                 self.connections.append(self.temp_connection)
+                            else:
+                                self.raise_error("Connection invalid")
                             self.temp_connection = None
                             self.connection_list = [False, None, None]
                         else:
