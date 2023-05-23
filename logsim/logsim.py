@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 """Parse command line options and arguments for the Logic Simulator.
 
 This script parses options and arguments specified on the command line, and
@@ -12,7 +12,6 @@ Graphical user interface: logsim.py <file path>
 """
 import getopt
 import sys
-import tempfile
 
 import wx
 
@@ -23,7 +22,7 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
-# from gui_mac import Gui_mac
+#from gui_mac import Gui_mac
 from gui_linux import Gui_linux
 from gui_interactive import Gui_interactive
 from network_fixture import create_network_fixture
@@ -55,6 +54,7 @@ def main(arg_list):
         if option == "-h":  # print the usage message
             print(usage_message)
             sys.exit()
+
         elif option == "-c":  # use the command line user interface
             scanner = Scanner(arguments[0], names)
             parser = Parser(names, devices, network, monitors, scanner)
@@ -62,54 +62,38 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
-
-        elif option == '-u':  # run simulation of UI with artificial network
-            # Initialise an instance of the userint.UserInterface() class
-            userint = UserInterface(names, devices, network, monitors)
-            userint.command_interface()
-
-        elif option == '-m':  # run simulation of GUI with artificial network
-            names, devices, network, monitors = create_network_fixture()
-
-            # Initialise an instance of the gui.Gui() class
-            app = wx.App()
-            gui = Gui_mac("Logic Simulator", path, names, devices, network,
-                          monitors)
-            gui.Show(True)
-            app.MainLoop()
-
-        elif option == '-l':  # run simulation of GUI with artificial network
-            names, devices, network, monitors = create_network_fixture()
-
-            # Initialise an instance of the gui.Gui() class
-            app = wx.App()
-            gui = Gui_linux("Logic Simulator", path, names, devices, network,
-                            monitors)
-            gui.Show(True)
-            app.MainLoop()
-
-        elif option == '-t':  # Run simulation of Drag and drop
-            # names, devices, network, monitors = create_network_fixture()
-
-            text = 'AND 2 G1, 2 G2; SWITCH 1 SW1, 1 SW2, 1 SW; CONNECT SW1 > G1.I1, SW2 > G1.I2;'
-
-            with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
-                # Write the string content to the temporary file
-                temp_file.write(text)
-                # Get the path of the temporary file
-                path_2 = temp_file.name
-            scanner = Scanner(path_2, names)
-            parser = Parser(names, devices, network, monitors, scanner)
-
-            # Initialise an instance of the gui.Gui() class
-            if parser.parse_network():
-                app = wx.App()
-                gui = Gui_interactive("Logic Simulator", path, names, devices, network,
-                                      monitors)
-                gui.Show(True)
-                app.MainLoop()
             sys.exit()
 
+        elif option == '-m':  # start up Mac GUI
+            scanner = Scanner(arguments[0], names)
+            parser = Parser(names, devices, network, monitors, scanner)
+            if parser.parse_network():
+                # Initialise an instance of the gui.Gui() class
+                app = wx.App()
+                gui = Gui_linux("Logic Simulator", path, names, devices, network,
+                                monitors)
+                gui.Show(True)
+                app.MainLoop()
+
+        elif option == '-l':  # start up linux GUI
+            scanner = Scanner(path, names)
+            parser = Parser(names, devices, network, monitors, scanner)
+            if parser.parse_network():
+                # Initialise an instance of the gui.Gui() class
+                app = wx.App()
+                gui = Gui_linux("Logic Simulator", path, names, devices, network,
+                                monitors)
+                gui.Show(True)
+                app.MainLoop()
+
+        elif option == '-t':  # Run simulation of Drag and drop
+            names, devices, network, monitors = create_network_fixture()
+
+            # Initialise an instance of the gui.Gui() class
+            app = wx.App()
+            gui = Gui_interactive("Logic Simulator", path, names, devices, network,
+                                  monitors) 
+                                  
         if len(arguments) != 1:  # wrong number of arguments
             print("Error: one file path required\n")
             print(usage_message)
@@ -121,8 +105,8 @@ def main(arg_list):
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
-            gui = Gui_mac("Logic Simulator", path, names, devices, network,
-                          monitors)
+            gui = Gui_linux("Logic Simulator", path, names, devices, network,
+                      monitors)
             gui.Show(True)
             app.MainLoop()
 

@@ -11,6 +11,8 @@ Gui - configures the main window and all the widgets.
 import wx
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
+import random
+from gui_interactive import line_with_thickness
 
 from names import Names
 from devices import Devices
@@ -74,6 +76,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
 
+        # Initialise monitors and devices
+        self.monitors = monitors
+        self.devices = devices
+        self.monitor_colours = dict()
+
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
@@ -103,19 +110,38 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Draw specified text at position (10, 10)
         self.render_text(text, 10, 10)
 
-        # Draw a sample signal trace
-        GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
-        GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(20):
-            x = (i * 20) + 50
-            x_next = (i * 20) + 50
-            if i % 2 == 0:
-                y = 75
-            else:
-                y = 150
-            GL.glVertex2f(x, y)
-            GL.glVertex2f(x_next, y)
-        GL.glEnd()
+        # Draw monitor traces
+        trace_count = 0
+        offset = -130
+        for device_id, output_id in self.monitors.monitors_dictionary:
+            monitor_name = self.devices.get_signal_name(device_id, output_id)
+            name_length = len(monitor_name)
+            signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
+            vertices = []
+
+            if monitor_name not in self.monitor_colours:
+                colour = (random.random(), random.random(), random.random())
+                self.monitor_colours[monitor_name] = colour
+
+            for i in range(len(signal_list) - 1):
+                x = i * 40
+                x_next = (i+1) * 40
+
+                if signal_list[i] == 1:
+                    y = 200 + offset*trace_count
+
+                elif signal_list[i] == 0:
+                    y = 110 + offset*trace_count
+
+                elif signal_list[i] == 4:
+                    line_with_thickness(vertices, 3, self.monitor_colours.get(monitor_name))
+                    continue
+
+                vertices.append((x, y))
+                vertices.append((x_next, y))
+
+            line_with_thickness(vertices, 3, self.monitor_colours.get(monitor_name))
+            trace_count += 1
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front

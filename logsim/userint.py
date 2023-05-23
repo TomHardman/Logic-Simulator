@@ -151,7 +151,6 @@ class UserInterface:
             return None
         else:
             name_id = self.names.query(name_string)
-            print(self.names.name_list)
         if name_id is None:
             print("Error! Unknown name.")
         return name_id
