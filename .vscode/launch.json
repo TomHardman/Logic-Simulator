@@ -41,7 +41,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-c",
-                "text_input/clock_inp.txt"
+                "text_inputs/clock_inp.txt"
             ],
         }
     ]

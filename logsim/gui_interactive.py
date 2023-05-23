@@ -19,6 +19,7 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
+from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
 def draw_circle(r, x, y, color):
@@ -37,22 +38,15 @@ def draw_text(x, y, text):
     for char in text:
         GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_TIMES_ROMAN_24, ord(char))
 
-def render_stroke_character_with_width(ch, width):
-    GL.glLineWidth(width)
-    GL.glBegin(GL.GL_LINE_LOOP)
-    for vertex in ch:
-        GL.glVertex2f(*vertex)
-    GL.glEnd()
-
-def render_text(text,w,  x_pos, y_pos):
+def render_text(text, w, x_pos, y_pos, color):
         """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glPushMatrix()
         GL.glTranslatef(x_pos, y_pos, 0.0)
         GL.glScalef(0.1, 0.1, 0.1)  # Scale down the text
 
-        GL.glLineWidth(2.0)
-        GL.glColor3f(1.0, 1.0, 1.0) 
+        GL.glLineWidth(w)
+        GL.glColor3f(*color) 
         for c in text:
             GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
 
@@ -980,6 +974,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                                     self.temp_connection.output_port_id = port_id
                                 self.objects.append(self.temp_connection)
                                 self.connections.append(self.temp_connection)
+                            else:
+                                self.raise_error("Connection invalid")
                             self.temp_connection = None
                             self.connection_list = [False, None, None]
                         else:
@@ -1152,6 +1148,14 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.objects.append(device_GL)
             self.devices_GL_list.append(device_GL)
         self.Refresh()
+
+    
+    def raise_error(self, string):
+        dlg = GMD(None, "Please select valid number of cycles greater than zero ",
+                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
+        dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+        dlg.ShowModal()
+        dlg.Destroy()
 
 
 class Gui_interactive(wx.Frame):

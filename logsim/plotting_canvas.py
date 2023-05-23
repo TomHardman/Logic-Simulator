@@ -23,6 +23,7 @@ from parse import Parser
 
 
 def plot_line(vertices, t, colour):
+    """Function for plotting line of a specified thickness given a list of vertices"""
     if not vertices:
         return
 
@@ -131,7 +132,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         # Draw monitor traces
         trace_count = 0
         offset = -100
-        y_0 = 200
+        y_0 = self.GetSize()[1] - 100
         height = 80
 
         for device_id, output_id in self.monitors.monitors_dictionary:
@@ -144,7 +145,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
             GL.glTranslate(-self.pan_x * 1/self.zoom, 0.0, 0.0)
             self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count)
             GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
-            #GL.glScaled(self.zoom, 1.0, 1.0)
+        
 
             if monitor_name not in self.monitor_colours:  # plot trace for each monitor
                 colour = (random.random(), random.random(), random.random())
