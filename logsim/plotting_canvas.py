@@ -139,7 +139,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
                 vertices.append((x, y))
                 vertices.append((x_next, y))
 
-            line_with_thickness(vertices, 3, self.monitor_colours.get(monitor_name))
+            line_with_thickness(vertices, 1, self.monitor_colours.get(monitor_name))
             trace_count += 1
 
         # We have been drawing to the back buffer, flush the graphics pipeline
@@ -201,6 +201,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
             self.pan_x -= (self.zoom - old_zoom) * ox
+            if self.pan_x > 0:
+                self.pan_x = 0
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
