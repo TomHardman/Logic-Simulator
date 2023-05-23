@@ -31,7 +31,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-l",
-                "text_inputs/flip_flop.txt"
+                "text_inputs/clock_inp.txt"
             ],
         },
         {
