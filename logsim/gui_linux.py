@@ -81,26 +81,36 @@ class Gui_linux(wx.Frame):
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
 
-        # Configure sizers for top level layout structure
+        # Set up panels to split window into main UI window and adjustable sidebar
+        main_splitter = wx.SplitterWindow(self)
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sidebar_sizer = wx.BoxSizer(wx.VERTICAL)
-        monitor_ui_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # Set up panels to split window into main content window and adjustable sidebar
-        splitter = wx.SplitterWindow(self)
-
-        sidebar = wx.Panel(splitter)
+        sidebar = wx.Panel(main_splitter)  # set up sidebar
         sidebar.SetBackgroundColour(wx.Colour(200, 200, 200))
+        sidebar_sizer = wx.BoxSizer(wx.VERTICAL)
         sidebar.SetSizer(sidebar_sizer)
         sidebar.SetMaxSize((100, -1))
 
-        monitor_ui = wx.Panel(splitter)
-        monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
-        monitor_ui.SetSizer(monitor_ui_sizer)
+        canvas_window = wx.SplitterWindow(main_splitter)  # set up canvas window
 
-        splitter.SplitVertically(monitor_ui, sidebar)
-        splitter.SetSashGravity(0.7)
-        splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
+        main_splitter.SplitVertically(canvas_window, sidebar)
+        main_splitter.SetSashGravity(0.7)
+        main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
+
+        # Set up panels for splitting canvas UI into circuit display and plotting window
+        plotting_ui = wx.Panel(canvas_window)  # panel for plotting traces
+        plotting_ui.SetBackgroundColour(wx.Colour(200, 200, 200))
+        plotting_sizer = wx.BoxSizer(wx.VERTICAL)
+        plotting_ui.SetSizer(plotting_sizer)
+
+        circuit_ui = wx.Panel(canvas_window)  # panel for displaying circuit
+        circuit_ui.SetBackgroundColour(wx.Colour(200, 200, 200))
+        circuit_sizer = wx.BoxSizer(wx.VERTICAL)
+        circuit_ui.SetSizer(circuit_sizer)
+
+        canvas_window.SplitHorizontally(circuit_ui, plotting_ui)
+        canvas_window.SetSashGravity(0.5)
+        #canvas_window.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
 
         # Set up panels for sidebar
         # bg colour is set to that of parent panel so only the painted on rounded panel shape is visible
@@ -172,7 +182,7 @@ class Gui_linux(wx.Frame):
         monitor_sizer.Add(title_sizer, 1, wx.ALL, 5)
         monitor_sizer.Add(add_zap_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
-        add_button_m.Bind(wx.EVT_BUTTON, self.on_add_button)
+        add_button_m.Bind(wx.EVT_BUTTON, self.on_add_monitor_button)
 
         # Widgets and sizers for device panel
         device_title = wx.StaticText(panel_devices, wx.ID_ANY, "Device Configuration:")  # create title
@@ -195,16 +205,17 @@ class Gui_linux(wx.Frame):
         sidebar_sizer.Add(panel_monitors, 1, wx.EXPAND | wx.ALL, 10)
 
         # Define canvas widget for monitor UI
-        self.trace_canvas = TraceCanvas(monitor_ui, devices, monitors)
+        self.trace_canvas = TraceCanvas(plotting_ui, devices, monitors)
 
         # Add widgets for monitor UI
-        monitor_ui_sizer.Add(self.trace_canvas, 2, wx.EXPAND | wx.ALL, 10)
+        plotting_sizer.Add(self.trace_canvas, 2, wx.EXPAND | wx.ALL, 10)
 
         # Configure main sizer layout
-        main_sizer.Add(splitter, 1, wx.EXPAND)
+        main_sizer.Add(main_splitter, 1, wx.EXPAND)
         self.SetSizer(main_sizer)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MENU, self.on_menu)
+        self.Layout()
         self.Centre()
 
         # Event handling:
@@ -323,8 +334,12 @@ class Gui_linux(wx.Frame):
             dlg.ShowModal()
             dlg.Destroy()
 
-    def on_add_button(self, event):
+    def on_add_monitor_button(self, event):
         """Handle the event when the user presses the add monitor button"""
+        pass
+
+    def on_add_device_button(self, event):
+        pass
 
 
 

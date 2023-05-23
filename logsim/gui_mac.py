@@ -85,7 +85,7 @@ class Gui_mac(wx.Frame):
         # Configure sizers for top level layout structure
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         sidebar_sizer = wx.BoxSizer(wx.VERTICAL)
-        monitor_ui_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        canvas_ui_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # Set up panels to split window into main content window and adjustable sidebar
         splitter = wx.SplitterWindow(self)
@@ -97,7 +97,7 @@ class Gui_mac(wx.Frame):
 
         monitor_ui = wx.Panel(splitter)
         monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
-        monitor_ui.SetSizer(monitor_ui_sizer)
+        monitor_ui.SetSizer(canvas_ui_sizer)
 
         splitter.SplitVertically(monitor_ui, sidebar)
         splitter.SetSashGravity(0.7)
@@ -220,7 +220,7 @@ class Gui_mac(wx.Frame):
         self.trace_canvas = TraceCanvas(monitor_ui, devices, monitors)
 
         # Add widgets for monitor UI
-        monitor_ui_sizer.Add(self.trace_canvas, 2, wx.EXPAND | wx.ALL, 10)
+        canvas_ui_sizer.Add(self.trace_canvas, 2, wx.EXPAND | wx.ALL, 10)
 
         # Configure main sizer layout
         main_sizer.Add(splitter, 1, wx.EXPAND)

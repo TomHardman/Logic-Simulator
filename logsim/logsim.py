@@ -23,7 +23,7 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
-from gui_mac import Gui_mac
+#from gui_mac import Gui_mac
 from gui_linux import Gui_linux
 from gui_interactive import Gui_interactive
 from network_fixture import create_network_fixture
@@ -73,7 +73,7 @@ def main(arg_list):
             if parser.parse_network():
                 # Initialise an instance of the gui.Gui() class
                 app = wx.App()
-                gui = Gui_mac("Logic Simulator", path, names, devices, network,
+                gui = Gui_linux("Logic Simulator", path, names, devices, network,
                                 monitors)
                 gui.Show(True)
                 app.MainLoop()
