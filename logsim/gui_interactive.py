@@ -64,11 +64,15 @@ class Monitor():
         self.device_GL = device_GL
         self.port_id = port_id
 
-        self.monitor_radius = 2
+        self.monitor_radius = 3
 
     def render(self):
+        dx = 10
+        dy = 10
         x, y = self.device_GL.get_port_coor(self.port_id)
-        draw_circle(self.monitor_radius, x, y, (0.1, 1.0, 0.0))
+        vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+        line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+        #draw_circle(self.monitor_radius, x, y, (0.6133, 0.196, 0.659))
 
 class Connection_GL:
     def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
