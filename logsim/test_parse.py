@@ -231,7 +231,7 @@ def system_with_no_connect():
 def test_parse(system_with_test_data):
     names, devices, network, monitors, scanner, parser = system_with_test_data
     parser.parse_network()
-    assert len(devices.devices_list) == 4
+    assert len(devices.devices_list) == 5
     assert parser.error_count == 1
 
 def test_invalid_keywords(system_with_invalid_keywords):
