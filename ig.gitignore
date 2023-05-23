@@ -3,3 +3,7 @@
 
 # Ignore .idea directory
 .idea/
+
+# Ignore cache files
+logsim/__pycache__/
+*.pyc

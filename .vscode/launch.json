@@ -33,6 +33,16 @@
                 "-l",
                 "snide.txt"
             ],
+        },
+        {
+            "name": "Run Command Line simulation",
+            "type": "python",
+            "request": "launch",
+            "program": "logsim/logsim.py",
+            "args": [
+                "-c",
+                "logsim/scan_test_input.txt"
+            ],
         }
     ]
 }
