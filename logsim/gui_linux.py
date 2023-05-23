@@ -193,7 +193,7 @@ class Gui_linux(wx.Frame):
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)
         add_button_d = wx.Button(panel_devices, wx.ID_ANY, "Add\nDevice")
         add_button_d.SetFont(self.font_buttons)
-        add_button_d.SetInitialSize(wx.Size(100, 35))
+        add_button_d.SetInitialSize(wx.Size(100, 60))
         button_sizer.Add(add_button_d, 0, wx.ALL, 5)
         device_sizer.Add(button_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
@@ -288,7 +288,8 @@ class Gui_linux(wx.Frame):
 
             self.trace_canvas.pan_x = 0
             self.trace_canvas.init = False
-            self.trace_canvas.Refresh()  # call plotting even and pan axes back to zero
+            self.trace_canvas.Refresh()  # call plotting event for trace and circuit canvas
+            self.circuit_canvas.Refresh()
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
@@ -328,7 +329,8 @@ class Gui_linux(wx.Frame):
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
-                    self.trace_canvas.Refresh()  # call plotting event
+                    self.trace_canvas.Refresh()  # call plotting event for trace and circuit canvas
+                    self.circuit_canvas.Refresh()
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
