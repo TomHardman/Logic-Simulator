@@ -67,8 +67,7 @@ class Gui_linux(wx.Frame):
         self.names = names
         self.monitors = monitors
         self.network = network
-        self.button_mem = None 
-
+        self.button_constraint = False # this variable is used to stop other buttons being pressed when user input is currently required
         self.first_run = True
         self.cycles = 10
         self.cycles_completed = 0
@@ -186,6 +185,7 @@ class Gui_linux(wx.Frame):
         monitor_sizer.Add(add_zap_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
         add_button_m.Bind(wx.EVT_BUTTON, self.on_add_monitor_button)
+        zap_button.Bind(wx.EVT_BUTTON, self.on_zap_monitor_button)
 
         # Widgets and sizers for device panel
         device_title = wx.StaticText(panel_devices, wx.ID_ANY, "Device Configuration:")  # create title
@@ -254,6 +254,9 @@ class Gui_linux(wx.Frame):
 
     def on_toggle_switch(self, event):
         """Handle the event when the user toggles a switch button"""
+        if self.button_constraint:
+            return
+        
         Id = event.GetId()
         toggle_button = self.FindWindowById(Id)
         button_state = toggle_button.GetValue()  # Gets button state: True means button is currently toggled on
@@ -277,6 +280,8 @@ class Gui_linux(wx.Frame):
         """Handles the event when the user presses the run button - on first run it causes the continue
         button to appear in the GUI - on all runs it runs the simulation from scratch for the specified
         number of cycles"""
+        if self.button_constraint:
+            return
 
         if self.cycles is not None and self.cycles > 0:  # if the number of cycles provided is valid
             if self.first_run:  # adds continue button to GUI after first run has been executed
@@ -338,6 +343,9 @@ class Gui_linux(wx.Frame):
 
     def on_continue_button(self, event):
         """Handle the event when the user presses the continue button"""
+        if self.button_constraint:
+            return
+        
         if self.cycles > 0:  # if the number of cycles provided is valid
             for i in range(self.cycles):  # executes run for specified no. cycles
                 if self.network.execute_network():
@@ -355,15 +363,45 @@ class Gui_linux(wx.Frame):
 
     def on_add_monitor_button(self, event):
         """Handle the event when the user presses the add monitor button"""
-        pass
+        Id = event.GetId()
+        button = self.FindWindowById(Id)
+        lab = button.GetLabel()
+        
+        if lab == 'Add\nMonitor':
+            button.SetLabel('Cancel')
+            button.SetBackgroundColour(wx.RED)
+        
+        elif lab == 'Cancel':
+            button.SetLabel('Add\nMonitor')
+            button.SetBackgroundColour(wx.Colour(255, 255, 255))
 
     def on_add_device_button(self, event):
         """Handle the event when the user presses the add device button"""
-        pass
+        Id = event.GetId()
+        button = self.FindWindowById(Id)
+        lab = button.GetLabel()
+        
+        if lab == 'Add\nDevice':
+            button.SetLabel('Cancel')
+            button.SetBackgroundColour(wx.RED)
+        
+        elif lab == 'Cancel':
+            button.SetLabel('Add\nDevice')
+            button.SetBackgroundColour(wx.Colour(255, 255, 255))
 
     def on_zap_monitor_button(self, event):
         """Handle the event when the user presses the zap monitor button"""
-        pass
+        Id = event.GetId()
+        button = self.FindWindowById(Id)
+        lab = button.GetLabel()
+        
+        if lab == 'Zap\nMonitor':
+            button.SetLabel('Cancel')
+            button.SetBackgroundColour(wx.RED)
+        
+        elif lab == 'Cancel':
+            button.SetLabel('Zap\nMonitor')
+            button.SetBackgroundColour(wx.Colour(255, 255, 255))
 
     def on_add_connection_button(self, event):
         """Handle the event when the user presses the add connection button"""
