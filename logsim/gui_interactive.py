@@ -735,6 +735,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_double_click)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
+        self.Bind(wx.EVT_ENTER_WINDOW, self. on_enter_window)
 
         self.init_objects(devices, names)
 
@@ -1032,6 +1033,9 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             else:
                 self.connection_list = [True, None, None]
             self.Refresh()
+    
+    def on_enter_window(self, event):
+        self.SetFocus()
 
     def render_text(self, text, x_pos, y_pos):
         """Handle text drawing operations."""
@@ -1158,13 +1162,6 @@ class Gui_interactive(wx.Frame):
         self.cont_button = wx.Button(self, wx.ID_ANY, "Continue")
         self.text_box = wx.TextCtrl(
             self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
-
-        self.text2 = wx.StaticText(self, wx.ID_ANY, "Configure Switches")
-        self.switch_selector = wx.ComboBox(
-            self, choices=choices, style=wx.CB_READONLY, name='Switch')  # widgets for setting switches
-        self.checkbox = wx.CheckBox(
-            self, label="Switch High", style=wx.CHK_UNCHECKED)
-        self.checkbox.Enable(True)
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)

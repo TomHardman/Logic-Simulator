@@ -92,6 +92,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
+        self.Bind(wx.EVT_ENTER_WINDOW, self. on_enter_window)
 
         # Initialise monitors and devices
         self.monitors = monitors
@@ -182,6 +183,9 @@ class TraceCanvas(wxcanvas.GLCanvas):
         text = "".join(["Canvas redrawn on paint event, size is ",
                         str(size.width), ", ", str(size.height)])
         self.render(text)
+    
+    def on_enter_window(self, event):
+        self.SetFocus()
 
     def on_size(self, event):
         """Handle the canvas resize event."""
@@ -246,11 +250,11 @@ class TraceCanvas(wxcanvas.GLCanvas):
         keycode = event.GetKeyCode()
 
         if keycode == wx.WXK_DOWN:
-            self.pan_y -= 10
+            self.pan_y += 10
             self.init = False
             self.Refresh()
         elif keycode == wx.WXK_UP:
-            self.pan_y += 10
+            self.pan_y -= 10
             self.init = False
             self.Refresh()
 
