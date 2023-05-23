@@ -1175,7 +1175,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
 
     
     def raise_error(self, string):
-        dlg = GMD(None, "Please select valid number of cycles greater than zero ",
+        dlg = GMD(None, string,
                       "Error", wx.OK | wx.ICON_ERROR | 0x40)
         dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
         dlg.ShowModal()
