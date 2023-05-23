@@ -674,7 +674,7 @@ class Switch(Device_GL):
         return (device_id, port_id)
 
 
-class MyGLCanvas(wxcanvas.GLCanvas):
+class InteractiveCanvas(wxcanvas.GLCanvas):
     """Handle all drawing operations.
 
     This class contains functions for drawing onto the canvas. It
@@ -1148,9 +1148,7 @@ class Gui_interactive(wx.Frame):
         self.first_run = False
 
         # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, devices, monitors, names, network)
-        self.canvas = MyGLCanvas(self, devices, monitors, names, network)
-
+        self.canvas = InteractiveCanvas(self, devices, monitors, names, network)
         choices = ['SW1', 'SW2', 'SW3']
 
         # Configure the widgets
