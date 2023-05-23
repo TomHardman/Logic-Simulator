@@ -104,6 +104,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Draw a sample signal trace
         GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
+        GL.glLineWidth(2)
         GL.glBegin(GL.GL_LINE_STRIP)
         for i in range(10):
             x = (i * 20) + 10
