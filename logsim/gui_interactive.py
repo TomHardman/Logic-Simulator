@@ -34,6 +34,8 @@ def draw_circle(r, x, y, color):
 
 
 def line_with_thickness(vertices, t, color):
+    if not vertices:
+        return
 
     i = 0
     while i < len(vertices) - 1:
@@ -57,6 +59,16 @@ def line_with_thickness(vertices, t, color):
         i += 1
     draw_circle(t/2, *vertices[-1], color)
 
+class Monitor():
+    def __init__(self, device_GL, port_id):
+        self.device_GL = device_GL
+        self.port_id = port_id
+
+        self.monitor_radius = 2
+
+    def render(self):
+        x, y = self.device_GL.get_port_coor(self.port_id)
+        draw_circle(self.monitor_radius, x, y, (0.1, 1.0, 0.0))
 
 class Connection_GL:
     def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
@@ -743,6 +755,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.objects = []
         self.devices_GL_list = []
         self.switch_GL_list = []
+        self.monitors_GL = []
 
         self.connections = []
 
@@ -821,6 +834,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 devices, self.devices_GL_list)
             self.connections += connections
             self.objects += connections
+
+        for device_id, port_id in self.monitors.monitors_dictionary:
+            [device_GL] = [
+                    i for i in self.devices_GL_list if i.id == device_id]
+            monitor = Monitor(device_GL, port_id)
+            self.monitors_GL.append(monitor)
+            self.objects.append(monitor)
+            
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -1055,6 +1076,31 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glLoadIdentity()
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
+    
+    def create_device(self,device_name, device_type, qualifier = None):
+        [device_id] = self.names.lookup([device_name])
+        error_code  = self.devices.create_device(device_id, device_type, qualifier)
+        if error_code == self.devices.NO_ERROR:
+            device = self.devices.get_device(device_id)
+            if device_type == self.devices.AND:
+                device_GL = And_gate(0, 0, device, self.names, False)
+            elif device_type == self.devices.NAND:
+                device_GL = And_gate(0, 0, device, self.names, True)
+            elif device_type == self.devices.OR:
+                device_GL = Or_gate(0, 0, device, self.names, False)
+            elif device_type == self.devices.NOR:
+                device_GL = Or_gate(0, 0, device, self.names, True)
+            elif device_type == self.devices.SWITCH:
+                device_GL = Switch(0, 0, device, self.names)
+            elif device_type == self.devices.XOR:
+                device_GL = Xor_gate(0,0, device, self.names)
+            elif device_type == self.devices.D_TYPE:
+                device_GL = D_type(0, 0, device, self.names)
+            elif device_type == self.devices.CLOCK:
+                device_GL = Clock(0,0, device, self.names)
+            self.objects.append(device_GL)
+            self.devices_GL_list.append(device_GL)
+        self.Refresh()
 
 
 class Gui_interactive(wx.Frame):

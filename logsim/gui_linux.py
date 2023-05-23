@@ -1,6 +1,7 @@
 import wx
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
-from canvas_copy import MyGLCanvas
+from plotting_canvas import TraceCanvas
+from wx.lib.buttons import GenButton
 
 
 class RoundedScrollWindow(wx.ScrolledWindow):
@@ -70,6 +71,8 @@ class Gui_linux(wx.Frame):
         self.cycles = 10
         self.cycles_completed = 0
 
+        self.font_buttons = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -91,11 +94,11 @@ class Gui_linux(wx.Frame):
         sidebar.SetSizer(sidebar_sizer)
         sidebar.SetMaxSize((100, -1))
 
-        self.monitor_ui = wx.Panel(splitter)
-        self.monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
-        self.monitor_ui.SetSizer(monitor_ui_sizer)
+        monitor_ui = wx.Panel(splitter)
+        monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
+        monitor_ui.SetSizer(monitor_ui_sizer)
 
-        splitter.SplitVertically(self.monitor_ui, sidebar)
+        splitter.SplitVertically(monitor_ui, sidebar)
         splitter.SetSashGravity(0.7)
         splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
 
@@ -107,11 +110,11 @@ class Gui_linux(wx.Frame):
         control_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_control.SetSizer(control_sizer)
 
-        panel_switch = RoundedScrollWindow(sidebar)
-        panel_switch.SetBackgroundColour(panel_switch.GetParent().GetBackgroundColour())
-        panel_switch.SetScrollRate(0, 10)
-        switch_sizer = wx.BoxSizer(wx.VERTICAL)
-        panel_switch.SetSizer(switch_sizer)
+        panel_devices = RoundedScrollWindow(sidebar)
+        panel_devices.SetBackgroundColour(panel_devices.GetParent().GetBackgroundColour())
+        panel_devices.SetScrollRate(0, 10)
+        device_sizer = wx.BoxSizer(wx.VERTICAL)
+        panel_devices.SetSizer(device_sizer)
 
         panel_monitors = RoundedScrollWindow(sidebar)
         panel_monitors.SetBackgroundColour(panel_monitors.GetParent().GetBackgroundColour())
@@ -121,16 +124,14 @@ class Gui_linux(wx.Frame):
 
         # Widgets and sizers for control panel
         cycle_text = wx.StaticText(panel_control, wx.ID_ANY, "Cycles:")
-        font_ct = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
-        cycle_text.SetFont(font_ct)
+        cycle_text.SetFont(self.font_buttons)
 
         cycle_spin = wx.SpinCtrl(panel_control, wx.ID_ANY, str(self.cycles))
         font_cs = wx.Font(12, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
         cycle_spin.SetFont(font_cs)
 
         run_button = wx.Button(panel_control, wx.ID_ANY, "Run")
-        font_rb = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
-        run_button.SetFont(font_rb)
+        run_button.SetFont(self.font_buttons)
 
         cycle_sizer = wx.BoxSizer(wx.HORIZONTAL)
         cycle_sizer.Add(cycle_text, 1, wx.ALL, 5)
@@ -141,7 +142,7 @@ class Gui_linux(wx.Frame):
         self.run_sizer = run_sizer  # creates sizer as instance variable so it can be accessed by methods
 
         control_sizer.Add(cycle_sizer, 1, wx.ALL, 5)
-        control_sizer.Add(run_sizer, 1, wx.ALL, 5)
+        control_sizer.Add(run_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
         # Set some panels and sizers as instance variables to make them accessible to on_run_button method
         self.panel_control = panel_control
@@ -155,50 +156,49 @@ class Gui_linux(wx.Frame):
         monitor_title = wx.StaticText(panel_monitors, wx.ID_ANY, "Monitor Configuration:")
         font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         monitor_title.SetFont(font_st)
-        monitor_sizer.Add(monitor_title, 1, wx.ALL, 10)
+        title_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        title_sizer.Add(monitor_title, 1, wx.ALL, 10)
 
-        # Widgets and sizers for switch panel
-        switch_title = wx.StaticText(panel_switch, wx.ID_ANY, "Switch Configuration:")
-        font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
-        switch_title.SetFont(font_st)
-        switch_sizer.Add(switch_title, 1, wx.ALL, 10)
+        add_button_m = wx.Button(panel_monitors, wx.ID_ANY, "Add\nMonitor")
+        add_button_m.SetFont(self.font_buttons)
 
-        switches = devices.find_devices(device_kind=devices.SWITCH)  # create array of switch IDs
+        zap_button = wx.Button(panel_monitors, wx.ID_ANY, "Zap\nMonitor")
+        zap_button.SetFont(self.font_buttons)
 
-        for id in switches:  # Add list of switch names with corresponding toggle buttons to panel
-            name = names.get_name_string(id)
-            switch_config_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        add_zap_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        add_zap_sizer.Add(add_button_m, 1, wx.ALL, 5)
+        add_zap_sizer.Add(zap_button, 1, wx.ALL, 5)
 
-            switch_dev = self.devices.get_device(id)
-            state = switch_dev.switch_state  # Read state of current switch
+        monitor_sizer.Add(title_sizer, 1, wx.ALL, 5)
+        monitor_sizer.Add(add_zap_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
-            switch_txt = wx.StaticText(panel_switch, wx.ID_ANY, f'Switch {name}:')   # Text to go left of button
-            font_sw_txt = wx.Font(12, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
-            switch_txt.SetFont(font_sw_txt)
+        add_button_m.Bind(wx.EVT_BUTTON, self.on_add_button)
 
-            # Set up toggle button for each switch depending on current state
-            if state == 0:
-                switch_button = wx.ToggleButton(panel_switch, id, label='Off')
-            else:
-                switch_button = wx.ToggleButton(panel_switch, id, label='On')
-                switch_button.SetValue(True)
+        # Widgets and sizers for device panel
+        device_title = wx.StaticText(panel_devices, wx.ID_ANY, "Device Configuration:")  # create title
+        device_title.SetFont(font_st)
+        device_sizer.Add(device_title, 1, wx.ALL, 5)
 
-            switch_button.Bind(wx.EVT_TOGGLEBUTTON, self.on_toggle_switch)
-            switch_config_sizer.Add(switch_txt, 1, wx.ALL, 5)
-            switch_config_sizer.Add(switch_button, 1, wx.ALL, 2)
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        add_button_d = wx.Button(panel_devices, wx.ID_ANY, "Add\nDevice")
+        add_button_d.SetFont(self.font_buttons)
+        add_button_d.SetInitialSize(wx.Size(100, 35))
+        button_sizer.Add(add_button_d, 0, wx.ALL, 5)
+        device_sizer.Add(button_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
-            switch_sizer.Add(switch_config_sizer, 1, wx.ALL, 5)
+        self.panel_devices = panel_devices  # set as instance variables to allow method access
+        self.device_sizer = device_sizer
 
         # Add panels to sidebar sizer
         sidebar_sizer.Add(panel_control, 1, wx.EXPAND | wx.ALL, 10)
-        sidebar_sizer.Add(panel_switch, 2, wx.EXPAND | wx.ALL, 10)
-        sidebar_sizer.Add(panel_monitors, 2, wx.EXPAND | wx.ALL, 10)
+        sidebar_sizer.Add(panel_devices, 1, wx.EXPAND | wx.ALL, 10)
+        sidebar_sizer.Add(panel_monitors, 1, wx.EXPAND | wx.ALL, 10)
 
         # Define canvas widget for monitor UI
-        canvas = MyGLCanvas(self.monitor_ui, devices, monitors)
+        self.trace_canvas = TraceCanvas(monitor_ui, devices, monitors)
 
         # Add widgets for monitor UI
-        monitor_ui_sizer.Add(canvas, 2, wx.EXPAND | wx.ALL, 10)
+        monitor_ui_sizer.Add(self.trace_canvas, 2, wx.EXPAND | wx.ALL, 10)
 
         # Configure main sizer layout
         main_sizer.Add(splitter, 1, wx.EXPAND)
@@ -257,8 +257,7 @@ class Gui_linux(wx.Frame):
                 panel_control = self.panel_control
 
                 cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
-                font_cb = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
-                cont_button.SetFont(font_cb)
+                cont_button.SetFont(self.font_buttons)
                 cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
 
                 run_sizer.Add(cont_button, 1, wx.ALL, 5)
@@ -272,11 +271,10 @@ class Gui_linux(wx.Frame):
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
-                    print(self.cycles_completed)
 
-            self.monitor_ui.Refresh()  # call plotting even and pan axes back to zero
-            self.monitor_ui.init = False
-            self.monitor_ui.pan_x = 0
+            self.trace_canvas.pan_x = 0
+            self.trace_canvas.init = False
+            self.trace_canvas.Refresh()  # call plotting even and pan axes back to zero
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
@@ -311,15 +309,12 @@ class Gui_linux(wx.Frame):
 
     def on_continue_button(self, event):
         """Handle the event when the user presses the continue button"""
-        if self.cycles_completed == 0: # provide dialogue box error message
-            pass
-
         if self.cycles > 0:  # if the number of cycles provided is valid
             for i in range(self.cycles):  # executes run for specified no. cycles
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
-                    self.monitor_ui.Refresh()  # call plotting event
+                    self.trace_canvas.Refresh()  # call plotting event
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
@@ -327,3 +322,9 @@ class Gui_linux(wx.Frame):
             dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
             dlg.ShowModal()
             dlg.Destroy()
+
+    def on_add_button(self, event):
+        """Handle the event when the user presses the add monitor button"""
+
+
+
