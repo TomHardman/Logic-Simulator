@@ -438,7 +438,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
 
     def display_error(self, error_code):
-        '''
+        
         def underline_text(text, index):
             underline = ''
             for i, char in enumerate(text):
@@ -449,16 +449,19 @@ class Parser:
             return (underline)
 
         def highlight_error(symbol):
-            print(symbol.linenum,len(self.scanner.input_file.readlines()))
-            position = self.scanner.input_file.tell()
-            self.scanner.input_file.seek(0)
-            lines = self.scanner.input_file.readlines()
-            line = lines[symbol.linenum]
-            self.scanner.input_file.seek(position)
-            return underline_text(line, symbol.linepos)
+            if symbol.linenum and symbol.linepos:
+                print(symbol.linenum,len(self.scanner.input_file.readlines()))
+                position = self.scanner.input_file.tell()
+                self.scanner.input_file.seek(0)
+                lines = self.scanner.input_file.readlines()
+                line = lines[symbol.linenum]
+                self.scanner.input_file.seek(position)
+                return underline_text(line, symbol.linepos)
+            else:
+                return None
 
-        print(highlight_error(self.symbol))
-        '''
+        return highlight_error(self.symbol)
+        
         if error_code == self.NAME_EXPECTED:
             print('Error: Expected a Name')
         
