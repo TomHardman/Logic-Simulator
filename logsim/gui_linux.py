@@ -350,6 +350,7 @@ class Gui_linux(wx.Frame):
         pass
 
     def on_add_device_button(self, event):
+        """Handle the event when the user presses the add device button"""
         pass
 
 
