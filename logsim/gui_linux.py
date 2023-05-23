@@ -1,6 +1,7 @@
 import wx
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 from plotting_canvas import TraceCanvas
+from gui_interactive import InteractiveCanvas
 from wx.lib.buttons import GenButton
 
 
@@ -206,9 +207,11 @@ class Gui_linux(wx.Frame):
 
         # Define canvas widget for monitor UI
         self.trace_canvas = TraceCanvas(plotting_ui, devices, monitors)
+        self.circuit_canvas = InteractiveCanvas(circuit_ui, devices, monitors, names, network)
 
         # Add widgets for monitor UI
-        plotting_sizer.Add(self.trace_canvas, 2, wx.EXPAND | wx.ALL, 10)
+        plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND , 5)
+        circuit_sizer.Add(self.circuit_canvas, 1, wx.EXPAND, 5)
 
         # Configure main sizer layout
         main_sizer.Add(main_splitter, 1, wx.EXPAND)
