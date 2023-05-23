@@ -166,6 +166,10 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
                 vertices.append((x, y))
 
+                GL.glTranslate(0.0, -self.pan_y, 0.0)  # generate axes labels that are invariant to translation in the y-direction
+                self.render_text(str(i), i*40, 20)
+                GL.glTranslated(0.0, self.pan_y, 0.0)
+
             plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
             trace_count += 1
 
