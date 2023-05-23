@@ -91,11 +91,11 @@ class Gui_linux(wx.Frame):
         sidebar.SetSizer(sidebar_sizer)
         sidebar.SetMaxSize((100, -1))
 
-        self.monitor_ui = wx.Panel(splitter)
-        self.monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
-        self.monitor_ui.SetSizer(monitor_ui_sizer)
+        monitor_ui = wx.Panel(splitter)
+        monitor_ui.SetBackgroundColour(wx.Colour(255, 255, 255))
+        monitor_ui.SetSizer(monitor_ui_sizer)
 
-        splitter.SplitVertically(self.monitor_ui, sidebar)
+        splitter.SplitVertically(monitor_ui, sidebar)
         splitter.SetSashGravity(0.7)
         splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
 
@@ -157,6 +157,19 @@ class Gui_linux(wx.Frame):
         monitor_title.SetFont(font_st)
         monitor_sizer.Add(monitor_title, 1, wx.ALL, 10)
 
+        add_button = wx.Button(panel_monitors, wx.ID_ANY, "Add Monitor")
+        font_ab = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        add_button.SetFont(font_ab)
+
+        zap_button = wx.Button(panel_monitors, wx.ID_ANY, "Zap Monitor")
+        font_zb = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        zap_button.SetFont(font_zb)
+
+        add_zap_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        add_zap_sizer.Add(add_button, 1, wx.ALL, 5)
+        add_zap_sizer.Add(zap_button, 1, wx.ALL, 5)
+        monitor_sizer.Add(add_zap_sizer)
+
         # Widgets and sizers for switch panel
         switch_title = wx.StaticText(panel_switch, wx.ID_ANY, "Switch Configuration:")
         font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
@@ -195,10 +208,10 @@ class Gui_linux(wx.Frame):
         sidebar_sizer.Add(panel_monitors, 2, wx.EXPAND | wx.ALL, 10)
 
         # Define canvas widget for monitor UI
-        canvas = MyGLCanvas(self.monitor_ui, devices, monitors)
+        self.trace_canvas = MyGLCanvas(monitor_ui, devices, monitors)
 
         # Add widgets for monitor UI
-        monitor_ui_sizer.Add(canvas, 2, wx.EXPAND | wx.ALL, 10)
+        monitor_ui_sizer.Add(self.trace_canvas, 2, wx.EXPAND | wx.ALL, 10)
 
         # Configure main sizer layout
         main_sizer.Add(splitter, 1, wx.EXPAND)
@@ -272,11 +285,10 @@ class Gui_linux(wx.Frame):
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
-                    print(self.cycles_completed)
 
-            self.monitor_ui.Refresh()  # call plotting even and pan axes back to zero
-            self.monitor_ui.init = False
-            self.monitor_ui.pan_x = 0
+            self.trace_canvas.pan_x = 0
+            self.trace_canvas.init = False
+            self.trace_canvas.Refresh()  # call plotting even and pan axes back to zero
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
@@ -319,7 +331,7 @@ class Gui_linux(wx.Frame):
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
-                    self.monitor_ui.Refresh()  # call plotting event
+                    self.trace_canvas.Refresh()  # call plotting event
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",

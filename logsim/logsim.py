@@ -51,6 +51,7 @@ def main(arg_list):
     monitors = Monitors(names, devices, network)
 
     for option, path in options:
+        print(arguments)
         if option == "-h":  # print the usage message
             print(usage_message)
             sys.exit()
@@ -62,10 +63,11 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
+            print(parser.error_count)
             sys.exit()
 
         elif option == '-m':  # start up Mac GUI
-            scanner = Scanner(arguments[0], names)
+            scanner = Scanner(path, names)
             parser = Parser(names, devices, network, monitors, scanner)
             if parser.parse_network():
                 # Initialise an instance of the gui.Gui() class

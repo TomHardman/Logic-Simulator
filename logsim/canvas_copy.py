@@ -115,7 +115,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         offset = -130
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
-            name_length = len(monitor_name)
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
             vertices = []
 
