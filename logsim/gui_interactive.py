@@ -33,6 +33,27 @@ def draw_circle(r, x, y, color):
     GL.glEnd()
 
 
+def render_stroke_character_with_width(ch, width):
+    GL.glLineWidth(width)
+    GL.glBegin(GL.GL_LINE_LOOP)
+    for vertex in ch:
+        GL.glVertex2f(*vertex)
+    GL.glEnd()
+
+def render_text(text,w,  x_pos, y_pos):
+        """Handle text drawing operations."""
+        GL.glColor3f(0.0, 0.0, 0.0)  # text is black
+        GL.glPushMatrix()
+        GL.glTranslatef(x_pos, y_pos, 0.0)
+        GL.glScalef(0.1, 0.1, 0.1)  # Scale down the text
+
+        GL.glLineWidth(2.0)
+        GL.glColor3f(1.0, 1.0, 1.0) 
+        for c in text:
+            GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
+
+        GL.glPopMatrix()
+
 def line_with_thickness(vertices, t, color):
     if not vertices:
         return
@@ -162,6 +183,8 @@ class Device_GL:
         self.id = device.device_id
         self.names = names
 
+        self.name_string = names.get_name_string(self.id)
+
     def create_connections(self, devices, GL_devices_list):
         """Creates and returns a list of Connections() """
         connection_list = []
@@ -231,6 +254,9 @@ class And_gate(Device_GL):
             y = self.input_height * (i + 0.5 - self.inputs*0.5) + self.y
             draw_circle(self.port_radius, self.x -
                         self.x_CoM, y, (0.0, 0.0, 0.0))
+
+        render_text(self.name_string, 2, self.x, self.y)
+
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
