@@ -67,6 +67,7 @@ class Gui_linux(wx.Frame):
         self.names = names
         self.monitors = monitors
         self.network = network
+        self.button_mem = None 
 
         self.first_run = True
         self.cycles = 10
@@ -191,26 +192,37 @@ class Gui_linux(wx.Frame):
         device_title.SetFont(font_st)
         device_sizer.Add(device_title, 1, wx.ALL, 5)
 
-        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
         add_button_d = wx.Button(panel_devices, wx.ID_ANY, "Add\nDevice")
         add_button_d.SetFont(self.font_buttons)
-        add_button_d.SetInitialSize(wx.Size(100, 60))
-        button_sizer.Add(add_button_d, 0, wx.ALL, 5)
+        add_button_d.SetInitialSize(wx.Size(140, 60))
+
+        add_button_c = wx.Button(panel_devices, wx.ID_ANY, "Add\nConnection")
+        add_button_c.SetFont(self.font_buttons)
+        add_button_c.SetInitialSize(wx.Size(140, 60))
+        
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL) # sizer for buttons
+        button_sizer.Add(add_button_d, 0, wx.ALL, 10)
+        button_sizer.Add(add_button_c, 0, wx.ALL, 10)
         device_sizer.Add(button_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
+        
+        add_button_c.Bind(wx.EVT_BUTTON, self.on_add_connection_button)  # event handling for widgets for device panel
+        add_button_d.Bind(wx.EVT_BUTTON, self.on_add_device_button)
 
         self.panel_devices = panel_devices  # set as instance variables to allow method access
         self.device_sizer = device_sizer
+        self.add_button_d = add_button_d
+        self.add_button_c = add_button_c
 
         # Add panels to sidebar sizer
         sidebar_sizer.Add(panel_control, 1, wx.EXPAND | wx.ALL, 10)
         sidebar_sizer.Add(panel_devices, 1, wx.EXPAND | wx.ALL, 10)
         sidebar_sizer.Add(panel_monitors, 1, wx.EXPAND | wx.ALL, 10)
 
-        # Define canvas widget for monitor UI
+        # Add canvas widgets - include as instance objects to allow method access
         self.trace_canvas = TraceCanvas(plotting_ui, devices, monitors)
         self.circuit_canvas = InteractiveCanvas(circuit_ui, devices, monitors, names, network)
 
-        # Add widgets for monitor UI
+        # Add canvases to respective panels
         plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND , 5)
         circuit_sizer.Add(self.circuit_canvas, 1, wx.EXPAND, 5)
 
@@ -220,15 +232,11 @@ class Gui_linux(wx.Frame):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MENU, self.on_menu)
 
-        self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
+       
         self.Layout()
         self.Centre()
 
         # Event handling:
-    
-    def on_key_down(self, event):
-        print("Key pressed")
-
     def on_size(self, event):
         """Handle resize events"""
         # Ensure the splitter adjusts to the frame size
@@ -352,6 +360,27 @@ class Gui_linux(wx.Frame):
     def on_add_device_button(self, event):
         """Handle the event when the user presses the add device button"""
         pass
+
+    def on_zap_monitor_button(self, event):
+        """Handle the event when the user presses the zap monitor button"""
+        pass
+
+    def on_add_connection_button(self, event):
+        """Handle the event when the user presses the add connection button"""
+        Id = event.GetId()
+        button = self.FindWindowById(Id)
+        lab = button.GetLabel()
+        
+        if lab == 'Add\nConnection':
+            button.SetLabel('Cancel')
+            button.SetBackgroundColour(wx.RED)
+        
+        elif lab == 'Cancel':
+            button.SetLabel('Add\nConnection')
+            button.SetBackgroundColour(wx.Colour(255, 255, 255))
+            
+
+            
 
 
 
