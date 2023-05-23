@@ -31,7 +31,11 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-l",
+<<<<<<< HEAD
                 "text_inputs/clock_inp.txt"
+=======
+                "text_inputs/alldevice.txt"
+>>>>>>> e1d0ca748e7743c251341b5b7f87d52a31f91805
             ],
         },
         {
