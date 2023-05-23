@@ -32,6 +32,10 @@ def draw_circle(r, x, y, color):
         GL.glVertex2f(x + dx, y + dy)
     GL.glEnd()
 
+def draw_text(x, y, text):
+    GL.glRasterPos2f(x, y)
+    for char in text:
+        GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_HELVETICA_18, ord(char))
 
 def line_with_thickness(vertices, t, color):
     if not vertices:
@@ -64,15 +68,24 @@ class Monitor():
         self.device_GL = device_GL
         self.port_id = port_id
 
-        self.monitor_radius = 3
+        self.monitor_radius = 15
 
     def render(self):
         dx = 10
         dy = 10
         x, y = self.device_GL.get_port_coor(self.port_id)
-        vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-        line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
-        #draw_circle(self.monitor_radius, x, y, (0.6133, 0.196, 0.659))
+        x -= 15
+        y += 25
+        #GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        GL.glColor(1, 1, 1)
+        
+        #vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+        #line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+        draw_circle(self.monitor_radius, x, y, (0,0.3,0.87))
+        GL.glColor(1, 1, 1)
+        draw_text(x-5, y-5, 'm')
+        GL.glFlush()
+        
 
 class Connection_GL:
     def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
