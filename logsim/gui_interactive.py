@@ -33,6 +33,24 @@ def draw_circle(r, x, y, color):
         GL.glVertex2f(x + dx, y + dy)
     GL.glEnd()
 
+def draw_text(x, y, text):
+    GL.glRasterPos2f(x, y)
+    for char in text:
+        GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_HELVETICA_18, ord(char))
+
+def render_text(text, w, x_pos, y_pos, color):
+        """Handle text drawing operations."""
+        GL.glColor3f(0.0, 0.0, 0.0)  # text is black
+        GL.glPushMatrix()
+        GL.glTranslatef(x_pos, y_pos, 0.0)
+        GL.glScalef(0.1, 0.1, 0.1)  # Scale down the text
+
+        GL.glLineWidth(w)
+        GL.glColor3f(*color) 
+        for c in text:
+            GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
+
+        GL.glPopMatrix()
 
 def line_with_thickness(vertices, t, color):
     if not vertices:
@@ -65,15 +83,24 @@ class Monitor():
         self.device_GL = device_GL
         self.port_id = port_id
 
-        self.monitor_radius = 3
+        self.monitor_radius = 15
 
     def render(self):
         dx = 10
         dy = 10
         x, y = self.device_GL.get_port_coor(self.port_id)
-        vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-        line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
-        #draw_circle(self.monitor_radius, x, y, (0.6133, 0.196, 0.659))
+        x -= 15
+        y += 25
+        #GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        GL.glColor(1, 1, 1)
+        
+        #vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+        #line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+        draw_circle(self.monitor_radius, x, y, (0,0.3,0.87))
+        GL.glColor(1, 1, 1)
+        draw_text(x-5, y-5, 'm')
+        GL.glFlush()
+        
 
 class Connection_GL:
     def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
@@ -163,6 +190,8 @@ class Device_GL:
         self.id = device.device_id
         self.names = names
 
+        self.name_string = names.get_name_string(self.id)
+
     def create_connections(self, devices, GL_devices_list):
         """Creates and returns a list of Connections() """
         connection_list = []
@@ -232,6 +261,9 @@ class And_gate(Device_GL):
             y = self.input_height * (i + 0.5 - self.inputs*0.5) + self.y
             draw_circle(self.port_radius, self.x -
                         self.x_CoM, y, (0.0, 0.0, 0.0))
+
+        render_text(self.name_string, 1, self.x - 3, self.y - 5, (1.0, 1.0,1.0))
+
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
@@ -938,6 +970,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                                     self.temp_connection.output_port_id = port_id
                                 self.objects.append(self.temp_connection)
                                 self.connections.append(self.temp_connection)
+                            else:
+                                self.raise_error("Connection invalid")
                             self.temp_connection = None
                             self.connection_list = [False, None, None]
                         else:
