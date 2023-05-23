@@ -23,7 +23,7 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
-#from gui_mac import Gui_mac
+from gui_mac import Gui_mac
 from gui_linux import Gui_linux
 from gui_interactive import Gui_interactive
 from network_fixture import create_network_fixture
@@ -52,6 +52,7 @@ def main(arg_list):
     monitors = Monitors(names, devices, network)
 
     for option, path in options:
+        print(arguments)
         if option == "-h":  # print the usage message
             print(usage_message)
             sys.exit()
@@ -63,6 +64,7 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
+            print(parser.error_count)
             sys.exit()
 
         elif option == '-m':  # start up Mac GUI
@@ -71,7 +73,7 @@ def main(arg_list):
             if parser.parse_network():
                 # Initialise an instance of the gui.Gui() class
                 app = wx.App()
-                gui = Gui_linux("Logic Simulator", path, names, devices, network,
+                gui = Gui_mac("Logic Simulator", path, names, devices, network,
                                 monitors)
                 gui.Show(True)
                 app.MainLoop()

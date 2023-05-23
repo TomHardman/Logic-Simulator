@@ -29,8 +29,8 @@ class Symbol:
         """Initialise symbol properties."""
         self.type = None
         self.id = None
-        self.linenum = None
-        self.linepos = None
+        self.linenum = 0
+        self.linepos = 0
 
 
 class Scanner:
@@ -68,6 +68,9 @@ class Scanner:
 
         self.temp_queue = []
         self.priority_queue = []
+        self.linecount = 0
+        self.poscount = 0
+        self.countcarry = 0
 
         # SYMBOLS
         #   0   .   - DOT
@@ -103,30 +106,19 @@ class Scanner:
 
         symbol.linenum = linenum
         symbol.linepos = linepos
-    '''
+    
         
-    def get_position(self, symbol):
+    def get_linenum(self):
         position = self.input_file.tell()
         self.input_file.seek(0)
 
         contents = self.input_file.read(position)
         linenum = contents.count('\n')
-        print(self.input_file.readlines(), linenum)
-        self.input_file.seek(0)
-        read_lines = self.input_file.readlines()
 
-        if not read_lines[linenum]:
-            line = read_lines[linenum]
-        else:
-            return None
-        
         self.input_file.seek(position)
-        char = self.input_file.read(1)
-        linepos = line.rfind(char)-1
-        self.input_file.seek(position)
-        
-        symbol.linenum = linenum
-        symbol.linepos =  linepos
+
+        return linenum
+        '''
 
 
     def get_symbol(self):
@@ -172,13 +164,27 @@ class Scanner:
         else:
             self.advance()
         if symbol.type != self.EOF:
-            pass
-        #self.get_position(symbol)
+            if symbol.type !=  self.KEYWORD and symbol.type != self.NAME:
+                symbol.linenum = self.linecount
+                symbol.linepos = [self.poscount, self.poscount]
+                self.poscount += self.countcarry
+                self.countcarry = 0
+            else:
+                symbol.linenum = self.linecount
+                symbol.linepos = [self.poscount, self.poscount+self.countcarry]
+                self.poscount += self.countcarry
+                self.countcarry = 0
         return symbol
 
     def skip_spaces(self):
         """Skips ahead in the file until a non-blank space charcter"""
         while self.current_character.isspace():
+            self.poscount += 1
+            self.countcarry = 0
+            if self.current_character == '\n':
+                self.linecount += 1
+                self.poscount = 0
+                self.countcarry = 0
             self.current_character = self.input_file.read(1)
 
     def get_name(self):
@@ -187,24 +193,28 @@ class Scanner:
             raise ValueError("Charcter is not a letter")
 
         name_string = ""
+        #self.poscount +=1
         while self.current_character.isalnum():
             name_string += self.current_character
             self.current_character = self.input_file.read(1)
+            self.countcarry += 1
 
         return name_string
 
     def get_number(self):
         """Returns number following on from current charcter"""
         if not self.current_character.isdigit():
-            raise ValueError("Charcter is not a digit")
+            raise ValueError("Character is not a digit")
 
         num_string = ""
         while self.current_character.isdigit():
             num_string += self.current_character
             self.current_character = self.input_file.read(1)
+            self.countcarry += 1
 
         return int(num_string)
 
     def advance(self):
         """Skips by 1 charcter"""
         self.current_character = self.input_file.read(1)
+        self.poscount +=1

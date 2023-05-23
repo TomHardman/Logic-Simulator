@@ -1,5 +1,5 @@
 import wx
-from canvas import MyGLCanvas
+from plotting_canvas import TraceCanvas
 import simpleaudio as sa
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
@@ -155,11 +155,35 @@ class Gui_mac(wx.Frame):
         run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
         cycle_spin.Bind(wx.EVT_SPINCTRL, self.on_cycle_spin)
 
+        # Widgets and sizers for monitor panel
+        monitor_title = wx.StaticText(panel_monitors, wx.ID_ANY, "Monitor Configuration:")
+        font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        monitor_title.SetFont(font_st)
+        title_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        title_sizer.Add(monitor_title, 1, wx.ALL, 10)
+
+        add_button = wx.Button(panel_monitors, wx.ID_ANY, "Add\nMonitor")
+        font_ab = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        add_button.SetFont(font_ab)
+
+        zap_button = wx.Button(panel_monitors, wx.ID_ANY, "Zap\nMonitor")
+        font_zb = wx.Font(14, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        zap_button.SetFont(font_zb)
+
+        add_zap_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        add_zap_sizer.Add(add_button, 1, wx.ALL, 5)
+        add_zap_sizer.Add(zap_button, 1, wx.ALL, 5)
+
+        monitor_sizer.Add(title_sizer, 1, wx.ALL, 5)
+        monitor_sizer.Add(add_zap_sizer, 1, wx.ALL, 5)
+
+        add_button.Bind(wx.EVT_BUTTON, self.on_add_button)
+
         # Widgets and sizers for switch panel
         switch_title = wx.StaticText(panel_switch, wx.ID_ANY, "Switch Configuration:")
         font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         switch_title.SetFont(font_st)
-        switch_sizer.Add(switch_title, 1, wx.ALL, 10)
+        switch_sizer.Add(switch_title, 1, wx.ALL, 5)
 
         switches = devices.find_devices(device_kind=devices.SWITCH)  # create array of switch IDs
 
@@ -170,7 +194,7 @@ class Gui_mac(wx.Frame):
             switch_dev = self.devices.get_device(id)
             state = switch_dev.switch_state  # Read state of current switch
 
-            switch_txt = wx.StaticText(panel_switch, wx.ID_ANY, f'Switch {name}:')   # Text to go left of button
+            switch_txt = wx.StaticText(panel_switch, wx.ID_ANY, f'Switch {name}:')  # Text to go left of button
             font_sw_txt = wx.Font(12, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
             switch_txt.SetFont(font_sw_txt)
 
@@ -188,15 +212,15 @@ class Gui_mac(wx.Frame):
             switch_sizer.Add(switch_config_sizer, 1, wx.ALL, 5)
 
         # Add panels to sidebar sizer
-        sidebar_sizer.Add(panel_control, 1, wx.EXPAND | wx.ALL, 10)
-        sidebar_sizer.Add(panel_switch, 2, wx.EXPAND | wx.ALL, 10)
+        sidebar_sizer.Add(panel_control, 2, wx.EXPAND | wx.ALL, 10)
+        sidebar_sizer.Add(panel_switch, 4, wx.EXPAND | wx.ALL, 10)
         sidebar_sizer.Add(panel_monitors, 2, wx.EXPAND | wx.ALL, 10)
 
         # Define canvas widget for monitor UI
-        canvas = MyGLCanvas(monitor_ui, devices, monitors)
+        self.trace_canvas = TraceCanvas(monitor_ui, devices, monitors)
 
         # Add widgets for monitor UI
-        monitor_ui_sizer.Add(canvas, 2, wx.EXPAND | wx.ALL, 10)
+        monitor_ui_sizer.Add(self.trace_canvas, 2, wx.EXPAND | wx.ALL, 10)
 
         # Configure main sizer layout
         main_sizer.Add(splitter, 1, wx.EXPAND)
@@ -271,6 +295,10 @@ class Gui_mac(wx.Frame):
                     self.monitors.record_signals()
                     self.cycles_completed += 1
 
+            self.trace_canvas.pan_x = 0
+            self.trace_canvas.init = False
+            self.trace_canvas.Refresh()  # call plotting even and pan axes back to zero
+
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
                       "Error", wx.OK | wx.ICON_ERROR | 0x40)
@@ -314,6 +342,7 @@ class Gui_mac(wx.Frame):
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
+                    self.trace_canvas.Refresh()  # call plotting event
 
         else:  # show error dialogue box if cycle no. is not valid
             dlg = GMD(None, "Please select valid number of cycles greater than zero ",
@@ -328,3 +357,7 @@ class Gui_mac(wx.Frame):
         filename = self.error_sound_path
         wave_obj = sa.WaveObject.from_wave_file(filename)
         play_obj = wave_obj.play()
+
+    def on_add_button(self, event):
+        """Handle the event when the user presses the add monitor button"""
+        pass

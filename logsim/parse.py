@@ -426,7 +426,9 @@ class Parser:
         stopping_symbol = self.scanner.COMMA
         self.error_bool = True
         self.error_count += 1
-        self.display_error(error_code)
+        error_message = self.display_error(error_code)
+        print(error_message)
+        print('---------')
         while (self.symbol.type != self.scanner.SEMICOLON and self.symbol.type != self.scanner.EOF and self.symbol.type != stopping_symbol):
             self.symbol = self.scanner.get_symbol()
         if self.symbol.type == stopping_symbol:
@@ -440,12 +442,20 @@ class Parser:
     def display_error(self, error_code):
         
         def underline_text(text, index):
+            
+            if index[0]==index[1]:
+                idxlist = [index[1]]
+            else:
+                idxlist = [i for i in range(index[0], index[1])]
+            print(idxlist)
             underline = ''
             for i, char in enumerate(text):
-                if i == index:
+                    
+                if i in idxlist:
                     underline += '\033[31;4m{}\033[0m'.format(char)
                 else:
                     underline += char
+
             return (underline)
 
         def highlight_error(symbol):
@@ -455,11 +465,13 @@ class Parser:
                 lines = self.scanner.input_file.readlines()
                 line = lines[symbol.linenum]
                 self.scanner.input_file.seek(position)
+                print(symbol.linenum)
                 return underline_text(line, symbol.linepos)
-
+        
         print(highlight_error(self.symbol))
         
         if error_code == self.NAME_EXPECTED:
+            
             return('Error: Expected a Name')
         
         if error_code == self.SEMICOLON_EXPECTED:
