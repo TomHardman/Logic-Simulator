@@ -37,26 +37,14 @@ def test_get_position(new_scanner):
         if sym.type == 2:
             new_scanner.get_position(sym)
             arrows_list.append([sym.linenum, sym.linepos])
+    new_scanner.input_file.close()
 
     assert new_scanner.names.name_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
                                            "AND", "NAND", "OR", "NOR", "DTYPE", "XOR",
                                            'G1', 'SW1', 'SW2', 'O', 'I1', 'I2']
-    assert arrows_list == [[4,15], [5,15]]
-'''
-def test_get_position2(new_scanner2):
-    arrows_list = []
-    sym = new_scanner2.get_symbol()
-    while sym.type != new_scanner2.EOF:
-        sym = new_scanner2.get_symbol()
-        if sym.type == 7:
-            new_scanner2.get_position(sym)
-            arrows_list.append([sym.linenum, sym.linepos])
+    assert arrows_list == [[3,15], [4,15]]
 
-    assert new_scanner2.names.name_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
-                                           "AND", "NAND", "OR", "NOR", "DTYPE", "XOR",
-                                           'SW1', 'SW2', 'G1', 'I1']
-    assert arrows_list == [[4,15], [5,15]]
-    '''
+    
 
 def testquery(new_scanner):
 
