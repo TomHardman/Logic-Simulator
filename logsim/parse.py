@@ -450,68 +450,65 @@ class Parser:
 
         def highlight_error(symbol):
             if symbol.linenum and symbol.linepos:
-                print(symbol.linenum,len(self.scanner.input_file.readlines()))
                 position = self.scanner.input_file.tell()
                 self.scanner.input_file.seek(0)
                 lines = self.scanner.input_file.readlines()
                 line = lines[symbol.linenum]
                 self.scanner.input_file.seek(position)
                 return underline_text(line, symbol.linepos)
-            else:
-                return None
 
-        return highlight_error(self.symbol)
+        print(highlight_error(self.symbol))
         
         if error_code == self.NAME_EXPECTED:
-            print('Error: Expected a Name')
+            return('Error: Expected a Name')
         
         if error_code == self.SEMICOLON_EXPECTED:
-            print('Error: Expected a Semicolon')
+            return('Error: Expected a Semicolon')
 
         if error_code == self.KEYWORD_EXPECTED:
-            print('Error: Expected a Keyword')
+            return('Error: Expected a Keyword')
 
         if error_code == self.NUMBER_EXPECTED:
-            print('Error: Expected a Number')
+            return('Error: Expected a Number')
 
         if error_code == self.ARROW_EXPECTED:
-            print('Error: Expected a Arrow')
+            return('Error: Expected a Arrow')
 
         if error_code == self.devices.INVALID_QUALIFIER:
-            print('Error: Invalid Qualifer')
+            return('Error: Invalid Qualifer')
 
         if error_code == self.devices.NO_QUALIFIER:
-            print('Error: No Qualifer')
+            return('Error: No Qualifer')
 
         if error_code == self.devices.BAD_DEVICE:
-            print('Error: Bad Device')
+            return('Error: Bad Device')
 
         if error_code == self.devices.QUALIFIER_PRESENT:
-            print('Error: Qualifier Present')
+            return('Error: Qualifier Present')
 
         if error_code == self.devices.DEVICE_PRESENT:
-            print('Error: Device Present')
+            return('Error: Device Present')
 
         if error_code == self.monitors.NOT_OUTPUT:
-            print('Error: Not an output')
+            return('Error: Not an output')
 
         if error_code == self.monitors.MONITOR_PRESENT:
-            print('Error: Monitor Present')
+            return('Error: Monitor Present')
 
         if error_code == self.network.INPUT_TO_INPUT:
-            print('Error: Connecting an input to input')
+            return('Error: Connecting an input to input')
 
         if error_code == self.network.OUTPUT_TO_OUTPUT:
-            print('Error: Connecting an output to output')
+            return('Error: Connecting an output to output')
 
         if error_code == self.network.INPUT_CONNECTED:
-            print('Error: Input connected')
+            return('Error: Input connected')
 
         if error_code == self.network.PORT_ABSENT:
-            print('Error: Port Absent')
+            return('Error: Port Absent')
 
         if error_code == self.network.DEVICE_ABSENT:
-            print('Error: Device Absent')
+            return('Error: Device Absent')
 
         
 

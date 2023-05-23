@@ -6,4 +6,3 @@
 
 # Ignore cache files
 logsim/__pycache__/
-*.pyc

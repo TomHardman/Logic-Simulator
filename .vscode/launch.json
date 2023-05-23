@@ -11,7 +11,7 @@
             "module": "pytest",
             "args": [
                 "-v",
-                "logsim/test_scanner.py"
+                "logsim/test_parse.py"
             ]
         },
         {
@@ -31,7 +31,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-l",
-                "snide.txt"
+                "text_inputs/clock_inp.txt"
             ],
         },
         {

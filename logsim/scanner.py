@@ -171,8 +171,9 @@ class Scanner:
 
         else:
             self.advance()
-        '''if symbol.type != self.EOF:
-            self.get_position(symbol)'''
+        if symbol.type != self.EOF:
+            pass
+        #self.get_position(symbol)
         return symbol
 
     def skip_spaces(self):

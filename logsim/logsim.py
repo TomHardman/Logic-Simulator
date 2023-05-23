@@ -12,6 +12,7 @@ Graphical user interface: logsim.py <file path>
 """
 import getopt
 import sys
+import tempfile
 
 import wx
 
@@ -89,13 +90,27 @@ def main(arg_list):
                 app.MainLoop()
 
         elif option == '-t':  # Run simulation of Drag and drop
-            names, devices, network, monitors = create_network_fixture()
+
+            text ='SWITCH 1 SW1, 0 SW2; AND 2 G1; CONNECT SW1 > G1.I1, SW2 > G1.I2; MONITOR G1;'
+ 
+            with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+            # Write the string content to the temporary file
+                temp_file.write(text)
+                # Get the path of the temporary file
+                path_2 = temp_file.name
+            
+            scanner = Scanner(path_2, names)
+            parser = Parser(names, devices, network, monitors, scanner)
 
             # Initialise an instance of the gui.Gui() class
-            app = wx.App()
-            gui = Gui_interactive("Logic Simulator", path, names, devices, network,
-                                  monitors) 
-                                  
+            if parser.parse_network():
+                app = wx.App()  
+                gui = Gui_interactive("Logic Simulator", path, names, devices, network,
+                                    monitors)
+                gui.Show(True)
+                app.MainLoop()
+            sys.exit()
+
         if len(arguments) != 1:  # wrong number of arguments
             print("Error: one file path required\n")
             print(usage_message)
