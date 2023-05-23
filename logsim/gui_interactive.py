@@ -35,7 +35,7 @@ def draw_circle(r, x, y, color):
 def draw_text(x, y, text):
     GL.glRasterPos2f(x, y)
     for char in text:
-        GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_HELVETICA_18, ord(char))
+        GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_TIMES_ROMAN_24, ord(char))
 
 def render_stroke_character_with_width(ch, width):
     GL.glLineWidth(width)
@@ -104,7 +104,7 @@ class Monitor():
         #line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
         draw_circle(self.monitor_radius, x, y, (0,0.3,0.87))
         GL.glColor(1, 1, 1)
-        draw_text(x-5, y-5, 'm')
+        render_text('M', 4, x-5, y-5)
         GL.glFlush()
         
 
@@ -225,6 +225,7 @@ class And_gate(Device_GL):
         self.port_radius = 7
         self.x_CoM = self.box_width*2/3
         self.NAND = NAND
+        self.show_text = True
 
     def render(self):
 
@@ -268,7 +269,10 @@ class And_gate(Device_GL):
             draw_circle(self.port_radius, self.x -
                         self.x_CoM, y, (0.0, 0.0, 0.0))
 
-        render_text(self.name_string, 2, self.x, self.y)
+        #render_text(self.name_string, 2, self.x, self.y)
+        if self.show_text:
+
+            draw_text(self.x-5, self.y - self.box_width *1.1, self.name_string)
 
 
     def is_clicked(self, mouse_x, mouse_y):
