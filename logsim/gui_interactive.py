@@ -266,7 +266,7 @@ class And_gate(Device_GL):
         #render_text(self.name_string, 2, self.x, self.y)
         if self.show_text:
 
-            draw_text(self.x-5, self.y - self.box_width *1.1, self.name_string)
+            draw_text(self.x-5, self.y - self.input_height*self.inputs/2 - 19, self.name_string)
 
 
     def is_clicked(self, mouse_x, mouse_y):
@@ -320,6 +320,7 @@ class Or_gate(Device_GL):
         self.x_CoM = 10
         self.straight_box_width = 15
         self.NOR = NOR
+        self.show_text = True
 
     def render(self):
 
@@ -354,6 +355,10 @@ class Or_gate(Device_GL):
             vertices = [(self.x - self.x_CoM, self.y + dy),
                         (self.x - self.x_CoM + dx, self.y + dy)]
             line_with_thickness(vertices, 3, (0.0, 0.0, 0.0))
+        
+        if self.show_text:
+
+            draw_text(self.x-5, self.y - self.input_height*self.inputs/2 -19, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
@@ -407,6 +412,7 @@ class Xor_gate(Device_GL):
         self.straight_box_width = 15
         self.gap_width = 5
         self.thickness = 2
+        self.show_text = True
 
     def render(self):
 
@@ -447,6 +453,9 @@ class Xor_gate(Device_GL):
             vertices = [(self.x - self.x_CoM, self.y + dy),
                         (self.x - self.x_CoM + dx, self.y + dy)]
             line_with_thickness(vertices, 3, (0.0, 0.0, 0.0))
+        if self.show_text:
+
+            draw_text(self.x-5, self.y - self.input_height*self.inputs/2 -19, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM - self.gap_width
@@ -495,6 +504,7 @@ class D_type(Device_GL):
         self.input_height = 30
         self.port_radius = 7
         self.no_segments = 100
+        self.show_text = True
 
     def render(self):
 
@@ -514,6 +524,10 @@ class D_type(Device_GL):
                     self.y + self.input_height/2, (0.0, 0.0, 0.0))
         draw_circle(self.port_radius, self.x + self.width/2,
                     self.y - self.input_height/2, (0.0, 0.0, 0.0))
+        
+        if self.show_text:
+
+            draw_text(self.x-7, self.y - self.input_height*self.inputs/2 - 19, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.width/2
@@ -582,6 +596,7 @@ class Clock(Device_GL):
         self.port_radius = 7
         self.no_segments = 100
         self.thickness = 2
+        self.show_text = True
 
     def render(self):
 
@@ -631,6 +646,10 @@ class Clock(Device_GL):
         draw_circle(self.port_radius, self.x +
                     self.width/2, self.y, (0.0, 0.0, 0.0))
 
+        if self.show_text:
+
+            draw_text(self.x-15, self.y - self.half_height*2 -5 , self.name_string)
+
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.width/2
         x_high = self.x + self.width
@@ -666,6 +685,7 @@ class Switch(Device_GL):
         self.width = 40
         self.port_radius = 7
         self.line_thickness = 3
+        self.show_text = True
 
         # Could mess up network execution?
         self.device.outputs[None] = self.device.switch_state
@@ -688,6 +708,10 @@ class Switch(Device_GL):
         draw_circle(self.port_radius, self.x - self.x_CoM +
                     self.width, self.y, color)
         line_with_thickness(vertices, self.line_thickness, color)
+
+        if self.show_text:
+
+            draw_text(self.x-8, self.y - self.half_height*2.5, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
