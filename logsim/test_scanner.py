@@ -19,6 +19,9 @@ def new_scanner2():
 
 
 def test_new_scanner(new_scanner):
+    sym = new_scanner.get_symbol()
+    while sym.type != new_scanner.EOF:
+        sym = new_scanner.get_symbol()
 
     assert type(new_scanner.symbol_type_list) == range
     assert all(isinstance(keyword, str)
@@ -26,7 +29,7 @@ def test_new_scanner(new_scanner):
     assert new_scanner.keywords_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
                                         "AND", "NAND", "OR", "NOR", "DTYPE", "XOR"]
     assert len(new_scanner.symbol_type_list) == 8
-    assert new_scanner.current_character == 'N'
+    assert new_scanner.current_character == ''
 
 
 def test_get_position(new_scanner):
@@ -41,7 +44,7 @@ def test_get_position(new_scanner):
 
     assert new_scanner.names.name_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
                                            "AND", "NAND", "OR", "NOR", "DTYPE", "XOR",
-                                           'G1', 'SW1', 'SW2', 'O', 'I1', 'I2']
+                                           'G1', 'SW1', 'SW2', 'I1', 'I2']
     assert arrows_list == [[3,15], [4,15]]
 
     

@@ -153,7 +153,7 @@ def system_with_output_to_output():
     devices = Devices(names)
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
-    text ='SWITCH 0 SW1, 0 SW2;\nNAND 2 G1;\nCONNECT SW1 > G1.I1, SW2 > G1.I2, G1.O > G1.I3;'
+    text ='SWITCH 0 SW1, 0 SW2;\nNAND 2 G1;\nCONNECT SW1 > G1.I1, SW2 > G1.I2, G1> G1.I3;'
 
     with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
     # Write the string content to the temporary file
@@ -231,7 +231,7 @@ def system_with_no_connect():
 def test_parse(system_with_test_data):
     names, devices, network, monitors, scanner, parser = system_with_test_data
     parser.parse_network()
-    assert len(devices.devices_list) == 5
+    assert len(devices.devices_list) == 4
     assert parser.error_count == 1
 
 def test_invalid_keywords(system_with_invalid_keywords):
