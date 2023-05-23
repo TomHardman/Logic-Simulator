@@ -126,17 +126,27 @@ class TraceCanvas(wxcanvas.GLCanvas):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
         # Draw specified text at position (10, 10)
-        self.render_text(text, 10, 10)
+        #self.render_text(text, 10, 10)
 
         # Draw monitor traces
         trace_count = 0
-        offset = -130
+        offset = -100
+        y_0 = 200
+        height = 80
+
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
             vertices = []
 
-            if monitor_name not in self.monitor_colours:
+            text = monitor_name  # label trace with name of monitor and make it invariant to zoom and pan
+            GL.glMatrixMode(GL.GL_MODELVIEW)
+            GL.glTranslate(-self.pan_x * 1/self.zoom, 0.0, 0.0)
+            self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count)
+            GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
+            #GL.glScaled(self.zoom, 1.0, 1.0)
+
+            if monitor_name not in self.monitor_colours:  # plot trace for each monitor
                 colour = (random.random(), random.random(), random.random())
                 self.monitor_colours[monitor_name] = colour
 
@@ -144,10 +154,10 @@ class TraceCanvas(wxcanvas.GLCanvas):
                 x = i * 40
 
                 if signal_list[i] == 1:
-                    y = 200 + offset*trace_count
+                    y = y_0 + offset*trace_count + height
 
                 elif signal_list[i] == 0:
-                    y = 110 + offset*trace_count
+                    y = y_0 + offset*trace_count
 
                 elif signal_list[i] == 4:
                     plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
@@ -254,7 +264,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_12
+        font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
