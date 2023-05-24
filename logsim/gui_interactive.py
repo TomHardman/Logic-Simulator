@@ -807,7 +807,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         self.last_mouse_y = 0  # previous mouse y position
         self.object_clicked = False
         self.connection_list = [False, None, None]
-        self.choose_monitor = True
+        self.choose_monitor = False
         self.temp_connection = None
 
         # Initialise variables for zooming
@@ -1042,7 +1042,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             else:
                                 self.raise_error("Connection invalid")
                             self.temp_connection = None
-                            self.connection_list = [False, None, None]
+                            self.connection_list = [True, None, None]
                         else:
                             self.connection_list[1] = device_id
                             self.connection_list[2] = port_id
