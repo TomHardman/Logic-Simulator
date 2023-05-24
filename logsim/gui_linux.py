@@ -418,7 +418,8 @@ class Gui_linux(wx.Frame):
             button.SetLabel('Add\nConnections')
             button.SetBackgroundColour(wx.Colour(255, 255, 255))
             self.circuit_canvas.connection_list = [False, None, None]
-            self.temp_connection = None
+            self.circuit_canvas.temp_connection = None
+            self.circuit_canvas.Refresh()
 
             
 
