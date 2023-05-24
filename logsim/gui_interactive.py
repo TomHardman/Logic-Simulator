@@ -1275,6 +1275,10 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 device_GL = Clock(0, 0, device, self.names)
             self.objects.append(device_GL)
             self.devices_GL_list.append(device_GL)
+        elif error_code == self.devices.INVALID_QUALIFIER:
+            self.raise_error("Error : Please use a valid qualifier")
+        elif error_code == self.devices.DEVICE_PRESENT:
+            self.raise_error("Error : Please use a different device name")
         self.Refresh()
 
     def raise_error(self, string):
