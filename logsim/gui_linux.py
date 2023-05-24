@@ -196,7 +196,7 @@ class Gui_linux(wx.Frame):
         add_button_d.SetFont(self.font_buttons)
         add_button_d.SetInitialSize(wx.Size(140, 60))
 
-        add_button_c = wx.Button(panel_devices, wx.ID_ANY, "Add\nConnection")
+        add_button_c = wx.Button(panel_devices, wx.ID_ANY, "Add\nConnections")
         add_button_c.SetFont(self.font_buttons)
         add_button_c.SetInitialSize(wx.Size(140, 60))
         
@@ -409,14 +409,16 @@ class Gui_linux(wx.Frame):
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
         
-        if lab == 'Add\nConnection':
+        if lab == 'Add\nConnections':
             button.SetLabel('Cancel')
             button.SetBackgroundColour(wx.RED)
+            self.circuit_canvas.connection_list = [True, None, None]
         
         elif lab == 'Cancel':
-            button.SetLabel('Add\nConnection')
+            button.SetLabel('Add\nConnections')
             button.SetBackgroundColour(wx.Colour(255, 255, 255))
-            
+            self.circuit_canvas.connection_list = [False, None, None]
+            self.temp_connection = None
 
             
 
