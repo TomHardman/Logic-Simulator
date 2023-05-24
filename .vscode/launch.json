@@ -42,7 +42,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-c",
-                "text_inputs/alldevice.txt"
+                "text_inputs/flip_flop.txt"
             ],
         }
     ]
