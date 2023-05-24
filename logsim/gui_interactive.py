@@ -1070,7 +1070,13 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             monitor = Monitor(device_GL, port_id)
                             self.objects.append(monitor)
                             self.monitors_GL.append(monitor)
-                            self.choose_monitor = False
+                            self.mother.trace_canvas.Refresh()
+                        elif self.monitors.remove_monitor(device_id, port_id):
+                            [device_GL] = [
+                            i for i in self.monitors_GL if i.device_GL.device.device_id == device_id]
+                            self.monitors_GL.remove(device_GL)
+                            self.objects.remove(device_GL)
+                            self.mother.trace_canvas.Refresh()
                         else:
                             self.raise_error("Choose a valid monitor point")
 
