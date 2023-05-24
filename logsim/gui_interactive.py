@@ -846,55 +846,74 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         x = 100
         y = 100
 
+        for id in clock_ids:
+            device = devices.get_device(id)
+            clock = Clock(x, y, device, names)
+            y += 200
+            self.objects.append(clock)
+            self.devices_GL_list.append(clock)
+
         for id in switch_ids:
             device = devices.get_device(id)
             switch = Switch(x, y, device, names)
-            x += 200
+            y += 200
             self.objects.append(switch)
             self.devices_GL_list.append(switch)
             self.switch_GL_list.append(switch)
+        
+        y = 100
+        x += 200
 
         for id in and_gate_ids:
             device = devices.get_device(id)
             and_gate = And_gate(x, y, device, names, False)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(and_gate)
             self.devices_GL_list.append(and_gate)
 
         for id in nand_gate_ids:
             device = devices.get_device(id)
             nand_gate = And_gate(x, y, device, names, True)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(nand_gate)
             self.devices_GL_list.append(nand_gate)
 
         for id in or_gate_ids:
             device = devices.get_device(id)
             or_gate = Or_gate(x, y, device, names, False)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(or_gate)
             self.devices_GL_list.append(or_gate)
 
         for id in nor_gate_ids:
             device = devices.get_device(id)
             nor_gate = Or_gate(x, y, device, names, True)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(nor_gate)
             self.devices_GL_list.append(nor_gate)
 
         for id in dtype_ids:
             device = devices.get_device(id)
             dtype = D_type(x, y, device, names)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(dtype)
             self.devices_GL_list.append(dtype)
 
-        for id in clock_ids:
-            device = devices.get_device(id)
-            clock = Clock(x, y, device, names)
-            x += 200
-            self.objects.append(clock)
-            self.devices_GL_list.append(clock)
 
         x = 100
         y = 300
