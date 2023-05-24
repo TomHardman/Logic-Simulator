@@ -487,8 +487,11 @@ class Xor_gate(Device_GL):
                             self.gap_width, self.y + dy))
         line_with_thickness(vertices, self.thickness, (0.212, 0.271, 0.310))
 
+        color = (0.0, 0.0, 0.0)
+        if self.device.outputs[None]:
+            color = (0.617, 0.0, 0.0)
         draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
-                    self.x_CoM, self.y, (0.0, 0.0, 0.0))
+                    self.x_CoM, self.y, color)
 
         for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
             dx = self.indent_width*(1 - (dy / c)**2)
@@ -565,10 +568,17 @@ class D_type(Device_GL):
         for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
             draw_circle(self.port_radius, self.x - self.width /
                         2, self.y + dy, (0.0, 0.0, 0.0))
+        
+        color = (0.0, 0.0, 0.0)
+        if self.device.outputs[self.names.query("Q")]:
+            color = (0.617, 0.0, 0.0)
         draw_circle(self.port_radius, self.x + self.width/2,
-                    self.y + self.input_height/2, (0.0, 0.0, 0.0))
+                    self.y + self.input_height/2, color)
+        color = (0.0, 0.0, 0.0)
+        if self.device.outputs[self.names.query("QBAR")]:
+            color = (0.617, 0.0, 0.0)
         draw_circle(self.port_radius, self.x + self.width/2,
-                    self.y - self.input_height/2, (0.0, 0.0, 0.0))
+                    self.y - self.input_height/2, color)
         
         render_text_scale('DATA', 1.5, self.x - self.width/2 +10 , self.y + self.input_height*1.5 -4, (1,1,1), 0.1)
         render_text_scale('CLK', 1.5, self.x - self.width/2 +10 , self.y + self.input_height/2-4, (1,1,1),0.1)
