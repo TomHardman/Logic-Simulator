@@ -12,6 +12,7 @@ import wx
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 import random
+import numpy as np
 from gui_interactive import line_with_thickness
 
 from names import Names
@@ -41,8 +42,20 @@ def plot_line(vertices, t, colour):
             x_next = x + 40
             GL.glVertex2f(x_next, y)
             
-
     GL.glEnd()
+
+def choose_viable_colour(colours, tol):
+    """Randomly generate colour for a trace check and return if its euclidean distance
+    to other trace colours is large enough that colours will be distinguishable"""
+    colour = (random.random(), random.random(), random.random())
+    while True:
+        for col in colours:
+            d = sum([(colour[i] - col[i])**2 for i in range(3)])
+            if d < tol:
+                colour = (random.random(), random.random(), random.random())
+                break
+        break
+    return colour
 
 
 class TraceCanvas(wxcanvas.GLCanvas):
@@ -152,11 +165,13 @@ class TraceCanvas(wxcanvas.GLCanvas):
             GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
         
 
-            if monitor_name not in self.monitor_colours:  # plot trace for each monitor
-                colour = (random.random(), random.random(), random.random())
+            if monitor_name not in self.monitor_colours:  # randomly choose colour for each monitor
+                if self.monitor_colours:
+                    colour = choose_viable_colour(self.monitor_colours.values(), 10000/len(self.monitor_colours))
+                else:
+                    colour = (random.random(), random.random(), random.random())
+                
                 self.monitor_colours[monitor_name] = colour
-
-            print(signal_list)
 
             for i in range(len(signal_list)):
                 x = i * 40
@@ -174,7 +189,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
                 vertices.append((x, y))
 
                 GL.glTranslate(0.0, -self.pan_y, 0.0)  # generate axes labels that are invariant to translation in the y-direction
-                self.render_text(str(i), i*40, 20)
+                self.render_text(str(i+1), (i+1)*40, 20)
                 GL.glTranslated(0.0, self.pan_y, 0.0)
 
             plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
