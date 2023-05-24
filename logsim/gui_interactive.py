@@ -21,6 +21,9 @@ from scanner import Scanner
 from parse import Parser
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
+def overline(text):
+    return u'{}\u0304'.format((text))
+
 
 def draw_circle(r, x, y, color):
     num_segments = 100
@@ -34,6 +37,7 @@ def draw_circle(r, x, y, color):
     GL.glEnd()
 
 def draw_text(x, y, text):
+    GL.glColor3f(0.0, 0.0, 0.0)  # text is black
     GL.glRasterPos2f(x, y)
     for char in text:
         GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_HELVETICA_18, ord(char))
@@ -44,6 +48,20 @@ def render_text(text, w, x_pos, y_pos, color):
         GL.glPushMatrix()
         GL.glTranslatef(x_pos, y_pos, 0.0)
         GL.glScalef(0.1, 0.1, 0.1)  # Scale down the text
+
+        GL.glLineWidth(w)
+        GL.glColor3f(*color) 
+        for c in text:
+            GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
+
+        GL.glPopMatrix()
+
+def render_text_scale(text, w, x_pos, y_pos, color, s):
+        """Handle text drawing operations."""
+        GL.glColor3f(0.0, 0.0, 0.0)  # text is black
+        GL.glPushMatrix()
+        GL.glTranslatef(x_pos, y_pos, 0.0)
+        GL.glScalef(s, s, s)  # Scale down the text
 
         GL.glLineWidth(w)
         GL.glColor3f(*color) 
@@ -500,7 +518,7 @@ class D_type(Device_GL):
     def __init__(self, x, y, device, names):
         super().__init__(x, y, device, names)
 
-        self.width = 45
+        self.width = 55
         self.input_height = 30
         self.port_radius = 7
         self.no_segments = 100
@@ -524,6 +542,14 @@ class D_type(Device_GL):
                     self.y + self.input_height/2, (0.0, 0.0, 0.0))
         draw_circle(self.port_radius, self.x + self.width/2,
                     self.y - self.input_height/2, (0.0, 0.0, 0.0))
+        
+        render_text_scale('DATA', 1, self.x - self.width/2 +10 , self.y + self.input_height*1.5 -4, (1,1,1), 0.05)
+        render_text_scale('CLK', 1, self.x - self.width/2 +10 , self.y + self.input_height/2-4, (1,1,1),0.05)
+        render_text_scale('SET', 1, self.x - self.width/2 +10 , self.y - self.input_height/2-4, (1,1,1),0.05)
+        render_text_scale('CLR', 1, self.x - self.width/2 +10 , self.y - self.input_height*1.5-4, (1,1,1), 0.05)
+        render_text_scale('Q', 1, self.x + self.width/2 -13 , self.y + self.input_height/2-4, (1,1,1),0.05)
+        render_text_scale(overline('Q'), 1, self.x + self.width/2 -13, self.y - self.input_height/2-4, (1,1,1),0.05)
+        line_with_thickness([(self.x + self.width/2-13, self.y - self.input_height/2+3), (self.x + self.width/2 - 9, self.y - self.input_height/2+3)], 0.3, (1,1,1))
         
         if self.show_text:
 
