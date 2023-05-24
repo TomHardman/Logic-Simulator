@@ -102,6 +102,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         self.pan_y = 0
         self.last_mouse_x = 0  # previous mouse x position
         self.last_mouse_y = 0  # previous mouse y position
+        self.continue_pan_reset = False
 
         # Initialise variables for zooming
         self.zoom = 1
@@ -152,6 +153,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         offset = -100
         y_0 = self.GetSize()[1] - 100
         height = 80
+        x_max = 0
 
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
@@ -194,6 +196,14 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
             plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
             trace_count += 1
+            
+            if len(signal_list) > 0:
+                x_max = x
+
+        if self.continue_pan_reset and x_max > self.GetSize()[0]:  # if continue event occurs and far edge is off screen
+            self.pan_x = -(x_max - self.GetSize()[0])
+            self.init = False  # pan to bring far edge on screen
+            self.continue_pan_reset = 0
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
