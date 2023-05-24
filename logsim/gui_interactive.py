@@ -33,24 +33,27 @@ def draw_circle(r, x, y, color):
         GL.glVertex2f(x + dx, y + dy)
     GL.glEnd()
 
+
 def draw_text(x, y, text):
     GL.glRasterPos2f(x, y)
     for char in text:
         GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_HELVETICA_18, ord(char))
 
+
 def render_text(text, w, x_pos, y_pos, color):
-        """Handle text drawing operations."""
-        GL.glColor3f(0.0, 0.0, 0.0)  # text is black
-        GL.glPushMatrix()
-        GL.glTranslatef(x_pos, y_pos, 0.0)
-        GL.glScalef(0.1, 0.1, 0.1)  # Scale down the text
+    """Handle text drawing operations."""
+    GL.glColor3f(0.0, 0.0, 0.0)  # text is black
+    GL.glPushMatrix()
+    GL.glTranslatef(x_pos, y_pos, 0.0)
+    GL.glScalef(0.1, 0.1, 0.1)  # Scale down the text
 
-        GL.glLineWidth(w)
-        GL.glColor3f(*color) 
-        for c in text:
-            GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
+    GL.glLineWidth(w)
+    GL.glColor3f(*color)
+    for c in text:
+        GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
 
-        GL.glPopMatrix()
+    GL.glPopMatrix()
+
 
 def line_with_thickness(vertices, t, color):
     if not vertices:
@@ -78,6 +81,7 @@ def line_with_thickness(vertices, t, color):
         i += 1
     draw_circle(t/2, *vertices[-1], color)
 
+
 class Monitor():
     def __init__(self, device_GL, port_id):
         self.device_GL = device_GL
@@ -91,16 +95,16 @@ class Monitor():
         x, y = self.device_GL.get_port_coor(self.port_id)
         x -= 15
         y += 25
-        #GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
         GL.glColor(1, 1, 1)
-        
-        #vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-        #line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
-        draw_circle(self.monitor_radius, x, y, (0,0.3,0.87))
+
+        # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+        # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+        draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
         GL.glColor(1, 1, 1)
-        render_text('M', 2, x-5, y-5, (1,1,1))
+        render_text('M', 2, x-5, y-5, (1, 1, 1))
         GL.glFlush()
-        
+
 
 class Connection_GL:
     def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
@@ -263,11 +267,11 @@ class And_gate(Device_GL):
             draw_circle(self.port_radius, self.x -
                         self.x_CoM, y, (0.0, 0.0, 0.0))
 
-        #render_text(self.name_string, 2, self.x, self.y)
+        # render_text(self.name_string, 2, self.x, self.y)
         if self.show_text:
 
-            draw_text(self.x-5, self.y - self.input_height*self.inputs/2 - 19, self.name_string)
-
+            draw_text(self.x-5, self.y - self.input_height *
+                      self.inputs/2 - 19, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
@@ -355,10 +359,11 @@ class Or_gate(Device_GL):
             vertices = [(self.x - self.x_CoM, self.y + dy),
                         (self.x - self.x_CoM + dx, self.y + dy)]
             line_with_thickness(vertices, 3, (0.0, 0.0, 0.0))
-        
+
         if self.show_text:
 
-            draw_text(self.x-5, self.y - self.input_height*self.inputs/2 -19, self.name_string)
+            draw_text(self.x-5, self.y - self.input_height *
+                      self.inputs/2 - 19, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
@@ -455,7 +460,8 @@ class Xor_gate(Device_GL):
             line_with_thickness(vertices, 3, (0.0, 0.0, 0.0))
         if self.show_text:
 
-            draw_text(self.x-5, self.y - self.input_height*self.inputs/2 -19, self.name_string)
+            draw_text(self.x-5, self.y - self.input_height *
+                      self.inputs/2 - 19, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM - self.gap_width
@@ -524,10 +530,11 @@ class D_type(Device_GL):
                     self.y + self.input_height/2, (0.0, 0.0, 0.0))
         draw_circle(self.port_radius, self.x + self.width/2,
                     self.y - self.input_height/2, (0.0, 0.0, 0.0))
-        
+
         if self.show_text:
 
-            draw_text(self.x-7, self.y - self.input_height*self.inputs/2 - 19, self.name_string)
+            draw_text(self.x-7, self.y - self.input_height *
+                      self.inputs/2 - 19, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.width/2
@@ -648,7 +655,8 @@ class Clock(Device_GL):
 
         if self.show_text:
 
-            draw_text(self.x-15, self.y - self.half_height*2 -5 , self.name_string)
+            draw_text(self.x-15, self.y - self.half_height *
+                      2 - 5, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.width/2
@@ -711,7 +719,8 @@ class Switch(Device_GL):
 
         if self.show_text:
 
-            draw_text(self.x-8, self.y - self.half_height*2.5, self.name_string)
+            draw_text(self.x-8, self.y - self.half_height *
+                      2.5, self.name_string)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
@@ -785,6 +794,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         self.last_mouse_y = 0  # previous mouse y position
         self.object_clicked = False
         self.connection_list = [False, None, None]
+        self.choose_monitor = True
         self.temp_connection = None
 
         # Initialise variables for zooming
@@ -836,55 +846,74 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         x = 100
         y = 100
 
+        for id in clock_ids:
+            device = devices.get_device(id)
+            clock = Clock(x, y, device, names)
+            y += 200
+            self.objects.append(clock)
+            self.devices_GL_list.append(clock)
+
         for id in switch_ids:
             device = devices.get_device(id)
             switch = Switch(x, y, device, names)
-            x += 200
+            y += 200
             self.objects.append(switch)
             self.devices_GL_list.append(switch)
             self.switch_GL_list.append(switch)
+        
+        y = 100
+        x += 200
 
         for id in and_gate_ids:
             device = devices.get_device(id)
             and_gate = And_gate(x, y, device, names, False)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(and_gate)
             self.devices_GL_list.append(and_gate)
 
         for id in nand_gate_ids:
             device = devices.get_device(id)
             nand_gate = And_gate(x, y, device, names, True)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(nand_gate)
             self.devices_GL_list.append(nand_gate)
 
         for id in or_gate_ids:
             device = devices.get_device(id)
             or_gate = Or_gate(x, y, device, names, False)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(or_gate)
             self.devices_GL_list.append(or_gate)
 
         for id in nor_gate_ids:
             device = devices.get_device(id)
             nor_gate = Or_gate(x, y, device, names, True)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(nor_gate)
             self.devices_GL_list.append(nor_gate)
 
         for id in dtype_ids:
             device = devices.get_device(id)
             dtype = D_type(x, y, device, names)
-            x += 200
+            y += 200
+            if y > 800:
+                x += 200
+                y = 100
             self.objects.append(dtype)
             self.devices_GL_list.append(dtype)
 
-        for id in clock_ids:
-            device = devices.get_device(id)
-            clock = Clock(x, y, device, names)
-            x += 200
-            self.objects.append(clock)
-            self.devices_GL_list.append(clock)
 
         x = 100
         y = 300
@@ -903,11 +932,10 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
 
         for device_id, port_id in self.monitors.monitors_dictionary:
             [device_GL] = [
-                    i for i in self.devices_GL_list if i.id == device_id]
+                i for i in self.devices_GL_list if i.id == device_id]
             monitor = Monitor(device_GL, port_id)
             self.monitors_GL.append(monitor)
             self.objects.append(monitor)
-            
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -1017,6 +1045,22 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             self.temp_connection.mouse_y = oy
                         break
 
+            if self.choose_monitor:
+                for ob in self.devices_GL_list:
+                    device_id, port_id = ob.is_port_clicked(ox, oy)
+                    if device_id is not None:
+                        error_code = self.monitors.make_monitor(
+                            device_id, port_id)
+                        if error_code == self.monitors.NO_ERROR:
+                            [device_GL] = [
+                                i for i in self.devices_GL_list if i.id == device_id]
+                            monitor = Monitor(device_GL, port_id)
+                            self.objects.append(monitor)
+                            self.monitors_GL.append(monitor)
+                            self.choose_monitor = False
+                        else:
+                            self.raise_error("Choose a valid monitor point")
+
         if event.ButtonUp():
             text = "".join(["Mouse button released at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
@@ -1047,7 +1091,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             text = "".join(["Mouse dragged to: ", str(event.GetX()),
                             ", ", str(event.GetY()), ". Pan is now: ",
                             str(self.pan_x), ", ", str(self.pan_y)])
-        if event.GetWheelRotation() < 0:
+        if event.GetWheelRotation() < 0 and self.zoom > 0.5:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
@@ -1056,7 +1100,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
-        if event.GetWheelRotation() > 0:
+        if event.GetWheelRotation() > 0 and self.zoom < 1.5:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
@@ -1086,17 +1130,21 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
 
     def on_key_down(self, event):
         keycode = event.GetUnicodeKey()
-        tmp = ord('c')
 
         if keycode == 67:
             # When c is pressed
             if self.connection_list[0]:
                 self.connection_list = [False, None, None]
                 self.temp_connection = None
-            else:
+            elif not self.choose_monitor:
                 self.connection_list = [True, None, None]
             self.Refresh()
-    
+        if keycode == 77:
+            if self.choose_monitor:
+                self.choose_monitor = False
+            elif not self.connection_list[0]:
+                self.choose_monitor = True
+
     def on_enter_window(self, event):
         self.SetFocus()
 
@@ -1125,6 +1173,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         x = 0
 
         GL.glColor3f(0.7, 0.7, 0.7)
+        GL.glLineWidth(1.0)
         GL.glBegin(GL.GL_LINES)
         while x < width/self.zoom:
             if abs(x - grid_spacing * self.pan_x//grid_spacing) < 8:
@@ -1147,10 +1196,11 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         GL.glLoadIdentity()
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
-    
-    def create_device(self,device_name, device_type, qualifier = None):
+
+    def create_device(self, device_name, device_type, qualifier=None):
         [device_id] = self.names.lookup([device_name])
-        error_code  = self.devices.create_device(device_id, device_type, qualifier)
+        error_code = self.devices.create_device(
+            device_id, device_type, qualifier)
         if error_code == self.devices.NO_ERROR:
             device = self.devices.get_device(device_id)
             if device_type == self.devices.AND:
@@ -1164,19 +1214,18 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             elif device_type == self.devices.SWITCH:
                 device_GL = Switch(0, 0, device, self.names)
             elif device_type == self.devices.XOR:
-                device_GL = Xor_gate(0,0, device, self.names)
+                device_GL = Xor_gate(0, 0, device, self.names)
             elif device_type == self.devices.D_TYPE:
                 device_GL = D_type(0, 0, device, self.names)
             elif device_type == self.devices.CLOCK:
-                device_GL = Clock(0,0, device, self.names)
+                device_GL = Clock(0, 0, device, self.names)
             self.objects.append(device_GL)
             self.devices_GL_list.append(device_GL)
         self.Refresh()
 
-    
     def raise_error(self, string):
         dlg = GMD(None, string,
-                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
+                  "Error", wx.OK | wx.ICON_ERROR | 0x40)
         dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
         dlg.ShowModal()
         dlg.Destroy()
@@ -1223,7 +1272,8 @@ class Gui_interactive(wx.Frame):
         self.first_run = False
 
         # Canvas for drawing signals
-        self.canvas = InteractiveCanvas(self, devices, monitors, names, network)
+        self.canvas = InteractiveCanvas(
+            self, devices, monitors, names, network)
         choices = ['SW1', 'SW2', 'SW3']
 
         # Configure the widgets

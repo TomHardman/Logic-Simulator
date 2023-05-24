@@ -52,7 +52,6 @@ def main(arg_list):
     monitors = Monitors(names, devices, network)
 
     for option, path in options:
-        print(arguments)
         if option == "-h":  # print the usage message
             print(usage_message)
             sys.exit()
