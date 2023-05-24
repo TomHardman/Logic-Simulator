@@ -326,7 +326,7 @@ class And_gate(Device_GL):
         device_id = None
         port_id = None
         for i in range(self.inputs):
-            if (self.x - self.x_CoM - mouse_x)**2 + (self.y + self.input_height * (self.inputs/2 - i - 0.5) - mouse_y)**2 < self.port_radius**2:
+            if (self.x - self.x_CoM - mouse_x)**2 + (self.y + self.input_height * (self.inputs/2 - i - 0.5) - mouse_y)**2 < (self.port_radius+3)**2:
                 port_id = self.names.query("I" + str(i+1))
                 device_id = self.device.device_id
                 return (device_id, port_id)
@@ -424,7 +424,7 @@ class Or_gate(Device_GL):
         device_id = None
         port_id = None
         for i in range(self.inputs):
-            if (self.x - self.x_CoM - mouse_x)**2 + (self.y + self.input_height * (self.inputs/2 - i - 0.5) - mouse_y)**2 < self.port_radius**2:
+            if (self.x - self.x_CoM - mouse_x)**2 + (self.y + self.input_height * (self.inputs/2 - i - 0.5) - mouse_y)**2 < (self.port_radius+3)**2:
                 port_id = self.names.query("I" + str(i+1))
                 device_id = self.device.device_id
                 return (device_id, port_id)
@@ -525,7 +525,7 @@ class Xor_gate(Device_GL):
         device_id = None
         port_id = None
         for i in range(2):
-            if (self.x - self.x_CoM - mouse_x - self.gap_width)**2 + (self.y + self.input_height * (0.5 - i) - mouse_y)**2 < self.port_radius**2:
+            if (self.x - self.x_CoM - mouse_x - self.gap_width)**2 + (self.y + self.input_height * (0.5 - i) - mouse_y)**2 < (self.port_radius+3)**2:
                 port_id = self.names.query("I" + str(i+1))
                 device_id = self.device.device_id
                 return (device_id, port_id)
@@ -612,22 +612,22 @@ class D_type(Device_GL):
     def is_port_clicked(self, mouse_x, mouse_y):
         device_id = self.device.device_id
         port_id = None
-        if (self.x - self.width/2 - mouse_x)**2 + (self.y + self.input_height * 1.5 - mouse_y)**2 < self.port_radius**2:
+        if (self.x - self.width/2 - mouse_x)**2 + (self.y + self.input_height * 1.5 - mouse_y)**2 < (self.port_radius+3)**2:
             port_id = self.names.query("DATA")
             return (device_id, port_id)
-        elif (self.x - self.width/2 - mouse_x)**2 + (self.y + self.input_height * 0.5 - mouse_y)**2 < self.port_radius**2:
+        elif (self.x - self.width/2 - mouse_x)**2 + (self.y + self.input_height * 0.5 - mouse_y)**2 < (self.port_radius+3)**2:
             port_id = self.names.query("CLK")
             return (device_id, port_id)
-        elif (self.x - self.width/2 - mouse_x)**2 + (self.y - self.input_height * 0.5 - mouse_y)**2 < self.port_radius**2:
+        elif (self.x - self.width/2 - mouse_x)**2 + (self.y - self.input_height * 0.5 - mouse_y)**2 < (self.port_radius+3)**2:
             port_id = self.names.query("SET")
             return (device_id, port_id)
-        elif (self.x - self.width/2 - mouse_x)**2 + (self.y - self.input_height * 1.5 - mouse_y)**2 < self.port_radius**2:
+        elif (self.x - self.width/2 - mouse_x)**2 + (self.y - self.input_height * 1.5 - mouse_y)**2 < (self.port_radius+3)**2:
             port_id = self.names.query("CLEAR")
             return (device_id, port_id)
-        elif (self.x + self.width/2 - mouse_x)**2 + (self.y + self.input_height * 0.5 - mouse_y)**2 < self.port_radius**2:
+        elif (self.x + self.width/2 - mouse_x)**2 + (self.y + self.input_height * 0.5 - mouse_y)**2 < (self.port_radius+3)**2:
             port_id = self.names.query("Q")
             return (device_id, port_id)
-        elif (self.x + self.width/2 - mouse_x)**2 + (self.y - self.input_height * 0.5 - mouse_y)**2 < self.port_radius**2:
+        elif (self.x + self.width/2 - mouse_x)**2 + (self.y - self.input_height * 0.5 - mouse_y)**2 < (self.port_radius+3)**2:
             port_id = self.names.query("QBAR")
             return (device_id, port_id)
         return (None, port_id)
@@ -734,7 +734,7 @@ class Clock(Device_GL):
     def is_port_clicked(self, mouse_x, mouse_y):
         device_id = None
         port_id = None
-        if (self.x + self.width/2 - mouse_x)**2 + (self.y - mouse_y)**2 < self.port_radius**2:
+        if (self.x + self.width/2 - mouse_x)**2 + (self.y - mouse_y)**2 < (self.port_radius+3)**2:
             device_id = self.device.device_id
         return (device_id, port_id)
 
@@ -804,7 +804,7 @@ class Switch(Device_GL):
     def is_port_clicked(self, mouse_x, mouse_y):
         device_id = None
         port_id = None
-        if (self.x - self.x_CoM + self.width - mouse_x)**2 + (self.y - mouse_y)**2 < self.port_radius**2:
+        if (self.x - self.x_CoM + self.width - mouse_x)**2 + (self.y - mouse_y)**2 < (self.port_radius+3)**2:
             device_id = self.device.device_id
         return (device_id, port_id)
 
