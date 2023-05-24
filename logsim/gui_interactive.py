@@ -257,10 +257,15 @@ class And_gate(Device_GL):
             GL.glVertex2f(self.x + self.box_width - self.x_CoM + dx, self.y -
                           self.input_height * (self.inputs - 2.0)/2.0 + dy)
         GL.glEnd()
-
+        color = (0.0, 0.0, 0.0)
+        if self.device.outputs[None]:
+            color = (0.617, 0.0, 0.0)
+        
+        draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
+                    self.input_height, self.y, color)
         if self.NAND:
-            draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
-                        self.input_height, self.y, (0.0, 0.0, 0.0))
+            draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
+                        self.input_height, self.y, (1.0, 1.0, 1.0))
 
         for i in range(self.inputs):
             y = self.input_height * (i + 0.5 - self.inputs*0.5) + self.y
@@ -348,9 +353,15 @@ class Or_gate(Device_GL):
 
         GL.glEnd()
 
+        color = (0.0, 0.0, 0.0)
+        if self.device.outputs[None]:
+            color = (0.617, 0.0, 0.0)
+        
+        draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
+                    self.x_CoM, self.y, color)
         if self.NOR:
-            draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
-                        self.x_CoM, self.y, (0.0, 0.0, 0.0))
+            draw_circle(self.port_radius - 2, self.x + self.box_width + self.straight_box_width -
+                        self.x_CoM, self.y, (1.0, 1.0, 1.0))
 
         for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
             dx = self.indent_width*(1 - (dy / c)**2)
@@ -1100,7 +1111,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
-        if event.GetWheelRotation() > 0 and self.zoom < 1.5:
+        if event.GetWheelRotation() > 0 and self.zoom < 2:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
