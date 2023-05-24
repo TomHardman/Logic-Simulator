@@ -1091,7 +1091,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             text = "".join(["Mouse dragged to: ", str(event.GetX()),
                             ", ", str(event.GetY()), ". Pan is now: ",
                             str(self.pan_x), ", ", str(self.pan_y)])
-        if event.GetWheelRotation() < 0:
+        if event.GetWheelRotation() < 0 and self.zoom > 0.5:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
@@ -1100,7 +1100,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
-        if event.GetWheelRotation() > 0:
+        if event.GetWheelRotation() > 0 and self.zoom < 1.5:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
@@ -1173,6 +1173,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         x = 0
 
         GL.glColor3f(0.7, 0.7, 0.7)
+        GL.glLineWidth(1.0)
         GL.glBegin(GL.GL_LINES)
         while x < width/self.zoom:
             if abs(x - grid_spacing * self.pan_x//grid_spacing) < 8:
