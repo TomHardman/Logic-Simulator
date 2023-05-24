@@ -219,8 +219,8 @@ class Gui_linux(wx.Frame):
         sidebar_sizer.Add(panel_monitors, 1, wx.EXPAND | wx.ALL, 10)
 
         # Add canvas widgets - include as instance objects to allow method access
-        self.trace_canvas = TraceCanvas(plotting_ui, self, devices, monitors)
-        self.circuit_canvas = InteractiveCanvas(circuit_ui, devices, monitors, names, network)
+        self.trace_canvas = TraceCanvas(plotting_ui, devices, monitors)
+        self.circuit_canvas = InteractiveCanvas(circuit_ui, self, devices, monitors, names, network)
 
         # Add canvases to respective panels
         plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND , 5)
