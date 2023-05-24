@@ -86,7 +86,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors):
+    def __init__(self, parent, devices, monitors, cycles_completed):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
@@ -96,6 +96,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         self.init = False
         self.context = wxcanvas.GLContext(self)
         self.SetSize(1000, 1000)
+        self.cycles_completed = 0
 
         # Initialise variables for panning
         self.pan_x = 0
