@@ -100,9 +100,10 @@ def line_with_thickness(vertices, t, color):
 
 
 class Monitor():
-    def __init__(self, device_GL, port_id):
+    def __init__(self,names, device_GL, port_id):
         self.device_GL = device_GL
         self.port_id = port_id
+        self.names = names
 
         self.monitor_radius = 15
 
@@ -981,7 +982,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         for device_id, port_id in self.monitors.monitors_dictionary:
             [device_GL] = [
                 i for i in self.devices_GL_list if i.id == device_id]
-            monitor = Monitor(device_GL, port_id)
+            monitor = Monitor(self.names, device_GL, port_id)
             self.monitors_GL.append(monitor)
             self.objects.append(monitor)
 
@@ -1102,7 +1103,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                         if error_code == self.monitors.NO_ERROR:
                             [device_GL] = [
                                 i for i in self.devices_GL_list if i.id == device_id]
-                            monitor = Monitor(device_GL, port_id)
+                            monitor = Monitor(self.names, device_GL, port_id)
                             self.objects.append(monitor)
                             self.monitors_GL.append(monitor)
                             self.mother.trace_canvas.Refresh()
