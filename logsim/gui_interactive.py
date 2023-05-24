@@ -274,10 +274,15 @@ class And_gate(Device_GL):
             GL.glVertex2f(self.x + self.box_width - self.x_CoM + dx, self.y -
                           self.input_height * (self.inputs - 2.0)/2.0 + dy)
         GL.glEnd()
-
+        color = (0.0, 0.0, 0.0)
+        if self.device.outputs[None]:
+            color = (0.617, 0.0, 0.0)
+        
+        draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
+                    self.input_height, self.y, color)
         if self.NAND:
-            draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
-                        self.input_height, self.y, (0.0, 0.0, 0.0))
+            draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
+                        self.input_height, self.y, (1.0, 1.0, 1.0))
 
         for i in range(self.inputs):
             y = self.input_height * (i + 0.5 - self.inputs*0.5) + self.y
@@ -365,9 +370,15 @@ class Or_gate(Device_GL):
 
         GL.glEnd()
 
+        color = (0.0, 0.0, 0.0)
+        if self.device.outputs[None]:
+            color = (0.617, 0.0, 0.0)
+        
+        draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
+                    self.x_CoM, self.y, color)
         if self.NOR:
-            draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
-                        self.x_CoM, self.y, (0.0, 0.0, 0.0))
+            draw_circle(self.port_radius - 2, self.x + self.box_width + self.straight_box_width -
+                        self.x_CoM, self.y, (1.0, 1.0, 1.0))
 
         for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
             dx = self.indent_width*(1 - (dy / c)**2)
@@ -797,7 +808,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors, names, network):
+    def __init__(self, parent, mother, devices, monitors, names, network):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
@@ -806,6 +817,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         GLUT.glutInit()
         self.init = False
         self.context = wxcanvas.GLContext(self)
+        self.parent = parent
+        self.mother = mother
 
         self.network = network
         self.monitors = monitors
@@ -819,7 +832,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         self.last_mouse_y = 0  # previous mouse y position
         self.object_clicked = False
         self.connection_list = [False, None, None]
-        self.choose_monitor = True
+        self.choose_monitor = False
         self.temp_connection = None
 
         # Initialise variables for zooming
@@ -1054,7 +1067,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             else:
                                 self.raise_error("Connection invalid")
                             self.temp_connection = None
-                            self.connection_list = [False, None, None]
+                            self.connection_list = [True, None, None]
                         else:
                             self.connection_list[1] = device_id
                             self.connection_list[2] = port_id
@@ -1075,14 +1088,20 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                     device_id, port_id = ob.is_port_clicked(ox, oy)
                     if device_id is not None:
                         error_code = self.monitors.make_monitor(
-                            device_id, port_id)
+                            device_id, port_id,self.mother.cycles_completed)
                         if error_code == self.monitors.NO_ERROR:
                             [device_GL] = [
                                 i for i in self.devices_GL_list if i.id == device_id]
                             monitor = Monitor(device_GL, port_id)
                             self.objects.append(monitor)
                             self.monitors_GL.append(monitor)
-                            self.choose_monitor = False
+                            self.mother.trace_canvas.Refresh()
+                        elif self.monitors.remove_monitor(device_id, port_id):
+                            [device_GL] = [
+                            i for i in self.monitors_GL if i.device_GL.device.device_id == device_id]
+                            self.monitors_GL.remove(device_GL)
+                            self.objects.remove(device_GL)
+                            self.mother.trace_canvas.Refresh()
                         else:
                             self.raise_error("Choose a valid monitor point")
 
@@ -1125,7 +1144,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
-        if event.GetWheelRotation() > 0 and self.zoom < 1.5:
+        if event.GetWheelRotation() > 0 and self.zoom < 2:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
