@@ -171,21 +171,16 @@ class Gui_linux(wx.Frame):
         title_sizer = wx.BoxSizer(wx.HORIZONTAL)
         title_sizer.Add(monitor_title, 1, wx.ALL, 10)
 
-        add_button_m = wx.Button(panel_monitors, wx.ID_ANY, "Add\nMonitor")
-        add_button_m.SetFont(self.font_buttons)
-
-        zap_button = wx.Button(panel_monitors, wx.ID_ANY, "Zap\nMonitor")
-        zap_button.SetFont(self.font_buttons)
+        add_zap_button = wx.Button(panel_monitors, wx.ID_ANY, "Add/Zap\nMonitor")
+        add_zap_button.SetFont(self.font_buttons)
 
         add_zap_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        add_zap_sizer.Add(add_button_m, 1, wx.ALL, 10)
-        add_zap_sizer.Add(zap_button, 1, wx.ALL, 10)
+        add_zap_sizer.Add(add_zap_button, 1, wx.ALL | wx.ALIGN_CENTRE, 10)
 
         monitor_sizer.Add(title_sizer, 1, wx.ALL, 5)
         monitor_sizer.Add(add_zap_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
-        add_button_m.Bind(wx.EVT_BUTTON, self.on_add_monitor_button)
-        zap_button.Bind(wx.EVT_BUTTON, self.on_zap_monitor_button)
+        add_zap_button.Bind(wx.EVT_BUTTON, self.on_add_zap_button)
 
         # Widgets and sizers for device panel
         device_title = wx.StaticText(panel_devices, wx.ID_ANY, "Device Configuration:")  # create title
@@ -194,11 +189,11 @@ class Gui_linux(wx.Frame):
 
         add_button_d = wx.Button(panel_devices, wx.ID_ANY, "Add\nDevice")
         add_button_d.SetFont(self.font_buttons)
-        add_button_d.SetInitialSize(wx.Size(140, 60))
+        add_button_d.SetInitialSize(wx.Size(150, 60))
 
         add_button_c = wx.Button(panel_devices, wx.ID_ANY, "Add\nConnections")
         add_button_c.SetFont(self.font_buttons)
-        add_button_c.SetInitialSize(wx.Size(140, 60))
+        add_button_c.SetInitialSize(wx.Size(150, 60))
         
         button_sizer = wx.BoxSizer(wx.HORIZONTAL) # sizer for buttons
         button_sizer.Add(add_button_d, 0, wx.ALL, 10)
@@ -252,30 +247,6 @@ class Gui_linux(wx.Frame):
             wx.MessageBox("Logic Simulator\nCreated by bd432, al2008, th624\n2023",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
 
-    def on_toggle_switch(self, event):
-        """Handle the event when the user toggles a switch button"""
-        if self.button_constraint:
-            return
-        
-        Id = event.GetId()
-        toggle_button = self.FindWindowById(Id)
-        button_state = toggle_button.GetValue()  # Gets button state: True means button is currently toggled on
-
-        if button_state:
-            switch_state = 1  # Button toggled on means new switch state is to be set as 1
-        else:
-            switch_state = 0
-
-        if self.devices.set_switch(Id, switch_state):  # Attempts to set switches to new state
-            if button_state:
-                toggle_button.SetLabel("On")
-
-            if not button_state:
-                toggle_button.SetLabel("Off")
-
-        else:  # unfinished but should display error message on window
-            pass
-
     def on_run_button(self, event):
         """Handles the event when the user presses the run button - on first run it causes the continue
         button to appear in the GUI - on all runs it runs the simulation from scratch for the specified
@@ -305,17 +276,16 @@ class Gui_linux(wx.Frame):
                     self.monitors.record_signals()
                     self.cycles_completed += 1
 
+                else: # raise error if there are unconnected devices
+                    self.error_pop_up('Run failed to execute - please make sure all devices are connected')
+                    
             self.trace_canvas.pan_x = 0
             self.trace_canvas.init = False
             self.trace_canvas.Refresh()  # call plotting event for trace and circuit canvas
             self.circuit_canvas.Refresh()
 
         else:  # show error dialogue box if cycle no. is not valid
-            dlg = GMD(None, "Please select valid number of cycles greater than zero ",
-                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
-            dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
-            dlg.ShowModal()
-            dlg.Destroy()
+            self.error_pop_up('Please select valid number of cycles greater than zero')
 
     def on_sash_position_change(self, event):
         """Handles the event where the sash position of the window changes - this
@@ -355,28 +325,32 @@ class Gui_linux(wx.Frame):
                     self.circuit_canvas.Refresh()
 
         else:  # show error dialogue box if cycle no. is not valid
-            dlg = GMD(None, "Please select valid number of cycles greater than zero ",
-                      "Error", wx.OK | wx.ICON_ERROR | 0x40)
-            dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
-            dlg.ShowModal()
-            dlg.Destroy()
+            self.error_pop_up('Please select valid number of cycles greater than zero')
 
-    def on_add_monitor_button(self, event):
+    def on_add_zap_button(self, event):
         """Handle the event when the user presses the add monitor button"""
+        if self.button_constraint:
+            return
+
         Id = event.GetId()
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
         
-        if lab == 'Add\nMonitor':
+        if lab == 'Add/Zap\nMonitors':
             button.SetLabel('Cancel')
             button.SetBackgroundColour(wx.RED)
+            self.circuit_canvas.choose_monitor = True
         
         elif lab == 'Cancel':
-            button.SetLabel('Add\nMonitor')
+            button.SetLabel('Add/Zap\nMonitors')
             button.SetBackgroundColour(wx.Colour(255, 255, 255))
+            self.circuit_canvas.choose_monitor = False
 
     def on_add_device_button(self, event):
         """Handle the event when the user presses the add device button"""
+        if self.button_constraint:
+            return
+
         Id = event.GetId()
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
@@ -389,22 +363,11 @@ class Gui_linux(wx.Frame):
             button.SetLabel('Add\nDevice')
             button.SetBackgroundColour(wx.Colour(255, 255, 255))
 
-    def on_zap_monitor_button(self, event):
-        """Handle the event when the user presses the zap monitor button"""
-        Id = event.GetId()
-        button = self.FindWindowById(Id)
-        lab = button.GetLabel()
-        
-        if lab == 'Zap\nMonitor':
-            button.SetLabel('Cancel')
-            button.SetBackgroundColour(wx.RED)
-        
-        elif lab == 'Cancel':
-            button.SetLabel('Zap\nMonitor')
-            button.SetBackgroundColour(wx.Colour(255, 255, 255))
-
     def on_add_connection_button(self, event):
         """Handle the event when the user presses the add connection button"""
+        if self.button_constraint:
+            return
+
         Id = event.GetId()
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
@@ -420,6 +383,12 @@ class Gui_linux(wx.Frame):
             self.circuit_canvas.connection_list = [False, None, None]
             self.circuit_canvas.temp_connection = None
             self.circuit_canvas.Refresh()
+
+    def error_pop_up(self, string):
+        dlg = GMD(None, string, "Error", wx.OK | wx.ICON_ERROR | 0x40)
+        dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+        dlg.ShowModal()
+        dlg.Destroy()
 
             
 
