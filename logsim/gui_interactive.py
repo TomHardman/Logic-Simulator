@@ -783,7 +783,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors, names, network):
+    def __init__(self, parent, mother, devices, monitors, names, network):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
@@ -792,6 +792,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         GLUT.glutInit()
         self.init = False
         self.context = wxcanvas.GLContext(self)
+        self.parent = parent
+        self.mother = mother
 
         self.network = network
         self.monitors = monitors
@@ -1061,7 +1063,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                     device_id, port_id = ob.is_port_clicked(ox, oy)
                     if device_id is not None:
                         error_code = self.monitors.make_monitor(
-                            device_id, port_id)
+                            device_id, port_id,self.mother.cycles_completed)
                         if error_code == self.monitors.NO_ERROR:
                             [device_GL] = [
                                 i for i in self.devices_GL_list if i.id == device_id]
