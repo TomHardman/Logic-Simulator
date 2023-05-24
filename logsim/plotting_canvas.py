@@ -31,11 +31,16 @@ def plot_line(vertices, t, colour):
     GL.glColor3f(*colour)
     GL.glBegin(GL.GL_LINE_STRIP)
 
-    for i in range(len(vertices)-1):
+    for i in range(len(vertices)):
         x, y = vertices[i][0], vertices[i][1]
-        x_next = vertices[i+1][0]
         GL.glVertex2f(x, y)
-        GL.glVertex2f(x_next, y)
+        try:
+            x_next = vertices[i+1][0]
+            GL.glVertex2f(x_next, y)
+        except IndexError:
+            x_next = x + 40
+            GL.glVertex2f(x_next, y)
+            
 
     GL.glEnd()
 
@@ -151,7 +156,9 @@ class TraceCanvas(wxcanvas.GLCanvas):
                 colour = (random.random(), random.random(), random.random())
                 self.monitor_colours[monitor_name] = colour
 
-            for i in range(len(signal_list) - 1):
+            print(signal_list)
+
+            for i in range(len(signal_list)):
                 x = i * 40
 
                 if signal_list[i] == 1:
