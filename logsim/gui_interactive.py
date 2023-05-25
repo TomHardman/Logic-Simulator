@@ -927,7 +927,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             and_gate = And_gate(x, y, device, names, False)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(and_gate)
@@ -937,7 +937,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             nand_gate = And_gate(x, y, device, names, True)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(nand_gate)
@@ -947,7 +947,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             or_gate = Or_gate(x, y, device, names, False)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(or_gate)
@@ -957,7 +957,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             nor_gate = Or_gate(x, y, device, names, True)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(nor_gate)
@@ -967,19 +967,19 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             dtype = D_type(x, y, device, names)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(dtype)
             self.devices_GL_list.append(dtype)
 
-
-        x = 100
-        y = 300
         for id in xor_gate_ids:
             device = devices.get_device(id)
             xor_gate = Xor_gate(x, y, device, names)
-            x += 200
+            y += 200
+            if y > 600:
+                x += 200
+                y = 100
             self.objects.append(xor_gate)
             self.devices_GL_list.append(xor_gate)
 
