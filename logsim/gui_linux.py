@@ -293,9 +293,9 @@ class Gui_linux(wx.Frame):
                 cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
 
                 run_sizer.Add(cont_button, 1, wx.ALL, 5)
-                self.cycles_comp_text.SetLabel(f"Cycles Completed: {self.cycles_completed}")
                 panel_control.Layout()
-                    
+
+            self.cycles_comp_text.SetLabel(f"Cycles Completed: {self.cycles_completed}")  
             self.trace_canvas.pan_x = 0  # autopan back to the beginning
             self.trace_canvas.init = False
             self.trace_canvas.Refresh()  # call plotting event for trace and circuit canvas
@@ -328,7 +328,7 @@ class Gui_linux(wx.Frame):
             return
 
         if self.monitor_constraint:
-            self.error_pop_up('Finish adding monitors before trying to execute another action')
+            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
         Id = event.GetId()
@@ -343,7 +343,7 @@ class Gui_linux(wx.Frame):
             return
 
         if self.monitor_constraint:
-            self.error_pop_up('Finish adding monitors before trying to execute another action')
+            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
         
         if self.cycles > 0:  # if the number of cycles provided is valid
@@ -388,7 +388,7 @@ class Gui_linux(wx.Frame):
             return
 
         if self.monitor_constraint:
-            self.error_pop_up('Finish adding monitors before trying to execute another action')
+            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
         Id = event.GetId()
@@ -406,7 +406,7 @@ class Gui_linux(wx.Frame):
     def on_add_connection_button(self, event):
         """Handle the event when the user presses the add connection button"""
         if self.monitor_constraint:
-            self.error_pop_up('Finish adding monitors before trying to execute another action')
+            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
         Id = event.GetId()
