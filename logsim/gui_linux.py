@@ -60,6 +60,87 @@ class RoundedScrollWindow(wx.ScrolledWindow):
 
         event.Skip()
 
+    
+class DeviceMenu(wx.Dialog):
+    def __init__(self, parent, title, devices):
+        wx.Dialog.__init__(self, parent, title=title)
+        self.devices = devices
+        self.device_chosen = None
+        self.font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        self.first_selection = True
+
+        # Create main sizer
+        overall_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(overall_sizer)
+
+        self.main_panel=wx.Panel(self)
+        self.panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.main_panel.SetSizer(self.panel_sizer)
+        overall_sizer.Add(self.main_panel, 1, wx.ALL, 5)
+
+        self.choose_device()
+    
+    def choose_device(self):
+        # Widgets for top sizer
+        choices = ['AND', 'NAND', 'SWITCH', 'OR', 
+                    'NOR', 'XOR', 'CLOCK', 'DTYPE']  # choices for drop down menu
+        device_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Choose Device:')
+        device_txt.SetFont(self.font)
+        drop_down = wx.Choice(self.main_panel, wx.ID_ANY, choices=choices)
+        drop_down.Bind(wx.EVT_CHOICE, self.on_drop_down)
+        
+        self.choose_dev_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.choose_dev_sizer.Add(device_txt, 1, wx.ALL, 5)
+        self.choose_dev_sizer.Add(drop_down, 1, wx.ALL, 5)
+        self.panel_sizer.Add(self.choose_dev_sizer, 1, wx.ALL, 5)
+
+    def destroyWidgetsInSizer(self, sizer):
+        for child in sizer.GetChildren():
+            widget = child.GetWindow()
+            if widget is not None:
+                widget.Destroy()
+
+    def choose_qualifier(self):
+        if self.device_chosen == 'CLOCK':
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter half period:')
+
+        elif self.device_chosen == 'SWITCH':
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter initial switch state:')
+        else:
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter number of inputs:')
+
+        self.choose_qual_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.choose_qual_sizer.Add(chosen_txt, 1, wx.ALL, 5)
+        self.choose_qual_sizer.Add(choose_txt, 1, wx.ALL, 5)
+        self.choose_qual_sizer.Add(choose_ctrl, 1, wx.ALL, 5)
+        self.choose_dev_sizer.Add(confirm_button_qual, 1, wx.ALL, 5)
+        self.panel_sizer.Add(self.choose_dev_sizer, 1, wx.ALL, 5)
+
+
+    def choose_name(self):
+        pass
+
+    def on_drop_down(self, event):
+        Id = event.GetId()
+        widget = self.FindWindowById(Id)
+
+        self.device_chosen = widget.GetStringSelection()
+
+        if self.first_selection and self.device_chosen:
+            confirm_button_dev = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
+            self.choose_dev_sizer.Add(confirm_button_dev, 1, wx.ALL, 5)
+            confirm_button_dev.Bind(wx.EVT_BUTTON, self.on_confirm_dev)
+            self.Layout()
+            self.first_selection = False
+
+    def on_confirm_dev(self, event):
+        self.destroyWidgetsInSizer(self.choose_dev_sizer)
+        self.choose_dev_sizer.Destroy()
+
+        if self.device_chosen == 'DTYPE' or self.device_chosen == 'XOR':
+            self.choose_name()
+
+
 
 class Gui_linux(wx.Frame):
 
@@ -244,8 +325,7 @@ class Gui_linux(wx.Frame):
 
         # Add canvas widgets - include as instance objects to allow method access
         self.trace_canvas = TraceCanvas(plotting_ui, devices, monitors)
-        self.circuit_canvas = InteractiveCanvas(
-            circuit_ui, self, devices, monitors, names, network)
+        self.circuit_canvas = InteractiveCanvas(circuit_ui, self, devices, monitors, names, network)
 
         # Add canvases to respective panels
         plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
@@ -390,8 +470,7 @@ class Gui_linux(wx.Frame):
     def on_add_zap_button(self, event):
         """Handle the event when the user presses the add monitor button"""
         if self.connection_constraint:
-            self.error_pop_up(
-                'Finish adding connections before trying to execute another action')
+            self.error_pop_up('Finish adding connections before trying to execute another action')
             return
 
         Id = event.GetId()
@@ -413,25 +492,16 @@ class Gui_linux(wx.Frame):
     def on_add_device_button(self, event):
         """Handle the event when the user presses the add device button"""
         if self.connection_constraint:
-            self.error_pop_up(
-                'Finish adding connections before trying to execute another action')
+            self.error_pop_up('Finish adding connections before trying to execute another action')
             return
 
         if self.monitor_constraint:
             self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
-        Id = event.GetId()
-        button = self.FindWindowById(Id)
-        lab = button.GetLabel()
-
-        if lab == 'Add\nDevice':
-            button.SetLabel('Stop')
-            button.SetBackgroundColour(wx.Colour(157, 0, 0))
-
-        elif lab == 'Stop':
-            button.SetLabel('Add\nDevice')
-            button.SetBackgroundColour(wx.Colour(255, 255, 255))
+        dev_menu = DeviceMenu(self, 'Device Menu', self.devices)
+        dev_menu.ShowModal()
+        dev_menu.Destroy()
 
     def on_add_connection_button(self, event):
         """Handle the event when the user presses the add connection button"""
