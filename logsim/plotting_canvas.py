@@ -203,7 +203,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         if self.continue_pan_reset and x_max > self.GetSize()[0]:  # if continue event occurs and far edge is off screen
             self.pan_x = -(x_max - self.GetSize()[0])
             self.init = False  # pan to bring far edge on screen
-            self.continue_pan_reset = 0
+            self.continue_pan_reset = False
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
