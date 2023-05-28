@@ -1262,38 +1262,33 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
     def render_grid(self):
 
         grid_spacing = 50
-        GL.glLoadIdentity()
-        GL.glTranslated(self.pan_x % grid_spacing,
-                        self.pan_y % grid_spacing, 0.0)
-        GL.glScaled(self.zoom, self.zoom, self.zoom)
-
         width, height = self.GetSize()
-        x = 0
+
+        x_min = (-self.pan_x/self.zoom)//grid_spacing * \
+            grid_spacing - grid_spacing
+        x_max = (width - self.pan_x) / self.zoom
+        y_min = (-self.pan_y/self.zoom)//grid_spacing * \
+            grid_spacing - grid_spacing
+        y_max = (height - self.pan_y) / self.zoom
+        x = x_min
 
         GL.glColor3f(0.7, 0.7, 0.7)
         GL.glLineWidth(1.0)
         GL.glBegin(GL.GL_LINES)
-        while x < width/self.zoom:
-            if abs(x - grid_spacing * self.pan_x//grid_spacing) < 8:
-                GL.glColor3f(0.7, 0, 0)
-            GL.glVertex2f(x, -grid_spacing)
-            GL.glVertex2f(x, height/self.zoom)
+        # while x < width/self.zoom:
+        while x < x_max:
+            GL.glVertex2f(x, y_min)
+            GL.glVertex2f(x, y_max)
             x += grid_spacing
-            GL.glColor3f(0.7, 0.7, 0.7)
         GL.glEnd()
 
         GL.glBegin(GL.GL_LINES)
-        y = 0
-        while y < grid_spacing + height/self.zoom:
-            GL.glVertex2f(-grid_spacing, y)
-            GL.glVertex2f(width/self.zoom, y)
+        y = y_min
+        while y < y_max:
+            GL.glVertex2f(x_min, y)
+            GL.glVertex2f(x_max, y)
             y += grid_spacing
         GL.glEnd()
-
-        GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()
-        GL.glTranslated(self.pan_x, self.pan_y, 0.0)
-        GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def create_device(self, device_name, device_type, qualifier=None):
         [device_id] = self.names.lookup([device_name])
