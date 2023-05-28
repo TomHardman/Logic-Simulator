@@ -66,59 +66,106 @@ class DeviceMenu(wx.Dialog):
         wx.Dialog.__init__(self, parent, title=title)
         self.devices = devices
         self.device_chosen = None
+        self.qualifier = None
+        self.device_name = None
         self.font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         self.first_selection = True
 
-        # Create main sizer
-        overall_sizer = wx.BoxSizer(wx.VERTICAL)
+        overall_sizer = wx.BoxSizer(wx.VERTICAL)  # Create main sizer
         self.SetSizer(overall_sizer)
 
-        self.main_panel=wx.Panel(self)
-        self.panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.main_panel = wx.Panel(self)
+        self.panel_sizer = wx.BoxSizer(wx.VERTICAL)  # Create main panel and relevant sizer
         self.main_panel.SetSizer(self.panel_sizer)
         overall_sizer.Add(self.main_panel, 1, wx.ALL, 5)
 
-        self.choose_device()
+        self.choose_device()  # This takes the user initially to the choose device state
     
     def choose_device(self):
-        # Widgets for top sizer
-        choices = ['AND', 'NAND', 'SWITCH', 'OR', 
-                    'NOR', 'XOR', 'CLOCK', 'DTYPE']  # choices for drop down menu
+        """Function that creates the pop up window to choose the device type"""
+        choices = ['AND', 'NAND', 'SWITCH', 'OR',
+                   'NOR', 'XOR', 'CLOCK', 'DTYPE']  # choices for drop down menu
         device_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Choose Device:')
         device_txt.SetFont(self.font)
         drop_down = wx.Choice(self.main_panel, wx.ID_ANY, choices=choices)
         drop_down.Bind(wx.EVT_CHOICE, self.on_drop_down)
         
         self.choose_dev_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.choose_dev_sizer.Add(device_txt, 1, wx.ALL, 5)
-        self.choose_dev_sizer.Add(drop_down, 1, wx.ALL, 5)
-        self.panel_sizer.Add(self.choose_dev_sizer, 1, wx.ALL, 5)
+        self.choose_dev_sizer.Add(device_txt, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+        self.choose_dev_sizer.Add(drop_down, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+        self.panel_sizer.Add(self.choose_dev_sizer, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+        self.Fit()
 
-    def destroyWidgetsInSizer(self, sizer):
+    def choose_qualifier(self):
+        """Function that creates the pop up window to choose the device qualifier - this
+        function is not called if the device is an XOR or DTYPE"""
+        if self.device_chosen == 'CLOCK':
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter half period:')
+            self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY, style=wx.SP_ARROW_KEYS, min=1, max=20)
+
+        elif self.device_chosen == 'SWITCH':
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter initial switch state:')
+            self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY, style=wx.SP_ARROW_KEYS, min=0, max=1)
+        else:
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter number of inputs:')
+            self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY, style=wx.SP_ARROW_KEYS, min=2, max=16)
+
+        chosen_txt = wx.StaticText(self.main_panel, wx.ID_ANY, f' Device chosen: {self.device_chosen}')
+        chosen_txt.SetFont(self.font)
+        confirm_button_qual = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
+        back_button_qual = wx.Button(self.main_panel, wx.ID_ANY, "Back")
+        confirm_button_qual.Bind(wx.EVT_BUTTON, self.on_confirm_qual)
+        back_button_qual.Bind(wx.EVT_BUTTON, self.on_back_qual)
+
+        self.choose_qual_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.choose_qual_sizer.Add(chosen_txt, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_qual_sizer.Add(choose_txt, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_qual_sizer.Add(self.choose_ctrl, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_qual_sizer.Add(confirm_button_qual, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_qual_sizer.Add(back_button_qual, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.panel_sizer.Add(self.choose_qual_sizer, 0, wx.ALL, 5)
+        self.Layout()
+        self.Fit()
+
+    def choose_name(self):
+        """Function that creates the pop up window for entering the device name"""
+
+        phrases = {'CLOCK': 'Half Period: ', 'NAND': 'Number of inputs: ', 'AND': 'Number of inputs: ',
+                   'NOR': 'Number of inputs: ', 'OR': 'Number of inputs: ', 'SWITCH': 'Initial State: '}
+
+        chosen_txt_dev = wx.StaticText(self.main_panel, wx.ID_ANY, f' Device chosen: {self.device_chosen}')
+        chosen_txt_dev.SetFont(self.font)
+
+        if self.device_chosen != 'XOR' and self.device_chosen != 'DTYPE':  # adds text to state qualifier if relevant
+            chosen_txt_qual = wx.StaticText(self.main_panel, wx.ID_ANY,
+                                            f' {phrases.get(self.device_chosen)}{self.qualifier}')
+            chosen_txt_qual.SetFont(self.font)
+
+        name_prompt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter device name:')
+        name_input = wx.TextCtrl(self.main_panel, wx.ID_ANY, size=(20, 100))
+        confirm_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
+        back_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Back")
+        confirm_button_name.Bind(wx.EVT_BUTTON, self.on_confirm_name)
+        back_button_name.Bind(wx.EVT_BUTTON, self.on_back_name)
+        name_prompt.Bind(wx.EVT_TEXT, self.on_name_entry)
+
+        self.choose_name_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.choose_name_sizer.Add(chosen_txt_dev, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        if self.device_chosen != 'XOR' and self.device_chosen != 'DTYPE':
+            self.choose_name_sizer.Add(chosen_txt_qual, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_name_sizer.Add(name_prompt, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_name_sizer.Add(name_input, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_name_sizer.Add(confirm_button_name, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_name_sizer.Add(back_button_name, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.Layout()
+        self.Fit()
+
+    def destroy_widgets_in_sizer(self, sizer):
+        """Function to destroy all the widgets in a given sizer"""
         for child in sizer.GetChildren():
             widget = child.GetWindow()
             if widget is not None:
                 widget.Destroy()
-
-    def choose_qualifier(self):
-        if self.device_chosen == 'CLOCK':
-            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter half period:')
-
-        elif self.device_chosen == 'SWITCH':
-            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter initial switch state:')
-        else:
-            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter number of inputs:')
-
-        self.choose_qual_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.choose_qual_sizer.Add(chosen_txt, 1, wx.ALL, 5)
-        self.choose_qual_sizer.Add(choose_txt, 1, wx.ALL, 5)
-        self.choose_qual_sizer.Add(choose_ctrl, 1, wx.ALL, 5)
-        self.choose_dev_sizer.Add(confirm_button_qual, 1, wx.ALL, 5)
-        self.panel_sizer.Add(self.choose_dev_sizer, 1, wx.ALL, 5)
-
-
-    def choose_name(self):
-        pass
 
     def on_drop_down(self, event):
         Id = event.GetId()
@@ -128,18 +175,49 @@ class DeviceMenu(wx.Dialog):
 
         if self.first_selection and self.device_chosen:
             confirm_button_dev = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
-            self.choose_dev_sizer.Add(confirm_button_dev, 1, wx.ALL, 5)
+            self.choose_dev_sizer.Add(confirm_button_dev, 1, wx.ALL | wx.ALIGN_LEFT, 5)
             confirm_button_dev.Bind(wx.EVT_BUTTON, self.on_confirm_dev)
             self.Layout()
             self.first_selection = False
+        self.Fit()  # fit layout to widgets
 
     def on_confirm_dev(self, event):
-        self.destroyWidgetsInSizer(self.choose_dev_sizer)
-        self.choose_dev_sizer.Destroy()
+        self.destroy_widgets_in_sizer(self.choose_dev_sizer)
+        self.panel_sizer.Detach(self.choose_dev_sizer)
 
         if self.device_chosen == 'DTYPE' or self.device_chosen == 'XOR':
             self.choose_name()
 
+        else:
+            self.choose_qualifier()
+
+    def on_confirm_qual(self, event):
+        self.qualifier = self.choose_ctrl.GetValue()
+        self.destroy_widgets_in_sizer(self.choose_qual_sizer)
+        self.panel_sizer.Detach(self.choose_qual_sizer)
+        self.choose_name()
+        return
+
+    def on_confirm_name(self, event):
+        pass
+
+    def on_back_qual(self, event):
+        self.destroy_widgets_in_sizer(self.choose_qual_sizer)
+        self.panel_sizer.Detach(self.choose_qual_sizer)
+        self.device_chosen = None
+        self.first_selection = True
+        self.choose_device()
+
+    def on_back_name(self, event):
+        self.destroy_widgets_in_sizer(self.choose_name_sizer)
+        self.panel_sizer.Detach(self.choose_name_sizer)
+        self.qualifier = None
+        self.choose_qualifier()
+
+    def on_name_entry(self, event):
+        Id = event.GetId()
+        widget = self.FindWindowById(Id)
+        self.device_name = widget.GetValue()
 
 
 class Gui_linux(wx.Frame):

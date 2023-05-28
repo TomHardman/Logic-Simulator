@@ -165,7 +165,6 @@ class TraceCanvas(wxcanvas.GLCanvas):
             GL.glTranslate(-self.pan_x * 1/self.zoom, 0.0, 0.0)
             self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count)
             GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
-        
 
             if monitor_name not in self.monitor_colours:  # randomly choose colour for each monitor
                 if self.monitor_colours:
