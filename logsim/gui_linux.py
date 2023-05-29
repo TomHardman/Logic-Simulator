@@ -196,7 +196,6 @@ class DeviceMenu(wx.Dialog):
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
         self.panel_sizer.Detach(self.choose_qual_sizer)
         self.choose_name()
-        return
 
     def on_confirm_name(self, event):
         pass
