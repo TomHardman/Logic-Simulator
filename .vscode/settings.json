@@ -2,11 +2,14 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
+    "python.formatting.autopep8Args": [
+        "--max-line-length",
+        "79"
+    ],
     "python.formatting.provider": "none",
     "python.testing.pytestArgs": [
         "."
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-
 }

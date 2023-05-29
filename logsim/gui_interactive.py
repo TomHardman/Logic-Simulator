@@ -21,11 +21,13 @@ from scanner import Scanner
 from parse import Parser
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
+
 def overline(text):
     return u'{}\u0304'.format((text))
 
 
 def draw_circle(r, x, y, color):
+    """Renders a circle of radius r at (x,y)"""
     num_segments = 100
     GL.glColor3f(*color)
     GL.glBegin(GL.GL_TRIANGLE_FAN)
@@ -38,8 +40,7 @@ def draw_circle(r, x, y, color):
 
 
 def draw_text(x, y, text):
-
-
+    """Renders text at (x,y)"""
     GL.glColor3f(0.0, 0.0, 0.0)  # text is black
     GL.glRasterPos2f(x, y)
     for char in text:
@@ -63,24 +64,23 @@ def render_text(text, w, x_pos, y_pos, color, dark_mode):
 
     GL.glPopMatrix()
 
-def render_text_scale(text, w, x_pos, y_pos, color, s, dark_mode):
-
-    if dark_mode:
-        GL.glColor3f(0.7, 0.7, 0.7)
-    else:
+def render_text_scale(text, w, x_pos, y_pos, color, s):
+        """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
-    GL.glPushMatrix()
-    GL.glTranslatef(x_pos, y_pos, 0.0)
-    GL.glScalef(s, s, s)  # Scale down the text
+        GL.glPushMatrix()
+        GL.glTranslatef(x_pos, y_pos, 0.0)
+        GL.glScalef(s, s, s)  # Scale down the text
 
-    GL.glLineWidth(w)
-    GL.glColor3f(*color) 
-    for c in text:
-        GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
+        GL.glLineWidth(w)
+        GL.glColor3f(*color) 
+        for c in text:
+            GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
 
     GL.glPopMatrix()
 
+
 def line_with_thickness(vertices, t, color):
+    """Renders a line with thickness t that joins up the given vertices"""
     if not vertices:
         return
 
@@ -108,7 +108,9 @@ def line_with_thickness(vertices, t, color):
 
 
 class Monitor():
-    def __init__(self,names, device_GL, port_id):
+    """Class that renders a monitor point"""
+
+    def __init__(self, names, device_GL, port_id):
         self.device_GL = device_GL
         self.port_id = port_id
         self.names = names
@@ -116,6 +118,69 @@ class Monitor():
         self.monitor_radius = 15
 
     def render(self, dark_mode):
+        dx = 10
+        dy = 10
+        x, y = self.device_GL.get_port_coor(self.port_id)
+
+        # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        GL.glColor(1, 1, 1)
+        if dark_mode:
+            if self.port_id == self.names.query('QBAR'):
+                x -= 5
+                y -= 30
+                draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
+                GL.glColor(1, 1, 1)
+                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1),dark_mode)
+                GL.glFlush()
+
+            elif self.port_id == self.names.query('Q'):
+                x -= 5
+                y += 30
+                draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
+                GL.glColor(1, 1, 1)
+                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1),dark_mode)
+                GL.glFlush()
+
+            else:
+            # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+            # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+                x -= 15
+                y += 25
+                draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
+                GL.glColor(1, 1, 1)
+                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.11),dark_mode)
+                GL.glFlush()
+        
+        else:
+
+            if self.port_id == self.names.query('QBAR'):
+                x -= 5
+                y -= 30
+                draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
+                GL.glColor(1, 1, 1)
+                render_text('M', 2, x-5, y-5, (1, 1, 1),dark_mode)
+                GL.glFlush()
+
+            elif self.port_id == self.names.query('Q'):
+                x -= 5
+                y += 30
+                draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
+                GL.glColor(1, 1, 1)
+                render_text('M', 2, x-5, y-5, (1, 1, 1),dark_mode)
+                GL.glFlush()
+
+        else:
+        # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+        # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+            x -= 15
+            y += 25
+            draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
+            GL.glColor(1, 1, 1)
+            render_text('M', 2, x-5, y-5, (1, 1, 1))
+            GL.glFlush()
+
+
+def render(self, dark_mode):
         dx = 10
         dy = 10
         x, y = self.device_GL.get_port_coor(self.port_id)
@@ -179,7 +244,10 @@ class Monitor():
 
 
 class Connection_GL:
-    def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
+    """Class that holds the rendering logic for a connection"""
+
+    def __init__(self, input_device_GL, output_device_GL,
+                 input_port_id, output_port_id):
         self.input_device_GL = input_device_GL
         self.output_device_GL = output_device_GL
         self.input_port_id = input_port_id
@@ -265,6 +333,8 @@ class Connection_GL:
 
 
 class Device_GL:
+    """Creates the base class for a device"""
+
     def __init__(self, x, y, device, names):
         self.x = x
         self.y = y
@@ -277,7 +347,7 @@ class Device_GL:
         self.name_string = names.get_name_string(self.id)
 
     def create_connections(self, devices, GL_devices_list):
-        """Creates and returns a list of Connections() """
+        """Creates and returns a list of Connections() drom the device inputs"""
         connection_list = []
         for input_id, o in self.device.inputs.items():
             if o is None:
@@ -305,11 +375,9 @@ class And_gate(Device_GL):
         self.NAND = NAND
         self.show_text = True
 
-    def render(self, dark_mode):
-        if dark_mode:
-            GL.glColor3f(0.074, 0,0.352)
-        else:
-            GL.glColor3f(0.212, 0.271, 0.310)
+    def render(self):
+
+        GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2f(self.x, self.y)
 
@@ -345,7 +413,7 @@ class And_gate(Device_GL):
             color = (0.0, 0.0, 0.0)
         if self.device.outputs[None]:
             color = (0.617, 0.0, 0.0)
-        
+
         draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
                     self.input_height, self.y, color)
         if self.NAND:
@@ -420,10 +488,7 @@ class Or_gate(Device_GL):
         self.NOR = NOR
         self.show_text = True
 
-    def render(self, dark_mode):
-        if dark_mode:
-            GL.glColor3f(0.074, 0,0.352)
-        else:
+    def render(self):
 
             GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
@@ -448,7 +513,7 @@ class Or_gate(Device_GL):
         color = (0.0, 0.0, 0.0)
         if self.device.outputs[None]:
             color = (0.617, 0.0, 0.0)
-        
+
         draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
                     self.x_CoM, self.y, color)
         if self.NOR:
@@ -529,11 +594,9 @@ class Xor_gate(Device_GL):
         self.thickness = 2
         self.show_text = True
 
-    def render(self, dark_mode):
-        if dark_mode:
-            GL.glColor3f(0.074, 0,0.352)
-        else:
-            GL.glColor3f(0.212, 0.271, 0.310)
+    def render(self):
+
+        GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2d(self.x + self.box_width - self.x_CoM, self.y)
 
@@ -634,10 +697,7 @@ class D_type(Device_GL):
         self.no_segments = 100
         self.show_text = True
 
-    def render(self, dark_mode):
-        if dark_mode:
-            GL.glColor3f(0.074, 0,0.352)
-        else:
+    def render(self):
 
             GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_POLYGON)
@@ -648,15 +708,9 @@ class D_type(Device_GL):
         GL.glEnd()
 
         vertices = []
-        if dark_mode:
-            for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
-                draw_circle(self.port_radius, self.x - self.width /
-                            2, self.y + dy, (0.7, 0.7, 0.7))
-        else:
-            for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
-                draw_circle(self.port_radius, self.x - self.width /
-                            2, self.y + dy, (0.7, 0.7, 0.7))
-
+        for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
+            draw_circle(self.port_radius, self.x - self.width /
+                        2, self.y + dy, (0.0, 0.0, 0.0))
         
         color = (0.0, 0.0, 0.0)
         if self.device.outputs[self.names.query("Q")]:
@@ -678,12 +732,12 @@ class D_type(Device_GL):
         draw_circle(self.port_radius, self.x + self.width/2,
                     self.y - self.input_height/2, color)
         
-        render_text_scale('DATA', 1.5, self.x - self.width/2 +10 , self.y + self.input_height*1.5 -4, (1,1,1), 0.1, dark_mode)
-        render_text_scale('CLK', 1.5, self.x - self.width/2 +10 , self.y + self.input_height/2-4, (1,1,1),0.1, dark_mode)
-        render_text_scale('SET', 1.5, self.x - self.width/2 +10 , self.y - self.input_height/2-4, (1,1,1),0.1, dark_mode)
-        render_text_scale('CLR', 1.5, self.x - self.width/2 +10 , self.y - self.input_height*1.5-4, (1,1,1), 0.1, dark_mode)
-        render_text_scale('Q', 1.5, self.x + self.width/2 -19 , self.y + self.input_height/2-4, (1,1,1),0.1, dark_mode)
-        render_text_scale(overline('Q'), 1.5, self.x + self.width/2 -19, self.y - self.input_height/2-4, (1,1,1),0.1, dark_mode)
+        render_text_scale('DATA', 1.5, self.x - self.width/2 +10 , self.y + self.input_height*1.5 -4, (1,1,1), 0.1)
+        render_text_scale('CLK', 1.5, self.x - self.width/2 +10 , self.y + self.input_height/2-4, (1,1,1),0.1)
+        render_text_scale('SET', 1.5, self.x - self.width/2 +10 , self.y - self.input_height/2-4, (1,1,1),0.1)
+        render_text_scale('CLR', 1.5, self.x - self.width/2 +10 , self.y - self.input_height*1.5-4, (1,1,1), 0.1)
+        render_text_scale('Q', 1.5, self.x + self.width/2 -19 , self.y + self.input_height/2-4, (1,1,1),0.1)
+        render_text_scale(overline('Q'), 1.5, self.x + self.width/2 -19, self.y - self.input_height/2-4, (1,1,1),0.1)
         line_with_thickness([(self.x + self.width/2-19, self.y - self.input_height/2+9.5), (self.x + self.width/2 - 11, self.y - self.input_height/2+9.5)], 0.9, (1,1,1))
         
         if self.show_text:
@@ -760,10 +814,7 @@ class Clock(Device_GL):
         self.thickness = 2
         self.show_text = True
 
-    def render(self, dark_mode):
-        if dark_mode:
-            GL.glColor3f(0.074, 0,0.352)
-        else:
+    def render(self):
 
             GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_POLYGON)
@@ -868,26 +919,14 @@ class Switch(Device_GL):
         # Could mess up network execution?
         self.device.outputs[None] = self.device.switch_state
 
-    def render(self, dark_mode):
-        if dark_mode:
-            color = (0.7, 0.7, 0.70)
-        else:
-            color = (0.0, 0.0, 0.0)
-        if dark_mode:
-            draw_circle(self.port_radius, self.x - self.x_CoM,
-                    self.y - self.half_height, (0.7, 0.7, 0.7))
-            draw_circle(self.port_radius, self.x - self.x_CoM,
-                    self.y + self.half_height, (0.48, 0, 1))
-            vertices = [(self.x - self.x_CoM +
+    def render(self):
+        color = (0.0, 0.0, 0.0)
+        draw_circle(self.port_radius, self.x - self.x_CoM,
+                    self.y - self.half_height, (0.0, 0.0, 0.0))
+        draw_circle(self.port_radius, self.x - self.x_CoM,
+                    self.y + self.half_height, (0.617, 0.0, 0.0))
+        vertices = [(self.x - self.x_CoM +
                     self.width, self.y)]
-
-        else:
-            draw_circle(self.port_radius, self.x - self.x_CoM,
-                        self.y - self.half_height, (0.0, 0.0, 0.0))
-            draw_circle(self.port_radius, self.x - self.x_CoM,
-                        self.y + self.half_height, (0.617, 0.0, 0.0))
-            vertices = [(self.x - self.x_CoM +
-                        self.width, self.y)]
         if self.device.switch_state == 1:
             if dark_mode:
                 color = (0.48, 0, 1)
@@ -1051,7 +1090,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.objects.append(switch)
             self.devices_GL_list.append(switch)
             self.switch_GL_list.append(switch)
-        
+
         y = 100
         x += 200
 
@@ -1059,7 +1098,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             and_gate = And_gate(x, y, device, names, False)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(and_gate)
@@ -1069,7 +1108,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             nand_gate = And_gate(x, y, device, names, True)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(nand_gate)
@@ -1079,7 +1118,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             or_gate = Or_gate(x, y, device, names, False)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(or_gate)
@@ -1089,7 +1128,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             nor_gate = Or_gate(x, y, device, names, True)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(nor_gate)
@@ -1099,19 +1138,19 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             device = devices.get_device(id)
             dtype = D_type(x, y, device, names)
             y += 200
-            if y > 800:
+            if y > 600:
                 x += 200
                 y = 100
             self.objects.append(dtype)
             self.devices_GL_list.append(dtype)
 
-
-        x = 100
-        y = 300
         for id in xor_gate_ids:
             device = devices.get_device(id)
             xor_gate = Xor_gate(x, y, device, names)
-            x += 200
+            y += 200
+            if y > 600:
+                x += 200
+                y = 100
             self.objects.append(xor_gate)
             self.devices_GL_list.append(xor_gate)
 
@@ -1238,7 +1277,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                     device_id, port_id = ob.is_port_clicked(ox, oy)
                     if device_id is not None:
                         error_code = self.monitors.make_monitor(
-                            device_id, port_id,self.mother.cycles_completed)
+                            device_id, port_id, self.mother.cycles_completed)
                         if error_code == self.monitors.NO_ERROR:
                             [device_GL] = [
                                 i for i in self.devices_GL_list if i.id == device_id]
@@ -1248,7 +1287,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             self.mother.trace_canvas.Refresh()
                         elif self.monitors.remove_monitor(device_id, port_id):
                             [device_GL] = [
-                            i for i in self.monitors_GL if i.device_GL.device.device_id == device_id]
+                                i for i in self.monitors_GL if i.device_GL.device.device_id == device_id]
                             self.monitors_GL.remove(device_GL)
                             self.objects.remove(device_GL)
                             self.mother.trace_canvas.Refresh()
@@ -1358,38 +1397,33 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
     def render_grid(self, dark_mode):
 
         grid_spacing = 50
-        GL.glLoadIdentity()
-        GL.glTranslated(self.pan_x % grid_spacing,
-                        self.pan_y % grid_spacing, 0.0)
-        GL.glScaled(self.zoom, self.zoom, self.zoom)
-
         width, height = self.GetSize()
-        x = 0
+
+        x_min = (-self.pan_x/self.zoom)//grid_spacing * \
+            grid_spacing - grid_spacing
+        x_max = (width - self.pan_x) / self.zoom
+        y_min = (-self.pan_y/self.zoom)//grid_spacing * \
+            grid_spacing - grid_spacing
+        y_max = (height - self.pan_y) / self.zoom
+        x = x_min
 
         GL.glColor3f(0.7, 0.7, 0.7)
         GL.glLineWidth(1.0)
         GL.glBegin(GL.GL_LINES)
-        while x < width/self.zoom:
-            if abs(x - grid_spacing * self.pan_x//grid_spacing) < 8:
-                GL.glColor3f(0.7, 0, 0)
-            GL.glVertex2f(x, -grid_spacing)
-            GL.glVertex2f(x, height/self.zoom)
+        # while x < width/self.zoom:
+        while x < x_max:
+            GL.glVertex2f(x, y_min)
+            GL.glVertex2f(x, y_max)
             x += grid_spacing
-            GL.glColor3f(0.7, 0.7, 0.7)
         GL.glEnd()
 
         GL.glBegin(GL.GL_LINES)
-        y = 0
-        while y < grid_spacing + height/self.zoom:
-            GL.glVertex2f(-grid_spacing, y)
-            GL.glVertex2f(width/self.zoom, y)
+        y = y_min
+        while y < y_max:
+            GL.glVertex2f(x_min, y)
+            GL.glVertex2f(x_max, y)
             y += grid_spacing
         GL.glEnd()
-
-        GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()
-        GL.glTranslated(self.pan_x, self.pan_y, 0.0)
-        GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def create_device(self, device_name, device_type, qualifier=None):
         [device_id] = self.names.lookup([device_name])

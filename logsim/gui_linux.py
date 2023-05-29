@@ -14,6 +14,7 @@ class RoundedScrollWindow(wx.ScrolledWindow):
 
     Also contains method to set a border on the panel, however this is not very compatible
     with windows OS when resizing"""
+
     def __init__(self, parent):
         super().__init__(parent)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
@@ -24,7 +25,8 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         if type(border) == bool:
             self.Panel_Border = border
         else:
-            raise AttributeError(f"'border' must be type bool but got type {type(border)}")
+            raise AttributeError(
+                f"'border' must be type bool but got type {type(border)}")
 
     def OnPaint(self, event):
         dc = wx.AutoBufferedPaintDC(self)
@@ -46,14 +48,175 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         dc.SetPen(wx.TRANSPARENT_PEN)
         dc.DrawRoundedRectangle(x, y, width, height, radius)
 
-        if self.Panel_Border:  # Draw rounded border if set_border(True) has been called
-            border_color = wx.Colour(72, 50, 168)  # Adjust the border colour as needed
-            pen = wx.Pen(border_color, width=w)  # Adjust the border width as needed
+        # Draw rounded border if set_border(True) has been called
+        if self.Panel_Border:
+            # Adjust the border colour as needed
+            border_color = wx.Colour(72, 50, 168)
+            # Adjust the border width as needed
+            pen = wx.Pen(border_color, width=w)
             dc.SetPen(pen)
             dc.SetBrush(wx.TRANSPARENT_BRUSH)
             dc.DrawRoundedRectangle(x, y, width, height, radius)
 
         event.Skip()
+
+    
+class DeviceMenu(wx.Dialog):
+    def __init__(self, parent, title, devices):
+        wx.Dialog.__init__(self, parent, title=title)
+        self.devices = devices
+        self.device_chosen = None
+        self.qualifier = None
+        self.device_name = None
+        self.font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        self.first_selection = True
+
+        overall_sizer = wx.BoxSizer(wx.VERTICAL)  # Create main sizer
+        self.SetSizer(overall_sizer)
+
+        self.main_panel = wx.Panel(self)
+        self.panel_sizer = wx.BoxSizer(wx.VERTICAL)  # Create main panel and relevant sizer
+        self.main_panel.SetSizer(self.panel_sizer)
+        overall_sizer.Add(self.main_panel, 1, wx.ALL, 5)
+
+        self.choose_device()  # This takes the user initially to the choose device state
+    
+    def choose_device(self):
+        """Function that creates the pop up window to choose the device type"""
+        choices = ['AND', 'NAND', 'SWITCH', 'OR',
+                   'NOR', 'XOR', 'CLOCK', 'DTYPE']  # choices for drop down menu
+        device_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Choose Device:')
+        device_txt.SetFont(self.font)
+        drop_down = wx.Choice(self.main_panel, wx.ID_ANY, choices=choices)
+        drop_down.Bind(wx.EVT_CHOICE, self.on_drop_down)
+        
+        self.choose_dev_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.choose_dev_sizer.Add(device_txt, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+        self.choose_dev_sizer.Add(drop_down, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+        self.panel_sizer.Add(self.choose_dev_sizer, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+        self.Fit()
+
+    def choose_qualifier(self):
+        """Function that creates the pop up window to choose the device qualifier - this
+        function is not called if the device is an XOR or DTYPE"""
+        if self.device_chosen == 'CLOCK':
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter half period:')
+            self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY, style=wx.SP_ARROW_KEYS, min=1, max=20)
+
+        elif self.device_chosen == 'SWITCH':
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter initial switch state:')
+            self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY, style=wx.SP_ARROW_KEYS, min=0, max=1)
+        else:
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter number of inputs:')
+            self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY, style=wx.SP_ARROW_KEYS, min=2, max=16)
+
+        chosen_txt = wx.StaticText(self.main_panel, wx.ID_ANY, f' Device chosen: {self.device_chosen}')
+        chosen_txt.SetFont(self.font)
+        confirm_button_qual = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
+        back_button_qual = wx.Button(self.main_panel, wx.ID_ANY, "Back")
+        confirm_button_qual.Bind(wx.EVT_BUTTON, self.on_confirm_qual)
+        back_button_qual.Bind(wx.EVT_BUTTON, self.on_back_qual)
+
+        self.choose_qual_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.choose_qual_sizer.Add(chosen_txt, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_qual_sizer.Add(choose_txt, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_qual_sizer.Add(self.choose_ctrl, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_qual_sizer.Add(confirm_button_qual, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_qual_sizer.Add(back_button_qual, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.panel_sizer.Add(self.choose_qual_sizer, 0, wx.ALL, 5)
+        self.Layout()
+        self.Fit()
+
+    def choose_name(self):
+        """Function that creates the pop up window for entering the device name"""
+
+        phrases = {'CLOCK': 'Half Period: ', 'NAND': 'Number of inputs: ', 'AND': 'Number of inputs: ',
+                   'NOR': 'Number of inputs: ', 'OR': 'Number of inputs: ', 'SWITCH': 'Initial State: '}
+
+        chosen_txt_dev = wx.StaticText(self.main_panel, wx.ID_ANY, f' Device chosen: {self.device_chosen}')
+        chosen_txt_dev.SetFont(self.font)
+
+        if self.device_chosen != 'XOR' and self.device_chosen != 'DTYPE':  # adds text to state qualifier if relevant
+            chosen_txt_qual = wx.StaticText(self.main_panel, wx.ID_ANY,
+                                            f' {phrases.get(self.device_chosen)}{self.qualifier}')
+            chosen_txt_qual.SetFont(self.font)
+
+        name_prompt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter device name:')
+        name_input = wx.TextCtrl(self.main_panel, wx.ID_ANY, size=(20, 100))
+        confirm_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
+        back_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Back")
+        confirm_button_name.Bind(wx.EVT_BUTTON, self.on_confirm_name)
+        back_button_name.Bind(wx.EVT_BUTTON, self.on_back_name)
+        name_prompt.Bind(wx.EVT_TEXT, self.on_name_entry)
+
+        self.choose_name_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.choose_name_sizer.Add(chosen_txt_dev, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        if self.device_chosen != 'XOR' and self.device_chosen != 'DTYPE':
+            self.choose_name_sizer.Add(chosen_txt_qual, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_name_sizer.Add(name_prompt, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_name_sizer.Add(name_input, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_name_sizer.Add(confirm_button_name, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.choose_name_sizer.Add(back_button_name, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.Layout()
+        self.Fit()
+
+    def destroy_widgets_in_sizer(self, sizer):
+        """Function to destroy all the widgets in a given sizer"""
+        for child in sizer.GetChildren():
+            widget = child.GetWindow()
+            if widget is not None:
+                widget.Destroy()
+
+    def on_drop_down(self, event):
+        Id = event.GetId()
+        widget = self.FindWindowById(Id)
+
+        self.device_chosen = widget.GetStringSelection()
+
+        if self.first_selection and self.device_chosen:
+            confirm_button_dev = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
+            self.choose_dev_sizer.Add(confirm_button_dev, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+            confirm_button_dev.Bind(wx.EVT_BUTTON, self.on_confirm_dev)
+            self.Layout()
+            self.first_selection = False
+        self.Fit()  # fit layout to widgets
+
+    def on_confirm_dev(self, event):
+        self.destroy_widgets_in_sizer(self.choose_dev_sizer)
+        self.panel_sizer.Detach(self.choose_dev_sizer)
+
+        if self.device_chosen == 'DTYPE' or self.device_chosen == 'XOR':
+            self.choose_name()
+
+        else:
+            self.choose_qualifier()
+
+    def on_confirm_qual(self, event):
+        self.qualifier = self.choose_ctrl.GetValue()
+        self.destroy_widgets_in_sizer(self.choose_qual_sizer)
+        self.panel_sizer.Detach(self.choose_qual_sizer)
+        self.choose_name()
+
+    def on_confirm_name(self, event):
+        pass
+
+    def on_back_qual(self, event):
+        self.destroy_widgets_in_sizer(self.choose_qual_sizer)
+        self.panel_sizer.Detach(self.choose_qual_sizer)
+        self.device_chosen = None
+        self.first_selection = True
+        self.choose_device()
+
+    def on_back_name(self, event):
+        self.destroy_widgets_in_sizer(self.choose_name_sizer)
+        self.panel_sizer.Detach(self.choose_name_sizer)
+        self.qualifier = None
+        self.choose_qualifier()
+
+    def on_name_entry(self, event):
+        Id = event.GetId()
+        widget = self.FindWindowById(Id)
+        self.device_name = widget.GetValue()
 
 
 class Gui_linux(wx.Frame):
@@ -67,12 +230,15 @@ class Gui_linux(wx.Frame):
         self.names = names
         self.monitors = monitors
         self.network = network
-        self.button_constraint = False # this variable is used to stop other buttons being pressed when user input is currently required
+        # these two booleans are used to stop other actions during adding of monitors/connections
+        self.connection_constraint = False
+        self.monitor_constraint = False
         self.first_run = True
         self.cycles = 10
         self.cycles_completed = 0
 
-        self.font_buttons = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        self.font_buttons = wx.Font(
+            14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -93,11 +259,12 @@ class Gui_linux(wx.Frame):
         sidebar.SetSizer(sidebar_sizer)
         sidebar.SetMaxSize((100, -1))
 
-        canvas_window = wx.SplitterWindow(main_splitter)  # set up canvas window
+        canvas_window = wx.SplitterWindow(
+            main_splitter)  # set up canvas window
 
         main_splitter.SplitVertically(canvas_window, sidebar)
         main_splitter.SetSashGravity(0.7)
-        #main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
+        # main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
 
         # Set up panels for splitting canvas UI into circuit display and plotting window
         plotting_ui = wx.Panel(canvas_window)  # panel for plotting traces
@@ -112,24 +279,27 @@ class Gui_linux(wx.Frame):
 
         canvas_window.SplitHorizontally(circuit_ui, plotting_ui)
         canvas_window.SetSashGravity(0.5)
-        #canvas_window.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
+        # canvas_window.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
 
         # Set up panels for sidebar
         # bg colour is set to that of parent panel so only the painted on rounded panel shape is visible
         panel_control = RoundedScrollWindow(sidebar)
         panel_control.SetScrollRate(10, 0)
-        panel_control.SetBackgroundColour(panel_control.GetParent().GetBackgroundColour())
+        panel_control.SetBackgroundColour(
+            panel_control.GetParent().GetBackgroundColour())
         control_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_control.SetSizer(control_sizer)
 
         panel_devices = RoundedScrollWindow(sidebar)
-        panel_devices.SetBackgroundColour(panel_devices.GetParent().GetBackgroundColour())
+        panel_devices.SetBackgroundColour(
+            panel_devices.GetParent().GetBackgroundColour())
         panel_devices.SetScrollRate(0, 10)
         device_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_devices.SetSizer(device_sizer)
 
         panel_monitors = RoundedScrollWindow(sidebar)
-        panel_monitors.SetBackgroundColour(panel_monitors.GetParent().GetBackgroundColour())
+        panel_monitors.SetBackgroundColour(
+            panel_monitors.GetParent().GetBackgroundColour())
         panel_monitors.SetScrollRate(0, 10)
         monitor_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_monitors.SetSizer(monitor_sizer)
@@ -139,39 +309,53 @@ class Gui_linux(wx.Frame):
         cycle_text.SetFont(self.font_buttons)
 
         cycle_spin = wx.SpinCtrl(panel_control, wx.ID_ANY, str(self.cycles))
-        font_cs = wx.Font(12, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
+        font_cs = wx.Font(12, wx.FONTFAMILY_MODERN,
+                          wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
         cycle_spin.SetFont(font_cs)
 
         run_button = wx.Button(panel_control, wx.ID_ANY, "Run")
         run_button.SetFont(self.font_buttons)
 
+        cycles_comp_text = wx.StaticText(
+            panel_control, wx.ID_ANY, f"Cycles Completed: {self.cycles_completed}")
+        cycles_comp_text.SetFont(self.font_buttons)
+
         cycle_sizer = wx.BoxSizer(wx.HORIZONTAL)
         cycle_sizer.Add(cycle_text, 1, wx.ALL, 5)
         cycle_sizer.Add(cycle_spin, 1, wx.ALL, 5)
 
+        cycles_comp_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        cycles_comp_sizer.Add(cycles_comp_text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
+
         run_sizer = wx.BoxSizer(wx.HORIZONTAL)
         run_sizer.Add(run_button, 1, wx.ALL, 5)
-        self.run_sizer = run_sizer  # creates sizer as instance variable so it can be accessed by methods
+        # creates sizer as instance variable so it can be accessed by methods
+        self.run_sizer = run_sizer
 
         control_sizer.Add(cycle_sizer, 1, wx.ALL, 5)
         control_sizer.Add(run_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
+        control_sizer.Add(cycles_comp_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
         # Set some panels and sizers as instance variables to make them accessible to on_run_button method
         self.panel_control = panel_control
         self.run_sizer = run_sizer
+        self.cycles_comp_text = cycles_comp_text
 
         # Bind control panel widgets
         run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
         cycle_spin.Bind(wx.EVT_SPINCTRL, self.on_cycle_spin)
 
         # Widgets and sizers for monitor panel
-        monitor_title = wx.StaticText(panel_monitors, wx.ID_ANY, "Monitor Configuration:")
-        font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        monitor_title = wx.StaticText(
+            panel_monitors, wx.ID_ANY, "Monitor Configuration:")
+        font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT,
+                          wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         monitor_title.SetFont(font_st)
         title_sizer = wx.BoxSizer(wx.HORIZONTAL)
         title_sizer.Add(monitor_title, 1, wx.ALL, 10)
 
-        add_zap_button = wx.Button(panel_monitors, wx.ID_ANY, "Add/Zap\nMonitor")
+        add_zap_button = wx.Button(
+            panel_monitors, wx.ID_ANY, "Add/Zap\nMonitors")
         add_zap_button.SetFont(self.font_buttons)
 
         add_zap_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -183,7 +367,8 @@ class Gui_linux(wx.Frame):
         add_zap_button.Bind(wx.EVT_BUTTON, self.on_add_zap_button)
 
         # Widgets and sizers for device panel
-        device_title = wx.StaticText(panel_devices, wx.ID_ANY, "Device Configuration:")  # create title
+        device_title = wx.StaticText(
+            panel_devices, wx.ID_ANY, "Device Configuration:")  # create title
         device_title.SetFont(font_st)
         device_sizer.Add(device_title, 1, wx.ALL, 5)
 
@@ -194,16 +379,18 @@ class Gui_linux(wx.Frame):
         add_button_c = wx.Button(panel_devices, wx.ID_ANY, "Add\nConnections")
         add_button_c.SetFont(self.font_buttons)
         add_button_c.SetInitialSize(wx.Size(150, 60))
-        
-        button_sizer = wx.BoxSizer(wx.HORIZONTAL) # sizer for buttons
+
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL)  # sizer for buttons
         button_sizer.Add(add_button_d, 0, wx.ALL, 10)
         button_sizer.Add(add_button_c, 0, wx.ALL, 10)
         device_sizer.Add(button_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
-        
-        add_button_c.Bind(wx.EVT_BUTTON, self.on_add_connection_button)  # event handling for widgets for device panel
+
+        # event handling for widgets for device panel
+        add_button_c.Bind(wx.EVT_BUTTON, self.on_add_connection_button)
         add_button_d.Bind(wx.EVT_BUTTON, self.on_add_device_button)
 
-        self.panel_devices = panel_devices  # set as instance variables to allow method access
+        # set as instance variables to allow method access
+        self.panel_devices = panel_devices
         self.device_sizer = device_sizer
         self.add_button_d = add_button_d
         self.add_button_c = add_button_c
@@ -218,7 +405,7 @@ class Gui_linux(wx.Frame):
         self.circuit_canvas = InteractiveCanvas(circuit_ui, self, devices, monitors, names, network)
 
         # Add canvases to respective panels
-        plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND , 5)
+        plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
         circuit_sizer.Add(self.circuit_canvas, 1, wx.EXPAND, 5)
 
         # Configure main sizer layout
@@ -227,7 +414,7 @@ class Gui_linux(wx.Frame):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MENU, self.on_menu)
 
-       
+
         self.Layout()
         self.Centre()
 
@@ -251,10 +438,31 @@ class Gui_linux(wx.Frame):
         """Handles the event when the user presses the run button - on first run it causes the continue
         button to appear in the GUI - on all runs it runs the simulation from scratch for the specified
         number of cycles"""
-        if self.button_constraint:
+        if self.connection_constraint:
+            self.error_pop_up(
+                'Finish adding connections before trying to execute another action')
+            return
+
+        if self.monitor_constraint:
+            self.error_pop_up(
+                'Finish adding/zapping monitors before trying to execute another action')
             return
 
         if self.cycles is not None and self.cycles > 0:  # if the number of cycles provided is valid
+            self.cycles_completed = 0
+            self.monitors.reset_monitors()
+            self.devices.cold_startup()
+
+            for i in range(self.cycles):  # executes run for specified no. cycles
+                if self.network.execute_network():
+                    self.monitors.record_signals()
+                    self.cycles_completed += 1
+
+                else:  # raise error if there are unconnected devices
+                    self.error_pop_up(
+                        'Run failed to execute - please make sure all devices are connected')
+                    return
+
             if self.first_run:  # adds continue button to GUI after first run has been executed
                 self.first_run = False
                 run_sizer = self.run_sizer
@@ -267,25 +475,15 @@ class Gui_linux(wx.Frame):
                 run_sizer.Add(cont_button, 1, wx.ALL, 5)
                 panel_control.Layout()
 
-            self.cycles_completed = 0
-            self.monitors.reset_monitors()
-            self.devices.cold_startup()
-
-            for i in range(self.cycles):  # executes run for specified no. cycles
-                if self.network.execute_network():
-                    self.monitors.record_signals()
-                    self.cycles_completed += 1
-
-                else: # raise error if there are unconnected devices
-                    self.error_pop_up('Run failed to execute - please make sure all devices are connected')
-                    
-            self.trace_canvas.pan_x = 0
+            self.cycles_comp_text.SetLabel(f"Cycles Completed: {self.cycles_completed}")   
+            self.trace_canvas.pan_x = 0  # autopan back to the beginning
             self.trace_canvas.init = False
             self.trace_canvas.Refresh()  # call plotting event for trace and circuit canvas
             self.circuit_canvas.Refresh()
 
         else:  # show error dialogue box if cycle no. is not valid
-            self.error_pop_up('Please select valid number of cycles greater than zero')
+            self.error_pop_up(
+                'Please select valid number of cycles greater than zero')
 
     def on_sash_position_change(self, event):
         """Handles the event where the sash position of the window changes - this
@@ -306,6 +504,15 @@ class Gui_linux(wx.Frame):
 
     def on_cycle_spin(self, event):
         """Handle the event when the user changes the no. cycles"""
+        if self.connection_constraint:
+            self.error_pop_up(
+                'Finish adding connections before trying to execute another action')
+            return
+
+        if self.monitor_constraint:
+            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
+            return
+
         Id = event.GetId()
         widget = self.FindWindowById(Id)
         self.cycles = widget.GetValue()
@@ -313,84 +520,92 @@ class Gui_linux(wx.Frame):
 
     def on_continue_button(self, event):
         """Handle the event when the user presses the continue button"""
-        if self.button_constraint:
+        if self.connection_constraint:
+            self.error_pop_up(
+                'Finish adding connections before trying to execute another action')
             return
-        
+
+        if self.monitor_constraint:
+            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
+            return
+
         if self.cycles > 0:  # if the number of cycles provided is valid
             for i in range(self.cycles):  # executes run for specified no. cycles
                 if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1
+                    self.trace_canvas.continue_pan_reset = True  # changes pan to include far right of plot if necessary
                     self.trace_canvas.Refresh()  # call plotting event for trace and circuit canvas
                     self.circuit_canvas.Refresh()
+                    self.cycles_comp_text.SetLabel(
+                        f"Cycles Completed: {self.cycles_completed}")
 
         else:  # show error dialogue box if cycle no. is not valid
-            self.error_pop_up('Please select valid number of cycles greater than zero')
+            self.error_pop_up(
+                'Please select valid number of cycles greater than zero')
 
     def on_add_zap_button(self, event):
         """Handle the event when the user presses the add monitor button"""
-        if self.button_constraint:
+        if self.connection_constraint:
+            self.error_pop_up('Finish adding connections before trying to execute another action')
             return
 
         Id = event.GetId()
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
-        
+
         if lab == 'Add/Zap\nMonitors':
-            button.SetLabel('Cancel')
-            button.SetBackgroundColour(wx.RED)
+            button.SetLabel('Stop')
+            button.SetBackgroundColour(wx.Colour(157, 0, 0))
             self.circuit_canvas.choose_monitor = True
-        
-        elif lab == 'Cancel':
+            self.monitor_constraint = True
+
+        elif lab == 'Stop':
             button.SetLabel('Add/Zap\nMonitors')
             button.SetBackgroundColour(wx.Colour(255, 255, 255))
             self.circuit_canvas.choose_monitor = False
+            self.monitor_constraint = False
 
     def on_add_device_button(self, event):
         """Handle the event when the user presses the add device button"""
-        if self.button_constraint:
+        if self.connection_constraint:
+            self.error_pop_up('Finish adding connections before trying to execute another action')
             return
 
-        Id = event.GetId()
-        button = self.FindWindowById(Id)
-        lab = button.GetLabel()
-        
-        if lab == 'Add\nDevice':
-            button.SetLabel('Cancel')
-            button.SetBackgroundColour(wx.RED)
-        
-        elif lab == 'Cancel':
-            button.SetLabel('Add\nDevice')
-            button.SetBackgroundColour(wx.Colour(255, 255, 255))
+        if self.monitor_constraint:
+            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
+            return
+
+        dev_menu = DeviceMenu(self, 'Device Menu', self.devices)
+        dev_menu.ShowModal()
+        dev_menu.Destroy()
 
     def on_add_connection_button(self, event):
         """Handle the event when the user presses the add connection button"""
-        if self.button_constraint:
+        if self.monitor_constraint:
+            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
         Id = event.GetId()
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
-        
+
         if lab == 'Add\nConnections':
-            button.SetLabel('Cancel')
-            button.SetBackgroundColour(wx.RED)
+            button.SetLabel('Stop')
+            button.SetBackgroundColour(wx.Colour(157, 0, 0))
             self.circuit_canvas.connection_list = [True, None, None]
-        
-        elif lab == 'Cancel':
+            self.connection_constraint = True
+
+        elif lab == 'Stop':
             button.SetLabel('Add\nConnections')
             button.SetBackgroundColour(wx.Colour(255, 255, 255))
             self.circuit_canvas.connection_list = [False, None, None]
             self.circuit_canvas.temp_connection = None
             self.circuit_canvas.Refresh()
+            self.connection_constraint = False
 
     def error_pop_up(self, string):
         dlg = GMD(None, string, "Error", wx.OK | wx.ICON_ERROR | 0x40)
         dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
         dlg.ShowModal()
         dlg.Destroy()
-
-            
-
-
-
