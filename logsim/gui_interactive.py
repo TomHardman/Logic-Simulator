@@ -10,9 +10,8 @@ Gui - configures the main window and all the widgets.
 """
 import wx
 import wx.glcanvas as wxcanvas
-from OpenGL import GL, GLUT
 import numpy as np
-
+from OpenGL import GL, GLUT
 from names import Names
 from devices import Devices
 from network import Network
@@ -39,9 +38,12 @@ def draw_circle(r, x, y, color):
     GL.glEnd()
 
 
-def draw_text(x, y, text):
+def draw_text(x, y, text, dark_mode):
     """Renders text at (x,y)"""
-    GL.glColor3f(0.0, 0.0, 0.0)  # text is black
+    if dark_mode:
+        GL.glColor3f(0.7, 0.7, 0.7)
+    else:
+        GL.glColor3f(0.0, 0.0, 0.0)  # text is black
     GL.glRasterPos2f(x, y)
     for char in text:
         GLUT.glutBitmapCharacter(GLUT.GLUT_BITMAP_HELVETICA_18, ord(char))
@@ -76,7 +78,7 @@ def render_text_scale(text, w, x_pos, y_pos, color, s):
         for c in text:
             GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
 
-    GL.glPopMatrix()
+        GL.glPopMatrix()
 
 
 def line_with_thickness(vertices, t, color):
@@ -142,8 +144,8 @@ class Monitor():
                 GL.glFlush()
 
             else:
-            # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-            # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+                # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+                # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
                 x -= 15
                 y += 25
                 draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
@@ -169,15 +171,15 @@ class Monitor():
                 render_text('M', 2, x-5, y-5, (1, 1, 1),dark_mode)
                 GL.glFlush()
 
-        else:
-        # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-        # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
-            x -= 15
-            y += 25
-            draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
-            GL.glColor(1, 1, 1)
-            render_text('M', 2, x-5, y-5, (1, 1, 1))
-            GL.glFlush()
+            else:
+                # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+                # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+                x -= 15
+                y += 25
+                draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
+                GL.glColor(1, 1, 1)
+                render_text('M', 2, x-5, y-5, (1, 1, 1))
+                GL.glFlush()
 
 
 def render(self, dark_mode):
@@ -244,10 +246,7 @@ def render(self, dark_mode):
 
 
 class Connection_GL:
-    """Class that holds the rendering logic for a connection"""
-
-    def __init__(self, input_device_GL, output_device_GL,
-                 input_port_id, output_port_id):
+    def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
         self.input_device_GL = input_device_GL
         self.output_device_GL = output_device_GL
         self.input_port_id = input_port_id
@@ -274,7 +273,7 @@ class Connection_GL:
         
         if self.output_device_GL is not None and self.output_device_GL.device.outputs[self.output_port_id]:
             if dark_mode:
-                color = (0.48, 0, 1)
+                color = (0.647, 0.41, 0.77)
             else:
                 color = (0.617, 0.0, 0.0)
             
@@ -375,9 +374,9 @@ class And_gate(Device_GL):
         self.NAND = NAND
         self.show_text = True
 
-    def render(self):
+    def render(self, dark_mode):
 
-        GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glColor3f(0.03, 0.172, 0.422)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2f(self.x, self.y)
 
@@ -417,8 +416,12 @@ class And_gate(Device_GL):
         draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
                     self.input_height, self.y, color)
         if self.NAND:
-            draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
-                        self.input_height, self.y, (1.0, 1.0, 1.0))
+            if dark_mode:
+                draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
+                            self.input_height, self.y, (0.0, 0.0, 0.0))
+            else:                
+                draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
+                            self.input_height, self.y, (1.0, 1.0, 1.0))
 
         for i in range(self.inputs):
             y = self.input_height * (i + 0.5 - self.inputs*0.5) + self.y
@@ -433,7 +436,7 @@ class And_gate(Device_GL):
         if self.show_text:
 
             draw_text(self.x-5, self.y - self.input_height *
-                      self.inputs/2 - 19, self.name_string)
+                      self.inputs/2 - 19, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
@@ -488,9 +491,9 @@ class Or_gate(Device_GL):
         self.NOR = NOR
         self.show_text = True
 
-    def render(self):
+    def render(self, dark_mode):
 
-            GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glColor3f(0.03, 0.172, 0.422)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2d(self.x + self.box_width - self.x_CoM, self.y)
 
@@ -509,16 +512,22 @@ class Or_gate(Device_GL):
         GL.glVertex2f(self.x + dx - self.x_CoM, self.y + dy)
 
         GL.glEnd()
-
-        color = (0.0, 0.0, 0.0)
+        if dark_mode:
+            color = (0.7, 0.7, 0.7)
+        else:
+            color = (0.0, 0.0, 0.0)
         if self.device.outputs[None]:
             color = (0.617, 0.0, 0.0)
 
         draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
                     self.x_CoM, self.y, color)
         if self.NOR:
-            draw_circle(self.port_radius - 2, self.x + self.box_width + self.straight_box_width -
-                        self.x_CoM, self.y, (1.0, 1.0, 1.0))
+            if dark_mode:
+                draw_circle(self.port_radius - 2, self.x + self.box_width - self.straight_box_width 
+                          - self.x_CoM + self.input_height, self.y, (0.0, 0.0, 0.0))
+            else:                
+                draw_circle(self.port_radius - 2, self.x + self.box_width - self.straight_box_width 
+                          - self.x_CoM + self.input_height, self.y, (1.0, 1.0, 1.0))
 
         for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
             dx = self.indent_width*(1 - (dy / c)**2)
@@ -538,7 +547,7 @@ class Or_gate(Device_GL):
         if self.show_text:
 
             draw_text(self.x-5, self.y - self.input_height *
-                      self.inputs/2 - 19, self.name_string)
+                      self.inputs/2 - 19, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
@@ -594,9 +603,9 @@ class Xor_gate(Device_GL):
         self.thickness = 2
         self.show_text = True
 
-    def render(self):
+    def render(self, dark_mode):
 
-        GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glColor3f(0.03, 0.172, 0.422)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2d(self.x + self.box_width - self.x_CoM, self.y)
 
@@ -621,9 +630,12 @@ class Xor_gate(Device_GL):
             dx = self.indent_width*(1 - (dy / c)**2)
             vertices.append((self.x + dx - self.x_CoM -
                             self.gap_width, self.y + dy))
-        line_with_thickness(vertices, self.thickness, (0.212, 0.271, 0.310))
-
-        color = (0.0, 0.0, 0.0)
+        if dark_mode:
+            line_with_thickness(vertices, self.thickness, (0.03, 0.172, 0.422))
+            color = (0.7, 0.7, 0.7)
+        else:
+            line_with_thickness(vertices, self.thickness, (0.212, 0.271, 0.310))
+            color = (0.0, 0.0, 0.0)
         if self.device.outputs[None]:
             color = (0.617, 0.0, 0.0)
         draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
@@ -633,7 +645,7 @@ class Xor_gate(Device_GL):
             dx = self.indent_width*(1 - (dy / c)**2)
             if dark_mode:
                 draw_circle(self.port_radius, self.x -
-                        self.x_CoM, self.y+dy, (0.7, 0.7, 0.7))
+                            self.x_CoM, self.y+dy, (0.7, 0.7, 0.7))
                 vertices = [(self.x - self.x_CoM, self.y + dy),
                             (self.x - self.x_CoM + dx, self.y + dy)]
                 line_with_thickness(vertices, 3, (0.7, 0.7, 0.7))                    
@@ -646,7 +658,7 @@ class Xor_gate(Device_GL):
         if self.show_text:
 
             draw_text(self.x-5, self.y - self.input_height *
-                      self.inputs/2 - 19, self.name_string)
+                      self.inputs/2 - 19, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM - self.gap_width
@@ -697,8 +709,10 @@ class D_type(Device_GL):
         self.no_segments = 100
         self.show_text = True
 
-    def render(self):
-
+    def render(self, dark_mode):
+        if dark_mode:
+            GL.glColor3f(0.03, 0.172, 0.422)
+        else:
             GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_POLYGON)
         GL.glVertex2f(self.x - self.width/2, self.y + self.input_height*2)
@@ -708,11 +722,19 @@ class D_type(Device_GL):
         GL.glEnd()
 
         vertices = []
-        for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
-            draw_circle(self.port_radius, self.x - self.width /
-                        2, self.y + dy, (0.0, 0.0, 0.0))
+        if dark_mode:
+            for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
+                draw_circle(self.port_radius, self.x - self.width /
+                            2, self.y + dy, (0.7, 0.7, 0.7))
         
-        color = (0.0, 0.0, 0.0)
+        else:
+            for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
+                draw_circle(self.port_radius, self.x - self.width /
+                            2, self.y + dy, (0.0, 0.0, 0.0))
+        if dark_mode:
+            color = (0.7, 0.7, 0.7)
+        else:    
+            color = (0.0, 0.0, 0.0)
         if self.device.outputs[self.names.query("Q")]:
             if dark_mode:
                 color = (0.48, 0, 1)
@@ -743,7 +765,7 @@ class D_type(Device_GL):
         if self.show_text:
 
             draw_text(self.x-7, self.y - self.input_height *
-                      self.inputs/2 - 19, self.name_string)
+                      self.inputs/2 - 19, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.width/2
@@ -814,8 +836,10 @@ class Clock(Device_GL):
         self.thickness = 2
         self.show_text = True
 
-    def render(self):
-
+    def render(self, dark_mode):
+        if dark_mode:
+            GL.glColor3f(0.03, 0.172, 0.422)
+        else:
             GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_POLYGON)
         GL.glVertex2f(self.x - self.width/2, self.y + self.half_height)
@@ -826,8 +850,8 @@ class Clock(Device_GL):
 
         if self.device.outputs[None]:
             if dark_mode:
-                GL.glColor3f(0.48, 0, 1)
-                color = (0.48, 0, 1)
+                GL.glColor3f(0.647, 0.41, 0.77)
+                color = (0.647, 0.41, 0.77)
             else:
                 GL.glColor3f(0.617, 0.0, 0.0)
                 color = (0.617, 0.0, 0.0)
@@ -877,7 +901,7 @@ class Clock(Device_GL):
         if self.show_text:
 
             draw_text(self.x-15, self.y - self.half_height *
-                      2 - 5, self.name_string)
+                      2 - 5, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.width/2
@@ -919,17 +943,28 @@ class Switch(Device_GL):
         # Could mess up network execution?
         self.device.outputs[None] = self.device.switch_state
 
-    def render(self):
-        color = (0.0, 0.0, 0.0)
-        draw_circle(self.port_radius, self.x - self.x_CoM,
-                    self.y - self.half_height, (0.0, 0.0, 0.0))
-        draw_circle(self.port_radius, self.x - self.x_CoM,
-                    self.y + self.half_height, (0.617, 0.0, 0.0))
-        vertices = [(self.x - self.x_CoM +
-                    self.width, self.y)]
+    def render(self, dark_mode):
+        if dark_mode:
+            color = (0.7,0.7,0.7)
+        else:
+            color = (0.0, 0.0, 0.0)
+        if dark_mode:
+            draw_circle(self.port_radius, self.x - self.x_CoM,
+                    self.y - self.half_height, (0.7, 0.7, 0.7))
+            draw_circle(self.port_radius, self.x - self.x_CoM,
+                        self.y + self.half_height, (0.647, 0.41, 0.77))
+            vertices = [(self.x - self.x_CoM +
+                        self.width, self.y)]
+        else:
+            draw_circle(self.port_radius, self.x - self.x_CoM,
+                        self.y - self.half_height, (0.0, 0.0, 0.0))
+            draw_circle(self.port_radius, self.x - self.x_CoM,
+                        self.y + self.half_height, (0.617, 0.0, 0.0))
+            vertices = [(self.x - self.x_CoM +
+                        self.width, self.y)]
         if self.device.switch_state == 1:
             if dark_mode:
-                color = (0.48, 0, 1)
+                color = (0.647, 0.41, 0.77)
             else:
                 color = (0.617, 0.0, 0.0)
             vertices.append((self.x - self.x_CoM,
@@ -944,7 +979,7 @@ class Switch(Device_GL):
         if self.show_text:
 
             draw_text(self.x-8, self.y - self.half_height *
-                      2.5, self.name_string)
+                      2.5, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
@@ -1185,7 +1220,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             ob.render(self.dark_mode)
 
         if self.temp_connection is not None:
-            self.temp_connection.render()
+            self.temp_connection.render(self.dark_mode)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
