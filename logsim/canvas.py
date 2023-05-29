@@ -72,6 +72,18 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+        self.dark_mode = True
+        GLUT.glutDisplayFunc(renderScene)
+
+    def renderScene(self):
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+
+        if self.dark_mode:
+            GL.glColor3f(0,0,0)
+        else:
+            GL.glColor3f(1,1,1)
+        
+        GL.glFlush()
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -87,6 +99,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glLoadIdentity()
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
+
 
     def render(self, text):
         """Handle all drawing operations."""
