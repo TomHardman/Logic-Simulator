@@ -62,7 +62,7 @@ class RoundedScrollWindow(wx.ScrolledWindow):
 
     
 class DeviceMenu(wx.Dialog):
-    def __init__(self, parent, title, devices):
+    def __init__(self, parent, title, devices, canvas):
         wx.Dialog.__init__(self, parent, title=title)
         self.devices = devices
         self.device_chosen = None
@@ -70,6 +70,10 @@ class DeviceMenu(wx.Dialog):
         self.device_name = None
         self.font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         self.first_selection = True
+        self.canvas = canvas
+        self.devices_dict = {'CLOCK': self.devices.CLOCK, 'NAND': self.devices.NAND, 'SWITCH': self.devices.SWITCH,
+                                'AND': self.devices.AND, 'NOR': self.devices.NOR, 'OR': self.devices.OR, 
+                                'XOR': self.devices.XOR, 'DTYPE': self.devices.D_TYPE}
 
         overall_sizer = wx.BoxSizer(wx.VERTICAL)  # Create main sizer
         self.SetSizer(overall_sizer)
@@ -94,6 +98,7 @@ class DeviceMenu(wx.Dialog):
         self.choose_dev_sizer.Add(device_txt, 1, wx.ALL | wx.ALIGN_LEFT, 5)
         self.choose_dev_sizer.Add(drop_down, 1, wx.ALL | wx.ALIGN_LEFT, 5)
         self.panel_sizer.Add(self.choose_dev_sizer, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+        self.Layout()
         self.Fit()
 
     def choose_qualifier(self):
@@ -142,12 +147,12 @@ class DeviceMenu(wx.Dialog):
             chosen_txt_qual.SetFont(self.font)
 
         name_prompt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter device name:')
-        name_input = wx.TextCtrl(self.main_panel, wx.ID_ANY, size=(20, 100))
+        name_input = wx.TextCtrl(self.main_panel, wx.ID_ANY, size=(100, 40))
         confirm_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
         back_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Back")
         confirm_button_name.Bind(wx.EVT_BUTTON, self.on_confirm_name)
         back_button_name.Bind(wx.EVT_BUTTON, self.on_back_name)
-        name_prompt.Bind(wx.EVT_TEXT, self.on_name_entry)
+        name_input.Bind(wx.EVT_TEXT, self.on_name_entry)
 
         self.choose_name_sizer = wx.BoxSizer(wx.VERTICAL)
         self.choose_name_sizer.Add(chosen_txt_dev, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
@@ -157,6 +162,7 @@ class DeviceMenu(wx.Dialog):
         self.choose_name_sizer.Add(name_input, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self.choose_name_sizer.Add(confirm_button_name, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self.choose_name_sizer.Add(back_button_name, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.panel_sizer.Add(self.choose_name_sizer, 0, wx.ALL, 5)
         self.Layout()
         self.Fit()
 
@@ -198,7 +204,7 @@ class DeviceMenu(wx.Dialog):
         self.choose_name()
 
     def on_confirm_name(self, event):
-        pass
+        self.canvas.create_device(self.device_name, self.device_chosen, self.qualifier)
 
     def on_back_qual(self, event):
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
@@ -211,12 +217,19 @@ class DeviceMenu(wx.Dialog):
         self.destroy_widgets_in_sizer(self.choose_name_sizer)
         self.panel_sizer.Detach(self.choose_name_sizer)
         self.qualifier = None
-        self.choose_qualifier()
+
+        if self.device_chosen == 'DTYPE' or self.device_chosen == 'XOR':
+            self.device_chosen = None
+            self.first_selection = True
+            self.choose_device()
+        else:
+            self.choose_qualifier()
 
     def on_name_entry(self, event):
         Id = event.GetId()
         widget = self.FindWindowById(Id)
         self.device_name = widget.GetValue()
+
 
 
 class Gui_linux(wx.Frame):
@@ -482,8 +495,7 @@ class Gui_linux(wx.Frame):
             self.circuit_canvas.Refresh()
 
         else:  # show error dialogue box if cycle no. is not valid
-            self.error_pop_up(
-                'Please select valid number of cycles greater than zero')
+            self.error_pop_up('Please select valid number of cycles greater than zero')
 
     def on_sash_position_change(self, event):
         """Handles the event where the sash position of the window changes - this
@@ -576,7 +588,7 @@ class Gui_linux(wx.Frame):
             self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
-        dev_menu = DeviceMenu(self, 'Device Menu', self.devices)
+        dev_menu = DeviceMenu(self, 'Device Menu', self.devices, self.circuit_canvas)
         dev_menu.ShowModal()
         dev_menu.Destroy()
 
