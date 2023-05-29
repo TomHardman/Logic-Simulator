@@ -197,15 +197,16 @@ class TraceCanvas(wxcanvas.GLCanvas):
             trace_count += 1
             
             if len(signal_list) > 0:
-                x_max = x
+                x_max = x + 40
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
         GL.glFlush()
         self.SwapBuffers()
+        w = self.GetSize()[0]
 
-        if self.continue_pan_reset and x_max > self.GetSize()[0]:  # if continue event occurs and far edge is off screen
-            self.pan_x = -(x_max - self.GetSize()[0])
+        if self.continue_pan_reset and x_max> self.GetSize()[0]:  # if continue event occurs and far edge is off screen
+            self.pan_x = -(x_max*self.zoom - self.GetSize()[0])
             self.init = False  # pan to bring far edge on screen
             self.Refresh()
             self.continue_pan_reset = False
