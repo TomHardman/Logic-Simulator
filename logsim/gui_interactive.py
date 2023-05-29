@@ -1306,6 +1306,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 device_GL = Or_gate(0, 0, device, self.names, True)
             elif device_type == self.devices.SWITCH:
                 device_GL = Switch(0, 0, device, self.names)
+                self.switch_GL_list.append(device_GL)
             elif device_type == self.devices.XOR:
                 device_GL = Xor_gate(0, 0, device, self.names)
             elif device_type == self.devices.D_TYPE:
