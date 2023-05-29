@@ -66,19 +66,20 @@ def render_text(text, w, x_pos, y_pos, color, dark_mode):
 
     GL.glPopMatrix()
 
+
 def render_text_scale(text, w, x_pos, y_pos, color, s):
-        """Handle text drawing operations."""
-        GL.glColor3f(0.0, 0.0, 0.0)  # text is black
-        GL.glPushMatrix()
-        GL.glTranslatef(x_pos, y_pos, 0.0)
-        GL.glScalef(s, s, s)  # Scale down the text
+    """Handle text drawing operations."""
+    GL.glColor3f(0.0, 0.0, 0.0)  # text is black
+    GL.glPushMatrix()
+    GL.glTranslatef(x_pos, y_pos, 0.0)
+    GL.glScalef(s, s, s)  # Scale down the text
 
-        GL.glLineWidth(w)
-        GL.glColor3f(*color) 
-        for c in text:
-            GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
+    GL.glLineWidth(w)
+    GL.glColor3f(*color)
+    for c in text:
+        GLUT.glutStrokeCharacter(GLUT.GLUT_STROKE_ROMAN, ord(c))
 
-        GL.glPopMatrix()
+    GL.glPopMatrix()
 
 
 def line_with_thickness(vertices, t, color):
@@ -132,7 +133,7 @@ class Monitor():
                 y -= 30
                 draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
                 GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1),dark_mode)
+                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1), dark_mode)
                 GL.glFlush()
 
             elif self.port_id == self.names.query('Q'):
@@ -140,7 +141,7 @@ class Monitor():
                 y += 30
                 draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
                 GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1),dark_mode)
+                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1), dark_mode)
                 GL.glFlush()
 
             else:
@@ -150,9 +151,9 @@ class Monitor():
                 y += 25
                 draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
                 GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.11),dark_mode)
+                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.11), dark_mode)
                 GL.glFlush()
-        
+
         else:
 
             if self.port_id == self.names.query('QBAR'):
@@ -160,7 +161,7 @@ class Monitor():
                 y -= 30
                 draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
                 GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (1, 1, 1),dark_mode)
+                render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
                 GL.glFlush()
 
             elif self.port_id == self.names.query('Q'):
@@ -168,7 +169,7 @@ class Monitor():
                 y += 30
                 draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
                 GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (1, 1, 1),dark_mode)
+                render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
                 GL.glFlush()
 
             else:
@@ -183,66 +184,66 @@ class Monitor():
 
 
 def render(self, dark_mode):
-        dx = 10
-        dy = 10
-        x, y = self.device_GL.get_port_coor(self.port_id)
+    dx = 10
+    dy = 10
+    x, y = self.device_GL.get_port_coor(self.port_id)
 
-        # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-        GL.glColor(1, 1, 1)
-        if dark_mode:
-            if self.port_id == self.names.query('QBAR'):
-                x -= 5
-                y -= 30
-                draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
-                GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1),dark_mode)
-                GL.glFlush()
+    # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+    GL.glColor(1, 1, 1)
+    if dark_mode:
+        if self.port_id == self.names.query('QBAR'):
+            x -= 5
+            y -= 30
+            draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
+            GL.glColor(1, 1, 1)
+            render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1), dark_mode)
+            GL.glFlush()
 
-            elif self.port_id == self.names.query('Q'):
-                x -= 5
-                y += 30
-                draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
-                GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1),dark_mode)
-                GL.glFlush()
+        elif self.port_id == self.names.query('Q'):
+            x -= 5
+            y += 30
+            draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
+            GL.glColor(1, 1, 1)
+            render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1), dark_mode)
+            GL.glFlush()
 
-            else:
-            # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-            # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
-                x -= 15
-                y += 25
-                draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
-                GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.11),dark_mode)
-                GL.glFlush()
-        
         else:
-
-            if self.port_id == self.names.query('QBAR'):
-                x -= 5
-                y -= 30
-                draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
-                GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (1, 1, 1),dark_mode)
-                GL.glFlush()
-
-            elif self.port_id == self.names.query('Q'):
-                x -= 5
-                y += 30
-                draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
-                GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (1, 1, 1),dark_mode)
-                GL.glFlush()
-
-            else:
             # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
             # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
-                x -= 15
-                y += 25
-                draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
-                GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (1, 1, 1),dark_mode)
-                GL.glFlush()
+            x -= 15
+            y += 25
+            draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
+            GL.glColor(1, 1, 1)
+            render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.11), dark_mode)
+            GL.glFlush()
+
+    else:
+
+        if self.port_id == self.names.query('QBAR'):
+            x -= 5
+            y -= 30
+            draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
+            GL.glColor(1, 1, 1)
+            render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
+            GL.glFlush()
+
+        elif self.port_id == self.names.query('Q'):
+            x -= 5
+            y += 30
+            draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
+            GL.glColor(1, 1, 1)
+            render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
+            GL.glFlush()
+
+        else:
+            # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
+            # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
+            x -= 15
+            y += 25
+            draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
+            GL.glColor(1, 1, 1)
+            render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
+            GL.glFlush()
 
 
 class Connection_GL:
@@ -270,13 +271,12 @@ class Connection_GL:
             color = (0.7, 0.7, 0.7)
         else:
             color = (0.0, 0.0, 0.0)
-        
+
         if self.output_device_GL is not None and self.output_device_GL.device.outputs[self.output_port_id]:
             if dark_mode:
                 color = (0.647, 0.41, 0.77)
             else:
                 color = (0.617, 0.0, 0.0)
-            
 
         draw_circle(7, in_x, in_y, color)
         # draw_circle(7, out_x, out_y, color)
@@ -406,20 +406,26 @@ class And_gate(Device_GL):
             GL.glVertex2f(self.x + self.box_width - self.x_CoM + dx, self.y -
                           self.input_height * (self.inputs - 2.0)/2.0 + dy)
         GL.glEnd()
+
         if dark_mode:
-            color = (0.7,0.7,0.7)
+            color = (0.7, 0.7, 0.7)
         else:
             color = (0.0, 0.0, 0.0)
+
         if self.device.outputs[None]:
-            color = (0.617, 0.0, 0.0)
+            if dark_mode:
+                color = (0.647, 0.41, 0.77)
+            else:
+                color = (0.617, 0.0, 0.0)
 
         draw_circle(self.port_radius, self.x + self.box_width - self.x_CoM +
                     self.input_height, self.y, color)
+
         if self.NAND:
             if dark_mode:
                 draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
-                            self.input_height, self.y, (0.0, 0.0, 0.0))
-            else:                
+                            self.input_height, self.y, (0.2, 0.2, 0.2))
+            else:
                 draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
                             self.input_height, self.y, (1.0, 1.0, 1.0))
 
@@ -427,7 +433,7 @@ class And_gate(Device_GL):
             y = self.input_height * (i + 0.5 - self.inputs*0.5) + self.y
             if dark_mode:
                 draw_circle(self.port_radius, self.x -
-                        self.x_CoM, y, (0.7, 0.7, 0.7))
+                            self.x_CoM, y, (0.7, 0.7, 0.7))
             else:
                 draw_circle(self.port_radius, self.x -
                             self.x_CoM, y, (0.0, 0.0, 0.0))
@@ -516,27 +522,31 @@ class Or_gate(Device_GL):
             color = (0.7, 0.7, 0.7)
         else:
             color = (0.0, 0.0, 0.0)
+
         if self.device.outputs[None]:
-            color = (0.617, 0.0, 0.0)
+            if dark_mode:
+                color = (0.647, 0.41, 0.77)
+            else:
+                color = (0.617, 0.0, 0.0)
 
         draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
                     self.x_CoM, self.y, color)
         if self.NOR:
             if dark_mode:
-                draw_circle(self.port_radius - 2, self.x + self.box_width - self.straight_box_width 
-                          - self.x_CoM + self.input_height, self.y, (0.0, 0.0, 0.0))
-            else:                
-                draw_circle(self.port_radius - 2, self.x + self.box_width - self.straight_box_width 
-                          - self.x_CoM + self.input_height, self.y, (1.0, 1.0, 1.0))
+                draw_circle(self.port_radius - 2, self.x + self.box_width - self.straight_box_width
+                            - self.x_CoM + self.input_height, self.y, (0.2, 0.2, 0.2))
+            else:
+                draw_circle(self.port_radius - 2, self.x + self.box_width - self.straight_box_width
+                            - self.x_CoM + self.input_height, self.y, (1.0, 1.0, 1.0))
 
         for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
             dx = self.indent_width*(1 - (dy / c)**2)
             if dark_mode:
                 draw_circle(self.port_radius, self.x -
-                        self.x_CoM, self.y+dy, (0.7, 0.7, 0.7))
+                            self.x_CoM, self.y+dy, (0.7, 0.7, 0.7))
                 vertices = [(self.x - self.x_CoM, self.y + dy),
                             (self.x - self.x_CoM + dx, self.y + dy)]
-                line_with_thickness(vertices, 3, (0.7, 0.7, 0.7))                    
+                line_with_thickness(vertices, 3, (0.7, 0.7, 0.7))
             else:
                 draw_circle(self.port_radius, self.x -
                             self.x_CoM, self.y+dy, (0.0, 0.0, 0.0))
@@ -634,7 +644,8 @@ class Xor_gate(Device_GL):
             line_with_thickness(vertices, self.thickness, (0.03, 0.172, 0.422))
             color = (0.7, 0.7, 0.7)
         else:
-            line_with_thickness(vertices, self.thickness, (0.212, 0.271, 0.310))
+            line_with_thickness(vertices, self.thickness,
+                                (0.212, 0.271, 0.310))
             color = (0.0, 0.0, 0.0)
         if self.device.outputs[None]:
             color = (0.617, 0.0, 0.0)
@@ -648,7 +659,7 @@ class Xor_gate(Device_GL):
                             self.x_CoM, self.y+dy, (0.7, 0.7, 0.7))
                 vertices = [(self.x - self.x_CoM, self.y + dy),
                             (self.x - self.x_CoM + dx, self.y + dy)]
-                line_with_thickness(vertices, 3, (0.7, 0.7, 0.7))                    
+                line_with_thickness(vertices, 3, (0.7, 0.7, 0.7))
             else:
                 draw_circle(self.port_radius, self.x -
                             self.x_CoM, self.y+dy, (0.0, 0.0, 0.0))
@@ -726,14 +737,14 @@ class D_type(Device_GL):
             for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
                 draw_circle(self.port_radius, self.x - self.width /
                             2, self.y + dy, (0.7, 0.7, 0.7))
-        
+
         else:
             for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
                 draw_circle(self.port_radius, self.x - self.width /
                             2, self.y + dy, (0.0, 0.0, 0.0))
         if dark_mode:
             color = (0.7, 0.7, 0.7)
-        else:    
+        else:
             color = (0.0, 0.0, 0.0)
         if self.device.outputs[self.names.query("Q")]:
             if dark_mode:
@@ -743,7 +754,7 @@ class D_type(Device_GL):
         draw_circle(self.port_radius, self.x + self.width/2,
                     self.y + self.input_height/2, color)
         if dark_mode:
-            colour = (0.7,0.7,0.7)
+            color = (0.7, 0.7, 0.7)
         else:
             color = (0.0, 0.0, 0.0)
         if self.device.outputs[self.names.query("QBAR")]:
@@ -753,15 +764,22 @@ class D_type(Device_GL):
                 color = (0.48, 0, 1)
         draw_circle(self.port_radius, self.x + self.width/2,
                     self.y - self.input_height/2, color)
-        
-        render_text_scale('DATA', 1.5, self.x - self.width/2 +10 , self.y + self.input_height*1.5 -4, (1,1,1), 0.1)
-        render_text_scale('CLK', 1.5, self.x - self.width/2 +10 , self.y + self.input_height/2-4, (1,1,1),0.1)
-        render_text_scale('SET', 1.5, self.x - self.width/2 +10 , self.y - self.input_height/2-4, (1,1,1),0.1)
-        render_text_scale('CLR', 1.5, self.x - self.width/2 +10 , self.y - self.input_height*1.5-4, (1,1,1), 0.1)
-        render_text_scale('Q', 1.5, self.x + self.width/2 -19 , self.y + self.input_height/2-4, (1,1,1),0.1)
-        render_text_scale(overline('Q'), 1.5, self.x + self.width/2 -19, self.y - self.input_height/2-4, (1,1,1),0.1)
-        line_with_thickness([(self.x + self.width/2-19, self.y - self.input_height/2+9.5), (self.x + self.width/2 - 11, self.y - self.input_height/2+9.5)], 0.9, (1,1,1))
-        
+
+        render_text_scale('DATA', 1.5, self.x - self.width/2 +
+                          10, self.y + self.input_height*1.5 - 4, (1, 1, 1), 0.1)
+        render_text_scale('CLK', 1.5, self.x - self.width/2 +
+                          10, self.y + self.input_height/2-4, (1, 1, 1), 0.1)
+        render_text_scale('SET', 1.5, self.x - self.width/2 +
+                          10, self.y - self.input_height/2-4, (1, 1, 1), 0.1)
+        render_text_scale('CLR', 1.5, self.x - self.width/2 +
+                          10, self.y - self.input_height*1.5-4, (1, 1, 1), 0.1)
+        render_text_scale('Q', 1.5, self.x + self.width/2 -
+                          19, self.y + self.input_height/2-4, (1, 1, 1), 0.1)
+        render_text_scale(overline('Q'), 1.5, self.x + self.width /
+                          2 - 19, self.y - self.input_height/2-4, (1, 1, 1), 0.1)
+        line_with_thickness([(self.x + self.width/2-19, self.y - self.input_height/2+9.5),
+                            (self.x + self.width/2 - 11, self.y - self.input_height/2+9.5)], 0.9, (1, 1, 1))
+
         if self.show_text:
 
             draw_text(self.x-7, self.y - self.input_height *
@@ -859,7 +877,7 @@ class Clock(Device_GL):
             if dark_mode:
                 GL.glColor3f(0.7, 0.7, 0.7)
                 color = (0.7, 0.7, 0.7)
-            else:            
+            else:
                 GL.glColor3f(0.0, 0.0, 0.0)
                 color = (0.0, 0.0, 0.0)
         GL.glBegin(GL.GL_TRIANGLE_STRIP)
@@ -893,7 +911,7 @@ class Clock(Device_GL):
         if dark_mode:
             draw_circle(self.port_radius, self.x +
                         self.width/2, self.y, (0.7, 0.7, 0.7))
-        
+
         else:
             draw_circle(self.port_radius, self.x +
                         self.width/2, self.y, (0.0, 0.0, 0.0))
@@ -945,12 +963,12 @@ class Switch(Device_GL):
 
     def render(self, dark_mode):
         if dark_mode:
-            color = (0.7,0.7,0.7)
+            color = (0.7, 0.7, 0.7)
         else:
             color = (0.0, 0.0, 0.0)
         if dark_mode:
             draw_circle(self.port_radius, self.x - self.x_CoM,
-                    self.y - self.half_height, (0.7, 0.7, 0.7))
+                        self.y - self.half_height, (0.7, 0.7, 0.7))
             draw_circle(self.port_radius, self.x - self.x_CoM,
                         self.y + self.half_height, (0.647, 0.41, 0.77))
             vertices = [(self.x - self.x_CoM +
@@ -1082,7 +1100,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         if self.dark_mode:
             GL.glClearColor(0.2, 0.2, 0.2, 0.0)
         else:
-            GL.glClearColor(1, 1, 1, 0.0)  
+            GL.glClearColor(1, 1, 1, 0.0)
         GL.glViewport(0, 0, size.width, size.height)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
@@ -1489,7 +1507,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.raise_error("Please use a valid qualifier")
             return False
         elif error_code == self.devices.DEVICE_PRESENT:
-            self.raise_error("Device name already in use - please use another device name")
+            self.raise_error(
+                "Device name already in use - please use another device name")
             return False
         self.Refresh()
         return True
