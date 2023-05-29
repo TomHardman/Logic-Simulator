@@ -62,7 +62,7 @@ class RoundedScrollWindow(wx.ScrolledWindow):
 
     
 class DeviceMenu(wx.Dialog):
-    def __init__(self, parent, title, devices):
+    def __init__(self, parent, title, devices, canvas):
         wx.Dialog.__init__(self, parent, title=title)
         self.devices = devices
         self.device_chosen = None
@@ -70,6 +70,10 @@ class DeviceMenu(wx.Dialog):
         self.device_name = None
         self.font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         self.first_selection = True
+        self.canvas = canvas
+        self.devices_dict = {'CLOCK': self.devices.CLOCK, 'NAND': self.devices.NAND, 'SWITCH': self.devices.SWITCH,
+                                'AND': self.devices.AND, 'NOR': self.devices.NOR, 'OR': self.devices.OR, 
+                                'XOR': self.devices.XOR, 'DTYPE': self.devices.D_TYPE}
 
         overall_sizer = wx.BoxSizer(wx.VERTICAL)  # Create main sizer
         self.SetSizer(overall_sizer)
@@ -94,6 +98,7 @@ class DeviceMenu(wx.Dialog):
         self.choose_dev_sizer.Add(device_txt, 1, wx.ALL | wx.ALIGN_LEFT, 5)
         self.choose_dev_sizer.Add(drop_down, 1, wx.ALL | wx.ALIGN_LEFT, 5)
         self.panel_sizer.Add(self.choose_dev_sizer, 1, wx.ALL | wx.ALIGN_LEFT, 5)
+        self.Layout()
         self.Fit()
 
     def choose_qualifier(self):
@@ -142,12 +147,12 @@ class DeviceMenu(wx.Dialog):
             chosen_txt_qual.SetFont(self.font)
 
         name_prompt = wx.StaticText(self.main_panel, wx.ID_ANY, 'Enter device name:')
-        name_input = wx.TextCtrl(self.main_panel, wx.ID_ANY, size=(20, 100))
+        name_input = wx.TextCtrl(self.main_panel, wx.ID_ANY, size=(100, 40))
         confirm_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
         back_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Back")
         confirm_button_name.Bind(wx.EVT_BUTTON, self.on_confirm_name)
         back_button_name.Bind(wx.EVT_BUTTON, self.on_back_name)
-        name_prompt.Bind(wx.EVT_TEXT, self.on_name_entry)
+        name_input.Bind(wx.EVT_TEXT, self.on_name_entry)
 
         self.choose_name_sizer = wx.BoxSizer(wx.VERTICAL)
         self.choose_name_sizer.Add(chosen_txt_dev, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
@@ -157,6 +162,7 @@ class DeviceMenu(wx.Dialog):
         self.choose_name_sizer.Add(name_input, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self.choose_name_sizer.Add(confirm_button_name, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self.choose_name_sizer.Add(back_button_name, 0, wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
+        self.panel_sizer.Add(self.choose_name_sizer, 0, wx.ALL, 5)
         self.Layout()
         self.Fit()
 
@@ -198,7 +204,12 @@ class DeviceMenu(wx.Dialog):
         self.choose_name()
 
     def on_confirm_name(self, event):
-        pass
+        if self.device_name[0].isalpha() and self.device_name.isalnum():
+            if self.canvas.create_device(self.device_name, self.devices_dict[self.device_chosen], self.qualifier):
+                self.EndModal(wx.ID_OK)
+
+        else:
+            error_pop_up('Please enter a valid name')
 
     def on_back_qual(self, event):
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
@@ -211,12 +222,19 @@ class DeviceMenu(wx.Dialog):
         self.destroy_widgets_in_sizer(self.choose_name_sizer)
         self.panel_sizer.Detach(self.choose_name_sizer)
         self.qualifier = None
-        self.choose_qualifier()
+
+        if self.device_chosen == 'DTYPE' or self.device_chosen == 'XOR':
+            self.device_chosen = None
+            self.first_selection = True
+            self.choose_device()
+        else:
+            self.choose_qualifier()
 
     def on_name_entry(self, event):
         Id = event.GetId()
         widget = self.FindWindowById(Id)
         self.device_name = widget.GetValue()
+
 
 
 class Gui_linux(wx.Frame):
@@ -439,12 +457,12 @@ class Gui_linux(wx.Frame):
         button to appear in the GUI - on all runs it runs the simulation from scratch for the specified
         number of cycles"""
         if self.connection_constraint:
-            self.error_pop_up(
+            error_pop_up(
                 'Finish adding connections before trying to execute another action')
             return
 
         if self.monitor_constraint:
-            self.error_pop_up(
+            error_pop_up(
                 'Finish adding/zapping monitors before trying to execute another action')
             return
 
@@ -459,7 +477,7 @@ class Gui_linux(wx.Frame):
                     self.cycles_completed += 1
 
                 else:  # raise error if there are unconnected devices
-                    self.error_pop_up(
+                    error_pop_up(
                         'Run failed to execute - please make sure all devices are connected')
                     return
 
@@ -482,8 +500,7 @@ class Gui_linux(wx.Frame):
             self.circuit_canvas.Refresh()
 
         else:  # show error dialogue box if cycle no. is not valid
-            self.error_pop_up(
-                'Please select valid number of cycles greater than zero')
+            error_pop_up('Please select valid number of cycles greater than zero')
 
     def on_sash_position_change(self, event):
         """Handles the event where the sash position of the window changes - this
@@ -505,12 +522,12 @@ class Gui_linux(wx.Frame):
     def on_cycle_spin(self, event):
         """Handle the event when the user changes the no. cycles"""
         if self.connection_constraint:
-            self.error_pop_up(
+            error_pop_up(
                 'Finish adding connections before trying to execute another action')
             return
 
         if self.monitor_constraint:
-            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
+            error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
         Id = event.GetId()
@@ -521,12 +538,12 @@ class Gui_linux(wx.Frame):
     def on_continue_button(self, event):
         """Handle the event when the user presses the continue button"""
         if self.connection_constraint:
-            self.error_pop_up(
+            error_pop_up(
                 'Finish adding connections before trying to execute another action')
             return
 
         if self.monitor_constraint:
-            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
+            error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
         if self.cycles > 0:  # if the number of cycles provided is valid
@@ -541,13 +558,13 @@ class Gui_linux(wx.Frame):
                         f"Cycles Completed: {self.cycles_completed}")
 
         else:  # show error dialogue box if cycle no. is not valid
-            self.error_pop_up(
+            error_pop_up(
                 'Please select valid number of cycles greater than zero')
 
     def on_add_zap_button(self, event):
         """Handle the event when the user presses the add monitor button"""
         if self.connection_constraint:
-            self.error_pop_up('Finish adding connections before trying to execute another action')
+            error_pop_up('Finish adding connections before trying to execute another action')
             return
 
         Id = event.GetId()
@@ -569,21 +586,21 @@ class Gui_linux(wx.Frame):
     def on_add_device_button(self, event):
         """Handle the event when the user presses the add device button"""
         if self.connection_constraint:
-            self.error_pop_up('Finish adding connections before trying to execute another action')
+            error_pop_up('Finish adding connections before trying to execute another action')
             return
 
         if self.monitor_constraint:
-            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
+            error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
-        dev_menu = DeviceMenu(self, 'Device Menu', self.devices)
+        dev_menu = DeviceMenu(self, 'Device Menu', self.devices, self.circuit_canvas)
         dev_menu.ShowModal()
         dev_menu.Destroy()
 
     def on_add_connection_button(self, event):
         """Handle the event when the user presses the add connection button"""
         if self.monitor_constraint:
-            self.error_pop_up('Finish adding/zapping monitors before trying to execute another action')
+            error_pop_up('Finish adding/zapping monitors before trying to execute another action')
             return
 
         Id = event.GetId()
@@ -604,8 +621,8 @@ class Gui_linux(wx.Frame):
             self.circuit_canvas.Refresh()
             self.connection_constraint = False
 
-    def error_pop_up(self, string):
-        dlg = GMD(None, string, "Error", wx.OK | wx.ICON_ERROR | 0x40)
-        dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
-        dlg.ShowModal()
-        dlg.Destroy()
+def error_pop_up(string):
+    dlg = GMD(None, string, "Error", wx.OK | wx.ICON_ERROR | 0x40)
+    dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+    dlg.ShowModal()
+    dlg.Destroy()

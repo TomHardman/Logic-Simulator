@@ -1462,7 +1462,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
 
     def create_device(self, device_name, device_type, qualifier=None):
         [device_id] = self.names.lookup([device_name])
-        error_code = self.devices.create_device(
+        error_code = self.devices.make_device(
             device_id, device_type, qualifier)
         if error_code == self.devices.NO_ERROR:
             device = self.devices.get_device(device_id)
@@ -1476,6 +1476,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 device_GL = Or_gate(0, 0, device, self.names, True)
             elif device_type == self.devices.SWITCH:
                 device_GL = Switch(0, 0, device, self.names)
+                self.switch_GL_list.append(device_GL)
             elif device_type == self.devices.XOR:
                 device_GL = Xor_gate(0, 0, device, self.names)
             elif device_type == self.devices.D_TYPE:
@@ -1485,10 +1486,13 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.objects.append(device_GL)
             self.devices_GL_list.append(device_GL)
         elif error_code == self.devices.INVALID_QUALIFIER:
-            self.raise_error("Error : Please use a valid qualifier")
+            self.raise_error("Please use a valid qualifier")
+            return False
         elif error_code == self.devices.DEVICE_PRESENT:
-            self.raise_error("Error : Please use a different device name")
+            self.raise_error("Device name already in use - please use another device name")
+            return False
         self.Refresh()
+        return True
 
     def raise_error(self, string):
         dlg = GMD(None, string,
