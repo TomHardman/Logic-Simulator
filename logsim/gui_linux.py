@@ -5,6 +5,15 @@ from gui_interactive import InteractiveCanvas
 from wx.lib.buttons import GenButton
 
 
+def error_pop_up(string):
+    """Function used for creating error pop up windows in the Gui when an error is raised -
+    takes one argument which is the string to be displayed in the pop up"""
+    dlg = GMD(None, string, "Error", wx.OK | wx.ICON_ERROR | 0x40)
+    dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
+    dlg.ShowModal()
+    dlg.Destroy()
+
+
 class RoundedScrollWindow(wx.ScrolledWindow):
     """ Class that inherits from the wx.ScrolledWindow class to be used as a scrollable panel,
     however the OnPaint method has been rewritten to paint a rounded rectangular panel and
@@ -620,9 +629,3 @@ class Gui_linux(wx.Frame):
             self.circuit_canvas.temp_connection = None
             self.circuit_canvas.Refresh()
             self.connection_constraint = False
-
-def error_pop_up(string):
-    dlg = GMD(None, string, "Error", wx.OK | wx.ICON_ERROR | 0x40)
-    dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
-    dlg.ShowModal()
-    dlg.Destroy()

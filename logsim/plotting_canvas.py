@@ -49,12 +49,15 @@ def choose_viable_colour(colours, tol):
     to other trace colours is large enough that colours will be distinguishable"""
     colour = (random.random(), random.random(), random.random())
     while True:
+        dist = True
         for col in colours:
             d = sum([(colour[i] - col[i])**2 for i in range(3)])
             if d < tol:
                 colour = (random.random(), random.random(), random.random())
+                dist = False
                 break
-        break
+        if dist:
+            break
     return colour
 
 
@@ -103,6 +106,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
         self.last_mouse_x = 0  # previous mouse x position
         self.last_mouse_y = 0  # previous mouse y position
         self.continue_pan_reset = False
+        self.x_max = 0
+        self.y_min = 0
 
         # Initialise variables for zooming
         self.zoom = 1
@@ -153,22 +158,15 @@ class TraceCanvas(wxcanvas.GLCanvas):
         offset = -100
         y_0 = self.GetSize()[1] - 100
         height = 80
-        x_max = 0
 
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
             vertices = []
 
-            text = monitor_name  # label trace with name of monitor and make it invariant to zoom and pan
-            GL.glMatrixMode(GL.GL_MODELVIEW)
-            GL.glTranslate(-self.pan_x * 1/self.zoom, 0.0, 0.0)
-            self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count)
-            GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
-
             if monitor_name not in self.monitor_colours:  # randomly choose colour for each monitor
                 if self.monitor_colours:
-                    colour = choose_viable_colour(self.monitor_colours.values(), 10000/len(self.monitor_colours))
+                    colour = choose_viable_colour(self.monitor_colours.values(), 0.1/len(self.monitor_colours))
                 else:
                     colour = (random.random(), random.random(), random.random())
                 
@@ -189,24 +187,32 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
                 vertices.append((x, y))
 
-                GL.glTranslate(0.0, -self.pan_y, 0.0)  # generate axes labels that are invariant to translation in the y-direction
-                self.render_text(str(i+1), (i+1)*40, 20)
-                GL.glTranslated(0.0, self.pan_y, 0.0)
-
             plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
+
+            text = monitor_name  # label trace with name of monitor and make it invariant to zoom and pan
+            GL.glMatrixMode(GL.GL_MODELVIEW)
+            GL.glTranslate(-self.pan_x * 1/self.zoom, 0.0, 0.0)
+            self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count)
+            GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
+
             trace_count += 1
+
+        for i in range(len(signal_list)):
+            GL.glTranslate(0.0, -self.pan_y, 0.0)  # generate axes labels that are invariant to translation in the y-direction
+            self.render_text(str(i+1), (i+1)*40-5, 20)
+            GL.glTranslated(0.0, self.pan_y, 0.0)
             
-            if len(signal_list) > 0:
-                x_max = x + 40
+        if len(signal_list) > 0:
+            self.x_max = len(signal_list)*40
+            self.y_min = offset * trace_count - 20
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
         GL.glFlush()
         self.SwapBuffers()
-        w = self.GetSize()[0]
 
-        if self.continue_pan_reset and x_max> self.GetSize()[0]:  # if continue event occurs and far edge is off screen
-            self.pan_x = -(x_max*self.zoom - self.GetSize()[0])
+        if self.continue_pan_reset and self.x_max*self.zoom> self.GetSize()[0]:  # if continue event occurs and far edge is off screen
+            self.pan_x = -(self.x_max*self.zoom - self.GetSize()[0])
             self.init = False  # pan to bring far edge on screen
             self.Refresh()
             self.continue_pan_reset = False
@@ -241,48 +247,36 @@ class TraceCanvas(wxcanvas.GLCanvas):
         ox = (event.GetX() - self.pan_x) / self.zoom
         oy = (size.height - event.GetY() - self.pan_y) / self.zoom
         old_zoom = self.zoom
-        if event.ButtonDown():
-            self.last_mouse_x = event.GetX()
-            self.last_mouse_y = event.GetY()
-            text = "".join(["Mouse button pressed at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
-        if event.ButtonUp():
-            text = "".join(["Mouse button released at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
-        if event.Leaving():
-            text = "".join(["Mouse left canvas at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
-        if event.Dragging():
+    
+        if event.Dragging():  # dragging only has effects in the x-direction
             self.pan_x += event.GetX() - self.last_mouse_x
-            if self.pan_x > 0:
+            if self.pan_x > 0: # limit panning to the bounds of the trace
                 self.pan_x = 0
-            self.last_mouse_x = event.GetX()
-            self.last_mouse_y = event.GetY()
+            if self.pan_x < -(self.x_max*self.zoom - self.GetSize()[0]):
+                self.pan_x = min(0, -(self.x_max*self.zoom - self.GetSize()[0]))
             self.init = False
             
-            text = "".join(["Mouse dragged to: ", str(event.GetX()),
-                            ", ", str(event.GetY()), ". Pan is now: ",
-                            str(self.pan_x), ", ", str(self.pan_y)])
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
             self.pan_x -= (self.zoom - old_zoom) * ox
-            if self.pan_x > 0:
+            if self.pan_x > 0: # limit panning to the bounds of the trace
                 self.pan_x = 0
+            if self.pan_x < -(self.x_max*self.zoom - self.GetSize()[0]):
+                self.pan_x = min(0, -(self.x_max*self.zoom - self.GetSize()[0]))
             self.init = False
-            text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
-                            str(self.zoom)])
+       
         if event.GetWheelRotation() > 0:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.init = False
-            text = "".join(["Positive mouse wheel rotation. Zoom is now: ",
-                            str(self.zoom)])
+   
         if text:
             self.render(text)
+        
         else:
             self.Refresh()  # triggers the paint event
 
@@ -291,10 +285,14 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
         if keycode == wx.WXK_DOWN:
             self.pan_y += 10
+            if self.pan_y > -self.y_min - self.GetSize()[1]:
+                self.pan_y = -self.y_min - self.GetSize()[1]
             self.init = False
             self.Refresh()
         elif keycode == wx.WXK_UP:
             self.pan_y -= 10
+            if self.pan_y < 0:
+                self.pan_y = 0
             self.init = False
             self.Refresh()
 
