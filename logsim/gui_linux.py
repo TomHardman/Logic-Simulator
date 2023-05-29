@@ -269,10 +269,20 @@ class Gui_linux(wx.Frame):
 
         # Configure the file menu
         fileMenu = wx.Menu()
+        themeMenu = wx.Menu()
         menuBar = wx.MenuBar()
+
+        themeMenu.Append(wx.ID_ANY, "Light")
+        themeMenu.Append(wx.ID_ANY, "Dark")
+        self.light_id = themeMenu.FindItemByPosition(0).GetId()
+        self.dark_id = themeMenu.FindItemByPosition(1).GetId()
+
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         fileMenu.Append(wx.ID_ABOUT, "&About")
+        fileMenu.AppendSubMenu(themeMenu, "&Theme")
+        fileMenu.Append(wx.ID_ANY, "&Help")
         menuBar.Append(fileMenu, "&File")
+        self.help_id = fileMenu.FindItemByPosition(3).GetId()
         self.SetMenuBar(menuBar)
         self.Maximize()
 
@@ -460,7 +470,13 @@ class Gui_linux(wx.Frame):
         if Id == wx.ID_ABOUT:
             wx.MessageBox("Logic Simulator\nCreated by bd432, al2008, th624\n2023",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
-
+        if Id == self.light_id:
+            self.circuit_canvas.dark_mode = False
+            self.circuit_canvas.Refresh()
+        if Id == self.dark_id:
+            self.circuit_canvas.dark_mode = True
+            self.circuit_canvas.Refresh()
+        
     def on_run_button(self, event):
         """Handles the event when the user presses the run button - on first run it causes the continue
         button to appear in the GUI - on all runs it runs the simulation from scratch for the specified

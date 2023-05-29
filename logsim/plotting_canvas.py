@@ -145,7 +145,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         if not self.init:
             # Configure the viewport, modelview and projection matrices
             self.init_gl()
-            self.init = True
+            self.init = False
 
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)

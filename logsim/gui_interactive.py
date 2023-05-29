@@ -178,7 +178,7 @@ class Monitor():
                 y += 25
                 draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
                 GL.glColor(1, 1, 1)
-                render_text('M', 2, x-5, y-5, (1, 1, 1))
+                render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
                 GL.glFlush()
 
 
@@ -1057,7 +1057,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         self.connection_list = [False, None, None]
         self.choose_monitor = False
         self.temp_connection = None
-        self.dark_mode = True
+        self.dark_mode = False
 
         # Initialise variables for zooming
         self.zoom = 1
