@@ -192,13 +192,15 @@ class TraceCanvas(wxcanvas.GLCanvas):
             text = monitor_name  # label trace with name of monitor and make it invariant to zoom and pan
             GL.glMatrixMode(GL.GL_MODELVIEW)
             GL.glTranslate(-self.pan_x * 1/self.zoom, 0.0, 0.0)
+            self.render_text('HIGH', 10/self.zoom, y_0 + height + offset*trace_count, 
+                                font=GLUT.GLUT_BITMAP_HELVETICA_12)
             self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count)
             GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
 
             trace_count += 1
 
         for i in range(len(signal_list)):
-            GL.glTranslate(0.0, -self.pan_y, 0.0)  # generate axes labels that are invariant to translation in the y-direction
+            GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
             self.render_text(str(i+1), (i+1)*40-5, 20)
             GL.glTranslated(0.0, self.pan_y, 0.0)
             
@@ -302,11 +304,10 @@ class TraceCanvas(wxcanvas.GLCanvas):
             self.init = False
             self.Refresh()
 
-    def render_text(self, text, x_pos, y_pos):
+    def render_text(self, text, x_pos, y_pos, font=GLUT.GLUT_BITMAP_HELVETICA_18):
         """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
