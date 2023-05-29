@@ -250,11 +250,17 @@ class TraceCanvas(wxcanvas.GLCanvas):
     
         if event.Dragging():  # dragging only has effects in the x-direction
             self.pan_x += event.GetX() - self.last_mouse_x
+            self.last_mouse_x = event.GetX()
             if self.pan_x > 0: # limit panning to the bounds of the trace
                 self.pan_x = 0
+                self.last_mouse_x = event.GetX()
             if self.pan_x < -(self.x_max*self.zoom - self.GetSize()[0]):
                 self.pan_x = min(0, -(self.x_max*self.zoom - self.GetSize()[0]))
+                self.last_mouse_x = event.GetX()
             self.init = False
+
+        if event.ButtonDown():
+            self.last_mouse_x = event.GetX()
             
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
@@ -263,8 +269,6 @@ class TraceCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             if self.pan_x > 0: # limit panning to the bounds of the trace
                 self.pan_x = 0
-            if self.pan_x < -(self.x_max*self.zoom - self.GetSize()[0]):
-                self.pan_x = min(0, -(self.x_max*self.zoom - self.GetSize()[0]))
             self.init = False
        
         if event.GetWheelRotation() > 0:
@@ -272,6 +276,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             # Adjust pan so as to zoom around the mouse position
             self.pan_x -= (self.zoom - old_zoom) * ox
+            if self.pan_x < -(self.x_max*self.zoom - self.GetSize()[0]):
+                self.pan_x = min(0, -(self.x_max*self.zoom - self.GetSize()[0]))
             self.init = False
    
         if text:
@@ -286,7 +292,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         if keycode == wx.WXK_DOWN:
             self.pan_y += 10
             if self.pan_y > -self.y_min - self.GetSize()[1]:
-                self.pan_y = -self.y_min - self.GetSize()[1]
+                self.pan_y = max(0, -self.y_min - self.GetSize()[1])
             self.init = False
             self.Refresh()
         elif keycode == wx.WXK_UP:
