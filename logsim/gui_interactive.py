@@ -1292,7 +1292,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
 
     def create_device(self, device_name, device_type, qualifier=None):
         [device_id] = self.names.lookup([device_name])
-        error_code = self.devices.create_device(
+        error_code = self.devices.make_device(
             device_id, device_type, qualifier)
         if error_code == self.devices.NO_ERROR:
             device = self.devices.get_device(device_id)

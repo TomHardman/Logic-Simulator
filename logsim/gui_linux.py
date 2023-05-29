@@ -204,7 +204,7 @@ class DeviceMenu(wx.Dialog):
         self.choose_name()
 
     def on_confirm_name(self, event):
-        self.canvas.create_device(self.device_name, self.device_chosen, self.qualifier)
+        self.canvas.create_device(self.device_name, self.devices_dict[self.device_chosen], self.qualifier)
 
     def on_back_qual(self, event):
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
