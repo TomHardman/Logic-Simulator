@@ -23,9 +23,7 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
-# from gui_mac import Gui_mac
 from gui_linux import Gui_linux
-from gui_interactive import Gui_interactive
 from network_fixture import create_network_fixture
 
 
@@ -39,7 +37,7 @@ def main(arg_list):
                      "Command line user interface: logsim.py -c <file path>\n"
                      "Graphical user interface: logsim.py <file path>")
     try:
-        options, arguments = getopt.getopt(arg_list, "hcmtl:")
+        options, arguments = getopt.getopt(arg_list, "hctl:")
     except getopt.GetoptError:
         print("Error: invalid command line arguments\n")
         print(usage_message)
@@ -74,17 +72,6 @@ def main(arg_list):
             print(parser.error_count)
             sys.exit()
 
-        elif option == '-m':  # start up Mac GUI
-            scanner = Scanner(arguments[0], names)
-            parser = Parser(names, devices, network, monitors, scanner)
-            if parser.parse_network():
-                # Initialise an instance of the gui.Gui() class
-                app = wx.App()
-                gui = Gui_linux("Logic Simulator", names, devices, network,
-                                monitors)
-                gui.Show(True)
-                app.MainLoop()
-
         elif option == '-l':  # start up linux GUI
             scanner = Scanner(path, names)
             parser = Parser(names, devices, network, monitors, scanner)
@@ -95,28 +82,6 @@ def main(arg_list):
                                 monitors)
                 gui.Show(True)
                 app.MainLoop()
-
-        elif option == '-t':  # Run simulation of Drag and drop
-
-            text = 'SWITCH 1 SW1, 0 SW2; AND 2 G1; CONNECT SW1 > G1.I1, SW2 > G1.I2; MONITOR G1;'
-
-            with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
-                # Write the string content to the temporary file
-                temp_file.write(text)
-                # Get the path of the temporary file
-                path_2 = temp_file.name
-
-            scanner = Scanner(path_2, names)
-            parser = Parser(names, devices, network, monitors, scanner)
-
-            # Initialise an instance of the gui.Gui() class
-            if parser.parse_network():
-                app = wx.App()
-                gui = Gui_interactive("Logic Simulator", path, names, devices, network,
-                                      monitors)
-                gui.Show(True)
-                app.MainLoop()
-            sys.exit()
 
         if len(arguments) != 1:  # wrong number of arguments
             print("Error: one file path required\n")

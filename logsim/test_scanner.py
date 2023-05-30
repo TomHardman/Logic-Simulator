@@ -1,6 +1,7 @@
 # tests for scanner functions
 
 import pytest
+import tempfile
 from names import Names
 from scanner import Scanner, Symbol
 
@@ -16,6 +17,21 @@ def new_scanner2():
     names = Names()
     newscanner = Scanner('logsim/scan_test_input2.txt', names)
     return newscanner
+
+@pytest.fixture
+def scan_invalidchar():
+    """Return a Network class instance with three devices in the network."""
+    names = Names()
+    text ='NAND G!;\nSWITCH 0 SW@\nCONNECT SW1 > G1.I1;' 
+ 
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+    # Write the string content to the temporary file
+        temp_file.write(text)
+        # Get the path of the temporary file
+        path = temp_file.name
+
+    scanner = Scanner(path, names)
+    return scanner
 
 
 def test_new_scanner(new_scanner):
@@ -71,6 +87,24 @@ def testquery(new_scanner):
                         verdict = False
 
     assert verdict == True
+
+
+def test_invalidchar(scan_invalidchar):
+    sym = scan_invalidchar.get_symbol()
+    poslist = []
+    while sym.type != scan_invalidchar.EOF:
+        sym = scan_invalidchar.get_symbol()
+        if sym.type == None:
+            poslist.append([sym.linenum, sym.linepos])
+
+    assert poslist == [[0,[7, 7]], [1, [12, 12]]]
+    assert type(scan_invalidchar.symbol_type_list) == range
+    assert all(isinstance(keyword, str)
+               for keyword in scan_invalidchar.keywords_list)
+    assert scan_invalidchar.keywords_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
+                                        "AND", "NAND", "OR", "NOR", "DTYPE", "XOR"]
+    assert len(scan_invalidchar.symbol_type_list) == 8
+    assert scan_invalidchar.current_character == ''
 
 
 
