@@ -12,12 +12,6 @@ import wx
 import wx.glcanvas as wxcanvas
 import numpy as np
 from OpenGL import GL, GLUT
-from names import Names
-from devices import Devices
-from network import Network
-from monitors import Monitors
-from scanner import Scanner
-from parse import Parser
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
@@ -121,8 +115,6 @@ class Monitor():
         self.monitor_radius = 15
 
     def render(self, dark_mode):
-        dx = 10
-        dy = 10
         x, y = self.device_GL.get_port_coor(self.port_id)
 
         # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
@@ -145,8 +137,6 @@ class Monitor():
                 GL.glFlush()
 
             else:
-                # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-                # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
                 x -= 15
                 y += 25
                 draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
@@ -155,7 +145,6 @@ class Monitor():
                 GL.glFlush()
 
         else:
-
             if self.port_id == self.names.query('QBAR'):
                 x -= 5
                 y -= 30
@@ -173,8 +162,6 @@ class Monitor():
                 GL.glFlush()
 
             else:
-                # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-                # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
                 x -= 15
                 y += 25
                 draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
@@ -208,8 +195,6 @@ def render(self, dark_mode):
             GL.glFlush()
 
         else:
-            # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-            # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
             x -= 15
             y += 25
             draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
@@ -236,8 +221,6 @@ def render(self, dark_mode):
             GL.glFlush()
 
         else:
-            # vertices = [(x + dx, y), (x , y), (x , y + dy), (x , y), (x + dx, y + dy), (x + dx, y + dy*3)]
-            # line_with_thickness(vertices, self.monitor_radius, (0.6133, 0.196, 0.659))
             x -= 15
             y += 25
             draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
@@ -247,7 +230,10 @@ def render(self, dark_mode):
 
 
 class Connection_GL:
-    def __init__(self, input_device_GL, output_device_GL, input_port_id, output_port_id):
+    def __init__(
+            self, input_device_GL, output_device_GL,
+            input_port_id, output_port_id):
+
         self.input_device_GL = input_device_GL
         self.output_device_GL = output_device_GL
         self.input_port_id = input_port_id
@@ -261,7 +247,8 @@ class Connection_GL:
         if self.input_device_GL is None:
             in_x, in_y = self.mouse_x, self.mouse_y
         else:
-            in_x, in_y = self.input_device_GL.get_port_coor(self.input_port_id)
+            in_x, in_y = self.input_device_GL.get_port_coor(
+                         self.input_port_id)
         if self.output_device_GL is None:
             out_x, out_y = self.mouse_x, self.mouse_y
         else:
@@ -272,7 +259,8 @@ class Connection_GL:
         else:
             color = (0.0, 0.0, 0.0)
 
-        if self.output_device_GL is not None and self.output_device_GL.device.outputs[self.output_port_id]:
+        if (self.output_device_GL is not None and
+                self.output_device_GL.device.outputs[self.output_port_id]):
             if dark_mode:
                 color = (0.647, 0.41, 0.77)
             else:
@@ -346,7 +334,9 @@ class Device_GL:
         self.name_string = names.get_name_string(self.id)
 
     def create_connections(self, devices, GL_devices_list):
-        """Creates and returns a list of Connections() drom the device inputs"""
+        """Creates and returns a list of
+        Connections() from the device inputs"""
+
         connection_list = []
         for input_id, o in self.device.inputs.items():
             if o is None:
@@ -354,10 +344,12 @@ class Device_GL:
             output_device_id, output_port_id = o
             if output_device_id is not None:
                 [output_device_GL] = [
-                    i for i in GL_devices_list if i.id == output_device_id]
+                    i for i in GL_devices_list
+                    if i.id == output_device_id]
                 input_device_GL = self
                 connection_list.append(Connection_GL(
-                    input_device_GL, output_device_GL, input_id, output_port_id))
+                    input_device_GL, output_device_GL,
+                    input_id, output_port_id))
         return connection_list
 
 
@@ -425,10 +417,12 @@ class And_gate(Device_GL):
 
         if self.NAND:
             if dark_mode:
-                draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
+                draw_circle(self.port_radius - 2, self.x +
+                            self.box_width - self.x_CoM +
                             self.input_height, self.y, (0.2, 0.2, 0.2))
             else:
-                draw_circle(self.port_radius - 2, self.x + self.box_width - self.x_CoM +
+                draw_circle(self.port_radius - 2, self.x +
+                            self.box_width - self.x_CoM +
                             self.input_height, self.y, (1.0, 1.0, 1.0))
 
         for i in range(self.inputs):
@@ -449,7 +443,9 @@ class And_gate(Device_GL):
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
         x_high = self.x - self.x_CoM + self.box_width + self.input_height
-        if x_low < mouse_x < x_high and self.y - self.input_height * self.inputs/2 < mouse_y < self.y + self.input_height * self.inputs/2:
+        if (x_low < mouse_x < x_high and
+            self.y - self.input_height * self.inputs/2 <
+                mouse_y < self.y + self.input_height * self.inputs/2):
             return True
         else:
             return False
@@ -458,11 +454,15 @@ class And_gate(Device_GL):
         device_id = None
         port_id = None
         for i in range(self.inputs):
-            if (self.x - self.x_CoM - mouse_x)**2 + (self.y + self.input_height * (self.inputs/2 - i - 0.5) - mouse_y)**2 < (self.port_radius+3)**2:
+            if ((self.x - self.x_CoM - mouse_x)**2 +
+                (self.y + self.input_height * (self.inputs/2 - i - 0.5) -
+                    mouse_y)**2 < (self.port_radius+3)**2):
                 port_id = self.names.query("I" + str(i+1))
                 device_id = self.device.device_id
                 return (device_id, port_id)
-        if (self.x - self.x_CoM + self.box_width + self.input_height - mouse_x)**2 + (self.y - mouse_y)**2 < self.port_radius**2:
+        if ((self.x - self.x_CoM + self.box_width +
+                self.input_height - mouse_x)**2 +
+                (self.y - mouse_y)**2 < self.port_radius**2):
             device_id = self.device.device_id
         return (device_id, port_id)
 
@@ -533,17 +533,22 @@ class Or_gate(Device_GL):
             else:
                 color = (0.617, 0.0, 0.0)
 
-        draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
+        draw_circle(self.port_radius, self.x + self.box_width +
+                    self.straight_box_width -
                     self.x_CoM, self.y, color)
         if self.NOR:
             if dark_mode:
-                draw_circle(self.port_radius - 2, self.x + self.box_width - self.straight_box_width
-                            - self.x_CoM + self.input_height, self.y, (0.2, 0.2, 0.2))
+                draw_circle(self.port_radius - 2, self.x + self.box_width -
+                            self.straight_box_width - self.x_CoM +
+                            self.input_height, self.y, (0.2, 0.2, 0.2))
             else:
-                draw_circle(self.port_radius - 2, self.x + self.box_width - self.straight_box_width
-                            - self.x_CoM + self.input_height, self.y, (1.0, 1.0, 1.0))
+                draw_circle(self.port_radius - 2, self.x + self.box_width -
+                            self.straight_box_width - self.x_CoM +
+                            self.input_height, self.y, (1.0, 1.0, 1.0))
 
-        for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
+        for dy in np.linspace(
+                -c + self.input_height/2, c -
+                self.input_height/2, self.inputs):
             dx = self.indent_width*(1 - (dy / c)**2)
             if dark_mode:
                 draw_circle(self.port_radius, self.x -
@@ -566,7 +571,9 @@ class Or_gate(Device_GL):
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
         x_high = self.x - self.x_CoM + self.box_width + self.straight_box_width
-        if x_low < mouse_x < x_high and self.y - self.input_height * self.inputs/2 < mouse_y < self.y + self.input_height * self.inputs/2:
+        if (x_low < mouse_x < x_high and
+                self.y - self.input_height * self.inputs/2 < mouse_y <
+                self.y + self.input_height * self.inputs/2):
             return True
         else:
             return False
@@ -575,13 +582,18 @@ class Or_gate(Device_GL):
         device_id = None
         port_id = None
         for i in range(self.inputs):
-            if (self.x - self.x_CoM - mouse_x)**2 + (self.y + self.input_height * (self.inputs/2 - i - 0.5) - mouse_y)**2 < (self.port_radius+3)**2:
+            if ((self.x - self.x_CoM - mouse_x)**2 +
+                    (self.y + self.input_height *
+                        (self.inputs/2 - i - 0.5) - mouse_y)**2 <
+                    (self.port_radius+3)**2):
                 port_id = self.names.query("I" + str(i+1))
                 device_id = self.device.device_id
                 return (device_id, port_id)
-        if (self.x - self.x_CoM + self.box_width + self.straight_box_width - mouse_x)**2 + (self.y - mouse_y)**2 < self.port_radius**2:
+        if ((self.x - self.x_CoM + self.box_width +
+            self.straight_box_width - mouse_x)**2 +
+                (self.y - mouse_y)**2 < self.port_radius**2):
             device_id = self.device.device_id
-        return (device_id, port_id)
+            return (device_id, port_id)
 
     def get_port_coor(self, port_id):
         if port_id is None:
@@ -658,10 +670,12 @@ class Xor_gate(Device_GL):
                 color = (0.647, 0.41, 0.77)
             else:
                 color = (0.617, 0.0, 0.0)
-        draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
+        draw_circle(self.port_radius, self.x + self.box_width +
+                    self.straight_box_width -
                     self.x_CoM, self.y, color)
 
-        for dy in np.linspace(-c + self.input_height/2, c - self.input_height/2, self.inputs):
+        for dy in np.linspace(-c + self.input_height/2, c -
+                              self.input_height/2, self.inputs):
             dx = self.indent_width*(1 - (dy / c)**2)
             if dark_mode:
                 draw_circle(self.port_radius, self.x -
@@ -683,7 +697,9 @@ class Xor_gate(Device_GL):
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM - self.gap_width
         x_high = self.x - self.x_CoM + self.box_width + self.straight_box_width
-        if x_low < mouse_x < x_high and self.y - self.input_height < mouse_y < self.y + self.input_height:
+        if (x_low < mouse_x < x_high and
+            self.y - self.input_height < mouse_y <
+                self.y + self.input_height):
             return True
         else:
             return False
@@ -692,13 +708,17 @@ class Xor_gate(Device_GL):
         device_id = None
         port_id = None
         for i in range(2):
-            if (self.x - self.x_CoM - mouse_x - self.gap_width)**2 + (self.y + self.input_height * (0.5 - i) - mouse_y)**2 < (self.port_radius+3)**2:
+            if ((self.x - self.x_CoM - mouse_x - self.gap_width)**2 +
+                (self.y + self.input_height * (0.5 - i) - mouse_y)**2 <
+                    (self.port_radius+3)**2):
                 port_id = self.names.query("I" + str(i+1))
                 device_id = self.device.device_id
                 return (device_id, port_id)
-        if (self.x - self.x_CoM + self.box_width + self.straight_box_width - mouse_x)**2 + (self.y - mouse_y)**2 < self.port_radius**2:
+        if ((self.x - self.x_CoM + self.box_width +
+            self.straight_box_width - mouse_x)**2 +
+                (self.y - mouse_y)**2 < self.port_radius**2):
             device_id = self.device.device_id
-        return (device_id, port_id)
+            return (device_id, port_id)
 
     def get_port_coor(self, port_id):
         if port_id is None:
@@ -743,12 +763,14 @@ class D_type(Device_GL):
 
         vertices = []
         if dark_mode:
-            for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
+            for dy in np.linspace(
+                    -1.5 * self.input_height, 1.5 * self.input_height, 4):
                 draw_circle(self.port_radius, self.x - self.width /
                             2, self.y + dy, (0.7, 0.7, 0.7))
 
         else:
-            for dy in np.linspace(-1.5 * self.input_height, 1.5 * self.input_height, 4):
+            for dy in np.linspace(
+                    -1.5 * self.input_height, 1.5 * self.input_height, 4):
                 draw_circle(self.port_radius, self.x - self.width /
                             2, self.y + dy, (0.0, 0.0, 0.0))
         if dark_mode:
@@ -775,19 +797,28 @@ class D_type(Device_GL):
                     self.y - self.input_height/2, color)
 
         render_text_scale('DATA', 1.5, self.x - self.width/2 +
-                          10, self.y + self.input_height*1.5 - 4, (1, 1, 1), 0.1)
+                          10, self.y + self.input_height*1.5 - 4,
+                          (1, 1, 1), 0.1)
         render_text_scale('CLK', 1.5, self.x - self.width/2 +
-                          10, self.y + self.input_height/2-4, (1, 1, 1), 0.1)
+                          10, self.y + self.input_height/2-4,
+                          (1, 1, 1), 0.1)
         render_text_scale('SET', 1.5, self.x - self.width/2 +
-                          10, self.y - self.input_height/2-4, (1, 1, 1), 0.1)
+                          10, self.y - self.input_height/2-4,
+                          (1, 1, 1), 0.1)
         render_text_scale('CLR', 1.5, self.x - self.width/2 +
-                          10, self.y - self.input_height*1.5-4, (1, 1, 1), 0.1)
+                          10, self.y - self.input_height*1.5-4,
+                          (1, 1, 1), 0.1)
         render_text_scale('Q', 1.5, self.x + self.width/2 -
-                          19, self.y + self.input_height/2-4, (1, 1, 1), 0.1)
+                          19, self.y + self.input_height/2-4,
+                          (1, 1, 1), 0.1)
         render_text_scale(overline('Q'), 1.5, self.x + self.width /
-                          2 - 19, self.y - self.input_height/2-4, (1, 1, 1), 0.1)
-        line_with_thickness([(self.x + self.width/2-19, self.y - self.input_height/2+9.5),
-                            (self.x + self.width/2 - 11, self.y - self.input_height/2+9.5)], 0.9, (1, 1, 1))
+                          2 - 19, self.y - self.input_height/2-4,
+                          (1, 1, 1), 0.1)
+        line_with_thickness([(self.x + self.width/2-19, self.y -
+                            self.input_height/2+9.5),
+                            (self.x + self.width/2 - 11,
+                            self.y - self.input_height/2+9.5)],
+                            0.9, (1, 1, 1))
 
         if self.show_text:
 
@@ -797,7 +828,9 @@ class D_type(Device_GL):
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.width/2
         x_high = self.x + self.width
-        if x_low < mouse_x < x_high and self.y - self.input_height*2 < mouse_y < self.y + 2*self.input_height:
+        if (x_low < mouse_x < x_high and
+                self.y - self.input_height*2 < mouse_y <
+                self.y + 2*self.input_height):
             return True
         else:
             return False
@@ -805,22 +838,34 @@ class D_type(Device_GL):
     def is_port_clicked(self, mouse_x, mouse_y):
         device_id = self.device.device_id
         port_id = None
-        if (self.x - self.width/2 - mouse_x)**2 + (self.y + self.input_height * 1.5 - mouse_y)**2 < (self.port_radius+3)**2:
+        if ((self.x - self.width/2 - mouse_x)**2 +
+            (self.y + self.input_height * 1.5 - mouse_y)**2 <
+                (self.port_radius+3)**2):
             port_id = self.names.query("DATA")
             return (device_id, port_id)
-        elif (self.x - self.width/2 - mouse_x)**2 + (self.y + self.input_height * 0.5 - mouse_y)**2 < (self.port_radius+3)**2:
+        elif ((self.x - self.width/2 - mouse_x)**2 +
+              (self.y + self.input_height * 0.5 - mouse_y)**2 <
+              (self.port_radius+3)**2):
             port_id = self.names.query("CLK")
             return (device_id, port_id)
-        elif (self.x - self.width/2 - mouse_x)**2 + (self.y - self.input_height * 0.5 - mouse_y)**2 < (self.port_radius+3)**2:
+        elif ((self.x - self.width/2 - mouse_x)**2 +
+              (self.y - self.input_height * 0.5 - mouse_y)**2 <
+              (self.port_radius+3)**2):
             port_id = self.names.query("SET")
             return (device_id, port_id)
-        elif (self.x - self.width/2 - mouse_x)**2 + (self.y - self.input_height * 1.5 - mouse_y)**2 < (self.port_radius+3)**2:
+        elif ((self.x - self.width/2 - mouse_x)**2 +
+              (self.y - self.input_height * 1.5 - mouse_y)**2 <
+              (self.port_radius+3)**2):
             port_id = self.names.query("CLEAR")
             return (device_id, port_id)
-        elif (self.x + self.width/2 - mouse_x)**2 + (self.y + self.input_height * 0.5 - mouse_y)**2 < (self.port_radius+3)**2:
+        elif ((self.x + self.width/2 - mouse_x)**2 +
+              (self.y + self.input_height * 0.5 - mouse_y)**2 <
+              (self.port_radius+3)**2):
             port_id = self.names.query("Q")
             return (device_id, port_id)
-        elif (self.x + self.width/2 - mouse_x)**2 + (self.y - self.input_height * 0.5 - mouse_y)**2 < (self.port_radius+3)**2:
+        elif ((self.x + self.width/2 - mouse_x)**2 +
+              (self.y - self.input_height * 0.5 - mouse_y)**2 <
+              (self.port_radius+3)**2):
             port_id = self.names.query("QBAR")
             return (device_id, port_id)
         return (None, port_id)
@@ -933,7 +978,9 @@ class Clock(Device_GL):
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.width/2
         x_high = self.x + self.width
-        if x_low < mouse_x < x_high and self.y - self.half_height < mouse_y < self.y + self.half_height:
+        if (x_low < mouse_x < x_high and
+            self.y - self.half_height < mouse_y <
+                self.y + self.half_height):
             return True
         else:
             return False
@@ -941,7 +988,8 @@ class Clock(Device_GL):
     def is_port_clicked(self, mouse_x, mouse_y):
         device_id = None
         port_id = None
-        if (self.x + self.width/2 - mouse_x)**2 + (self.y - mouse_y)**2 < (self.port_radius+3)**2:
+        if ((self.x + self.width/2 - mouse_x)**2 +
+                (self.y - mouse_y)**2 < (self.port_radius+3)**2):
             device_id = self.device.device_id
         return (device_id, port_id)
 
@@ -1011,7 +1059,9 @@ class Switch(Device_GL):
     def is_clicked(self, mouse_x, mouse_y):
         x_low = self.x - self.x_CoM
         x_high = self.x - self.x_CoM + self.width
-        if x_low < mouse_x < x_high and self.y - self.half_height < mouse_y < self.y + self.half_height:
+        if (x_low < mouse_x < x_high and
+            self.y - self.half_height < mouse_y <
+                self.y + self.half_height):
             return True
         else:
             return False
@@ -1025,7 +1075,8 @@ class Switch(Device_GL):
     def is_port_clicked(self, mouse_x, mouse_y):
         device_id = None
         port_id = None
-        if (self.x - self.x_CoM + self.width - mouse_x)**2 + (self.y - mouse_y)**2 < (self.port_radius+3)**2:
+        if ((self.x - self.x_CoM + self.width - mouse_x)**2 +
+                (self.y - mouse_y)**2 < (self.port_radius+3)**2):
             device_id = self.device.device_id
         return (device_id, port_id)
 
@@ -1098,8 +1149,6 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_ENTER_WINDOW, self. on_enter_window)
 
         self.init_objects(devices, names)
-
-        # self.objects = [And_gate(50, 50), And_gate(300, 50), Or_gate(500, 50)]
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -1306,15 +1355,18 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             if error_code == self.network.NO_ERROR:
                                 # Raise error message otherwise
                                 [device_GL] = [
-                                    i for i in self.devices_GL_list if i.id == device_id]
+                                    i for i in self.devices_GL_list
+                                    if i.id == device_id]
                                 if port_id in device_GL.device.inputs:
                                     self.temp_connection.input_device_GL = device_GL
                                     self.temp_connection.input_port_id = port_id
                                 else:
                                     self.temp_connection.output_device_GL = device_GL
                                     self.temp_connection.output_port_id = port_id
-                                self.objects.append(self.temp_connection)
-                                self.connections.append(self.temp_connection)
+                                self.objects.append(
+                                    self.temp_connection)
+                                self.connections.append(
+                                    self.temp_connection)
                             else:
                                 self.raise_error("Connection invalid")
                             self.temp_connection = None
@@ -1323,7 +1375,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             self.connection_list[1] = device_id
                             self.connection_list[2] = port_id
                             [device_GL] = [
-                                i for i in self.devices_GL_list if i.id == device_id]
+                                i for i in self.devices_GL_list
+                                if i.id == device_id]
                             if port_id in device_GL.device.inputs:
                                 self.temp_connection = Connection_GL(
                                     device_GL, None, port_id, None)
@@ -1342,14 +1395,17 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             device_id, port_id, self.mother.cycles_completed)
                         if error_code == self.monitors.NO_ERROR:
                             [device_GL] = [
-                                i for i in self.devices_GL_list if i.id == device_id]
+                                i for i in self.devices_GL_list
+                                if i.id == device_id]
                             monitor = Monitor(self.names, device_GL, port_id)
                             self.objects.append(monitor)
                             self.monitors_GL.append(monitor)
                             self.mother.trace_canvas.Refresh()
-                        elif self.monitors.remove_monitor(device_id, port_id):
+                        elif self.monitors.remove_monitor(
+                                device_id, port_id):
                             [device_GL] = [
-                                i for i in self.monitors_GL if i.device_GL.device.device_id == device_id]
+                                i for i in self.monitors_GL
+                                if i.device_GL.device.device_id == device_id]
                             self.monitors_GL.remove(device_GL)
                             self.objects.remove(device_GL)
                             self.mother.trace_canvas.Refresh()
