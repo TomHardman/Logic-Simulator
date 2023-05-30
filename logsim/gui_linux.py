@@ -249,7 +249,7 @@ class Gui_linux(wx.Frame):
         
         if Id == wx.ID_ABOUT:
             wx.MessageBox("Logic Simulator\nCreated by bd432, al2008, th624\n2023",
-                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
+                          "About Logsim", wx.ICON_WARNING | wx.OK)
         
         if Id == self.light_id or Id == self.dark_id:
             if Id == self.light_id:
@@ -370,6 +370,10 @@ class Gui_linux(wx.Frame):
         lab = button.GetLabel()
 
         if lab == 'Animate':
+            if self.cycles_completed == 0:
+                self.monitors.reset_monitors()
+                self.devices.cold_startup()
+
             if self.network.execute_network():
                     self.monitors.record_signals()
                     self.cycles_completed += 1                                               
@@ -391,6 +395,9 @@ class Gui_linux(wx.Frame):
                         cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
                         cont_button.SetFont(self.font_buttons)
                         cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
+
+                        if self.dark_mode:
+                            cont_button.SetForegroundColour(wx.Colour(100, 80, 100))
 
                         run_sizer.Add(cont_button, 1, wx.ALL, 5)
                         panel_control.Layout()
