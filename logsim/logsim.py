@@ -23,7 +23,7 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
-from gui_linux import Gui_linux
+from gui_linux import GuiLinux
 from network_fixture import create_network_fixture
 
 
@@ -51,8 +51,7 @@ def main(arg_list):
 
     if not options:
         app = wx.App()
-        gui = Gui_linux("Logic Simulator", names, devices, network,
-                        monitors)
+        gui = GuiLinux("Logic Simulator", names, devices, network, monitors)
         gui.Show(True)
         app.MainLoop()
         sys.exit()
@@ -78,7 +77,7 @@ def main(arg_list):
             if parser.parse_network():
                 # Initialise an instance of the gui.Gui() class
                 app = wx.App()
-                gui = Gui_linux("Logic Simulator", names, devices, network,
+                gui = GuiLinux("Logic Simulator", names, devices, network,
                                 monitors)
                 gui.Show(True)
                 app.MainLoop()
@@ -94,7 +93,7 @@ def main(arg_list):
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
-            gui = Gui_linux("Logic Simulator", names, devices, network,
+            gui = GuiLinux("Logic Simulator", names, devices, network,
                             monitors)
             gui.Show(True)
             app.MainLoop()
