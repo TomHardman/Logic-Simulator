@@ -375,8 +375,10 @@ class And_gate(Device_GL):
         self.show_text = True
 
     def render(self, dark_mode):
-
-        GL.glColor3f(0.03, 0.172, 0.422)
+        if dark_mode:
+            GL.glColor3f(0.03, 0.172, 0.422)
+        else:
+            GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2f(self.x, self.y)
 
@@ -498,8 +500,10 @@ class Or_gate(Device_GL):
         self.show_text = True
 
     def render(self, dark_mode):
-
-        GL.glColor3f(0.03, 0.172, 0.422)
+        if dark_mode:
+            GL.glColor3f(0.03, 0.172, 0.422)
+        else:
+            GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2d(self.x + self.box_width - self.x_CoM, self.y)
 
@@ -614,8 +618,10 @@ class Xor_gate(Device_GL):
         self.show_text = True
 
     def render(self, dark_mode):
-
-        GL.glColor3f(0.03, 0.172, 0.422)
+        if dark_mode:
+            GL.glColor3f(0.03, 0.172, 0.422)
+        else:
+            GL.glColor3f(0.212, 0.271, 0.310)
         GL.glBegin(GL.GL_TRIANGLE_FAN)
         GL.glVertex2d(self.x + self.box_width - self.x_CoM, self.y)
 
@@ -1459,8 +1465,11 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             grid_spacing - grid_spacing
         y_max = (height - self.pan_y) / self.zoom
         x = x_min
-
-        GL.glColor3f(0.7, 0.7, 0.7)
+        if dark_mode:
+            GL.glColor3f(0.2, 0.2, 0.2)
+        
+        else:
+            GL.glColor3f(0.7, 0.7, 0.7)
         GL.glLineWidth(1.0)
         GL.glBegin(GL.GL_LINES)
         # while x < width/self.zoom:
