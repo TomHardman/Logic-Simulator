@@ -4,7 +4,6 @@ from plotting_canvas import TraceCanvas
 from gui_interactive import InteractiveCanvas
 from wx.lib.buttons import GenButton
 
-
 def error_pop_up(string):
     """Function used for creating error pop up windows in the Gui when an error is raised -
     takes one argument which is the string to be displayed in the pop up"""
@@ -88,8 +87,7 @@ class DeviceMenu(wx.Dialog):
         overall_sizer = wx.BoxSizer(wx.VERTICAL)  # Create main sizer
         self.SetSizer(overall_sizer)
 
-        self.main_panel = wx.Panel(self)
-        # Create main panel and relevant sizer
+        self.main_panel = wx.Panel(self)  # Create main panel and relevant sizer
         self.panel_sizer = wx.BoxSizer(wx.VERTICAL)
         self.main_panel.SetSizer(self.panel_sizer)
         overall_sizer.Add(self.main_panel, 1, wx.ALL, 5)
@@ -282,9 +280,12 @@ class Gui_linux(wx.Frame):
         self.names = names
         self.monitors = monitors
         self.network = network
-        # these two booleans are used to stop other actions during adding of monitors/connections
+        
+        # Booleans used to stop other buttons being executed when certain processes are happening
         self.connection_constraint = False
         self.monitor_constraint = False
+        self.animation_constraint = False
+
         self.first_run = True
         self.cycles = 10
         self.cycles_completed = 0
@@ -382,6 +383,11 @@ class Gui_linux(wx.Frame):
             panel_control, wx.ID_ANY, f"Cycles Completed: {self.cycles_completed}")
         cycles_comp_text.SetFont(self.font_buttons)
 
+        animate_button = wx.Button(panel_control, wx.ID_ANY, "Animate", size=(120, 40))
+        animate_button.SetFont(self.font_buttons)
+        self.timer = wx.Timer(self)  # Create a timer object used for animation events 
+        
+
         cycle_sizer = wx.BoxSizer(wx.HORIZONTAL)
         cycle_sizer.Add(cycle_text, 1, wx.ALL, 5)
         cycle_sizer.Add(cycle_spin, 1, wx.ALL, 5)
@@ -389,13 +395,15 @@ class Gui_linux(wx.Frame):
         cycles_comp_sizer = wx.BoxSizer(wx.HORIZONTAL)
         cycles_comp_sizer.Add(cycles_comp_text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
 
+        animate_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        animate_sizer.Add(animate_button, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+
         run_sizer = wx.BoxSizer(wx.HORIZONTAL)
         run_sizer.Add(run_button, 1, wx.ALL, 5)
-        # creates sizer as instance variable so it can be accessed by methods
-        self.run_sizer = run_sizer
 
         control_sizer.Add(cycle_sizer, 1, wx.ALL, 5)
         control_sizer.Add(run_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
+        control_sizer.Add(animate_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
         control_sizer.Add(cycles_comp_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
         # Set some panels and sizers as instance variables to make them accessible to on_run_button method
@@ -406,6 +414,8 @@ class Gui_linux(wx.Frame):
         # Bind control panel widgets
         run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
         cycle_spin.Bind(wx.EVT_SPINCTRL, self.on_cycle_spin)
+        animate_button.Bind(wx.EVT_BUTTON, self.on_animate)
+        self.Bind(wx.EVT_TIMER, self.on_tick, self.timer)
 
         # Widgets and sizers for monitor panel
         monitor_title = wx.StaticText(
@@ -512,10 +522,13 @@ class Gui_linux(wx.Frame):
             error_pop_up(
                 'Finish adding connections before trying to execute another action')
             return
-
         if self.monitor_constraint:
             error_pop_up(
                 'Finish adding/zapping monitors before trying to execute another action')
+            return
+        if self.animation_constraint:
+            error_pop_up(
+                'End animation before trying to execute another action')
             return
 
         if self.cycles is not None and self.cycles > 0:  # if the number of cycles provided is valid
@@ -555,6 +568,62 @@ class Gui_linux(wx.Frame):
         else:  # show error dialogue box if cycle no. is not valid
             error_pop_up(
                 'Please select valid number of cycles greater than zero')
+    
+    def on_animate(self, event):
+        """Handles the event where the animate button is pressed"""
+        if self.connection_constraint:
+            error_pop_up(
+                'Finish adding connections before trying to execute another action')
+            return
+    
+        Id = event.GetId()
+        button = self.FindWindowById(Id)
+        lab = button.GetLabel()
+
+        if lab == 'Animate':
+            if self.network.execute_network():
+                    self.monitors.record_signals()
+                    self.cycles_completed += 1                                               
+                    self.trace_canvas.continue_pan_reset = True  # changes pan to include far right of plot if necessary
+                    self.trace_canvas.Refresh()  # call plotting event for trace and circuit canvas
+                    self.circuit_canvas.Refresh()
+                    self.cycles_comp_text.SetLabel(
+                        f"Cycles Completed: {self.cycles_completed}")
+                    button.SetLabel('Stop')
+                    button.SetBackgroundColour(wx.Colour(157, 0, 0))
+                    self.animation_constraint = True
+                    self.timer.Start(500)
+
+                    if self.first_run:  # adds continue button to GUI after first run has been executed
+                        self.first_run = False
+                        run_sizer = self.run_sizer
+                        panel_control = self.panel_control
+
+                        cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
+                        cont_button.SetFont(self.font_buttons)
+                        cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
+
+                        run_sizer.Add(cont_button, 1, wx.ALL, 5)
+                        panel_control.Layout()
+
+            else:
+                error_pop_up('Run failed to execute - please make sure all devices are connected')
+
+        elif lab == 'Stop':
+            button.SetLabel('Animate')
+            button.SetBackgroundColour(wx.Colour(255, 255, 255))
+            self.animation_constraint = False
+            self.timer.Stop()
+
+    def on_tick(self, event):
+        if self.network.execute_network():
+                self.monitors.record_signals()
+                self.cycles_completed += 1                                               
+                self.trace_canvas.continue_pan_reset = True  # changes pan to include far right of plot if necessary
+                self.trace_canvas.Refresh()  # call plotting event for trace and circuit canvas
+                self.circuit_canvas.Refresh()
+                self.cycles_comp_text.SetLabel(
+                    f"Cycles Completed: {self.cycles_completed}")
 
     def on_sash_position_change(self, event):
         """Handles the event where the sash position of the window changes - this
@@ -584,6 +653,10 @@ class Gui_linux(wx.Frame):
             error_pop_up(
                 'Finish adding/zapping monitors before trying to execute another action')
             return
+        if self.animation_constraint:
+            error_pop_up(
+                'End animation before trying to execute another action')
+            return
 
         Id = event.GetId()
         widget = self.FindWindowById(Id)
@@ -600,6 +673,10 @@ class Gui_linux(wx.Frame):
         if self.monitor_constraint:
             error_pop_up(
                 'Finish adding/zapping monitors before trying to execute another action')
+            return
+        if self.animation_constraint:
+            error_pop_up(
+                'End animation before trying to execute another action')
             return
 
         if self.cycles > 0:  # if the number of cycles provided is valid
@@ -623,6 +700,10 @@ class Gui_linux(wx.Frame):
         if self.connection_constraint:
             error_pop_up(
                 'Finish adding connections before trying to execute another action')
+            return
+        if self.animation_constraint:
+            error_pop_up(
+                'End animation before trying to execute another action')
             return
 
         Id = event.GetId()
@@ -652,6 +733,10 @@ class Gui_linux(wx.Frame):
             error_pop_up(
                 'Finish adding/zapping monitors before trying to execute another action')
             return
+        if self.animation_constraint:
+            error_pop_up(
+                'End animation before trying to execute another action')
+            return
 
         dev_menu = DeviceMenu(self, 'Device Menu',
                               self.devices, self.circuit_canvas)
@@ -663,6 +748,10 @@ class Gui_linux(wx.Frame):
         if self.monitor_constraint:
             error_pop_up(
                 'Finish adding/zapping monitors before trying to execute another action')
+            return
+        if self.animation_constraint:
+            error_pop_up(
+                'End animation before trying to execute another action')
             return
 
         Id = event.GetId()
@@ -682,3 +771,4 @@ class Gui_linux(wx.Frame):
             self.circuit_canvas.temp_connection = None
             self.circuit_canvas.Refresh()
             self.connection_constraint = False
+

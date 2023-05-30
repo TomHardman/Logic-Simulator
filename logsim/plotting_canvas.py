@@ -205,7 +205,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
             GL.glTranslated(0.0, self.pan_y, 0.0)
             
         if len(signal_list) > 0:
-            self.x_max = len(signal_list)*40
+            self.x_max = len(signal_list)*40 + 20/self.zoom  # set x_max to maximum + add some whitespace
             self.y_min = offset * trace_count - 20
 
         # We have been drawing to the back buffer, flush the graphics pipeline
