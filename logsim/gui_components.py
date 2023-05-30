@@ -27,7 +27,8 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         super().__init__(parent)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.Panel_Border = False
+        self.Panel_Border = True
+        self.parent = parent
 
     def set_border(self, border):
         if type(border) == bool:
@@ -59,7 +60,7 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         # Draw rounded border if set_border(True) has been called
         if self.Panel_Border:
             # Adjust the border colour as needed
-            border_color = wx.Colour(72, 50, 168)
+            border_color = wx.Colour(20, 50, 180)
             # Adjust the border width as needed
             pen = wx.Pen(border_color, width=w)
             dc.SetPen(pen)

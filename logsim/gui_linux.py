@@ -64,9 +64,9 @@ class Gui_linux(wx.Frame):
             main_splitter)  # set up canvas window
 
         main_splitter.SplitVertically(canvas_window, sidebar)
-        main_splitter.SetSashGravity(0.7)
-        # main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
-
+        main_splitter.SetSashGravity(0.6)
+        main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change_side)
+    
         # Set up panels for splitting canvas UI into circuit display and plotting window
         plotting_ui = wx.Panel(canvas_window)  # panel for plotting traces
         plotting_ui.SetBackgroundColour(wx.Colour(200, 200, 200))
@@ -80,7 +80,7 @@ class Gui_linux(wx.Frame):
 
         canvas_window.SplitHorizontally(circuit_ui, plotting_ui)
         canvas_window.SetSashGravity(0.65)
-        # canvas_window.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
+        canvas_window.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change_canvas)
 
         # Set up panels for sidebar
         # bg colour is set to that of parent panel so only the painted on rounded panel shape is visible
@@ -181,7 +181,7 @@ class Gui_linux(wx.Frame):
         device_title = wx.StaticText(
             panel_devices, wx.ID_ANY, "Device Configuration:")  # create title
         device_title.SetFont(font_st)
-        device_sizer.Add(device_title, 1, wx.ALL, 5)
+        device_sizer.Add(device_title, 1, wx.ALL, 10)
 
         add_button_d = wx.Button(panel_devices, wx.ID_ANY, "Add\nDevice")
         add_button_d.SetFont(self.font_buttons)
@@ -234,24 +234,32 @@ class Gui_linux(wx.Frame):
         """Handle resize events"""
         # Ensure the splitter adjusts to the frame size
         self.GetSizer().Layout()
+        #self.panel_control.clear_dc()
+        self.panel_control.Refresh()
         event.Skip()
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
+        
         if Id == wx.ID_EXIT:
             self.Close(True)
+        
         if Id == wx.ID_ABOUT:
             wx.MessageBox("Logic Simulator\nCreated by bd432, al2008, th624\n2023",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
-        if Id == self.light_id:
-            self.circuit_canvas.dark_mode = False
+        
+        if Id == self.light_id or Id == self.dark_id:
+            if Id == self.light_id:
+                self.circuit_canvas.dark_mode = False
+                self.trace_canvas.dark_mode = False
+            if Id == self.dark_id:
+                self.circuit_canvas.dark_mode = True
+                self.trace_canvas.dark_mode = True
             self.circuit_canvas.init = False
             self.circuit_canvas.Refresh()
-        if Id == self.dark_id:
-            self.circuit_canvas.dark_mode = True
-            self.circuit_canvas.init = False
-            self.circuit_canvas.Refresh()
+            self.trace_canvas.init = False
+            self.trace_canvas.Refresh()
 
     def on_run_button(self, event):
         """Handles the event when the user presses the run button - on first run it causes the continue
@@ -368,7 +376,7 @@ class Gui_linux(wx.Frame):
                 self.cycles_comp_text.SetLabel(
                     f"Cycles Completed: {self.cycles_completed}")
 
-    def on_sash_position_change(self, event):
+    def on_sash_position_change_side(self, event):
         """Handles the event where the sash position of the window changes - this
         is used to implement an upper size limit on the sidebar"""
         Id = event.GetId()
@@ -376,14 +384,18 @@ class Gui_linux(wx.Frame):
         current_width = self.GetSize().GetWidth()
         current_position = window.GetSashPosition()
 
-        min_sash_pos = current_width - 280
-        max_sash_pos = current_width - 10
+        min_sash_pos = current_width - 400
+        max_sash_pos = current_width - 20
 
         if current_position < min_sash_pos:  # places max size on sidebar
             window.SetSashPosition(min_sash_pos)
 
-        if current_position > max_sash_pos or current_position == 2:  # places min size on sidebar
+        if current_position > min_sash_pos or current_position == 2:  # places min size on sidebar
             window.SetSashPosition(max_sash_pos)
+
+    def on_sash_position_change_canvas(self, event):
+        pass
+
 
     def on_cycle_spin(self, event):
         """Handle the event when the user changes the no. cycles"""
