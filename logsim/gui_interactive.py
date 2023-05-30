@@ -1466,7 +1466,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         y_max = (height - self.pan_y) / self.zoom
         x = x_min
         if dark_mode:
-            GL.glColor3f(0.2, 0.2, 0.2)
+            GL.glColor3f(0.4, 0.4, 0.4)
         
         else:
             GL.glColor3f(0.7, 0.7, 0.7)
