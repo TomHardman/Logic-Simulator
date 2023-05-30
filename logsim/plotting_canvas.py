@@ -23,8 +23,8 @@ from scanner import Scanner
 from parse import Parser
 
 
-def plot_line(vertices, t, colour):
-    """Function for plotting line of a specified thickness given a list of vertices"""
+def plot_trace(vertices, t, colour):
+    """Function for plotting trace of a specified thickness given a list of vertices"""
     if not vertices:
         return
 
@@ -38,14 +38,14 @@ def plot_line(vertices, t, colour):
         try:
             x_next = vertices[i+1][0]
             GL.glVertex2f(x_next, y)
-        except IndexError:
-            x_next = x + 40
+        except IndexError: 
+            x_next = x + 40  # extend final vertex horizontally
             GL.glVertex2f(x_next, y)
             
     GL.glEnd()
 
 def choose_viable_colour(colours, tol):
-    """Randomly generate colour for a trace check and return if its euclidean distance
+    """Randomly generate colour for a trace and return if its euclidean distance
     to other trace colours is large enough that colours will be distinguishable"""
     colour = (random.random(), random.random(), random.random())
     while True:
@@ -182,12 +182,12 @@ class TraceCanvas(wxcanvas.GLCanvas):
                     y = y_0 + offset*trace_count
 
                 elif signal_list[i] == 4:
-                    plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
+                    plot_trace(vertices, 4, self.monitor_colours.get(monitor_name))
                     continue
 
                 vertices.append((x, y))
 
-            plot_line(vertices, 4, self.monitor_colours.get(monitor_name))
+            plot_trace(vertices, 4, self.monitor_colours.get(monitor_name))
 
             text = monitor_name  # label trace with name of monitor and make it invariant to zoom and pan
             GL.glMatrixMode(GL.GL_MODELVIEW)
