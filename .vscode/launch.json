@@ -32,7 +32,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-l",
-                "text_inputs/alldevice.txt"
+                "text_inputs/clock_inp.txt"
             ],
         },
         {

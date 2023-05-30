@@ -13,7 +13,6 @@ import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 import random
 import numpy as np
-from gui_interactive import line_with_thickness
 
 from names import Names
 from devices import Devices
@@ -150,14 +149,12 @@ class TraceCanvas(wxcanvas.GLCanvas):
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
-        # Draw specified text at position (10, 10)
-        #self.render_text(text, 10, 10)
-
-        # Draw monitor traces
+        # Initialise variables for drawing monitor traces
         trace_count = 0
         offset = -100
-        y_0 = self.GetSize()[1] - 100
+        y_0 = self.GetSize()[1] - 100 
         height = 80
+        signal_list = []
 
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
@@ -192,20 +189,27 @@ class TraceCanvas(wxcanvas.GLCanvas):
             text = monitor_name  # label trace with name of monitor and make it invariant to zoom and pan
             GL.glMatrixMode(GL.GL_MODELVIEW)
             GL.glTranslate(-self.pan_x * 1/self.zoom, 0.0, 0.0)
-            self.render_text('HIGH', 10/self.zoom, y_0 + height + offset*trace_count, 
+            self.render_text('H', 10/self.zoom, y_0 + height + offset*trace_count - 5, 
                                 font=GLUT.GLUT_BITMAP_HELVETICA_12)
-            self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count)
+            self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count - 7)
+            self.render_text('L', 10/self.zoom, y_0 + offset*trace_count - 5, 
+                                font=GLUT.GLUT_BITMAP_HELVETICA_12)
             GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
 
             trace_count += 1
 
         for i in range(len(signal_list)):
-            GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
-            self.render_text(str(i+1), (i+1)*40-5, 20)
-            GL.glTranslated(0.0, self.pan_y, 0.0)
+            if self.zoom > 0.7:
+                GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
+                self.render_text(str(i+1), (i+1)*40-(5*len(str(i+1)))/self.zoom, 20)
+                GL.glTranslated(0.0, self.pan_y, 0.0)
+            elif i % 2:
+                GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
+                self.render_text(str(i+1), (i+1)*40-(5*len(str(i+1)))/self.zoom, 20)
+                GL.glTranslated(0.0, self.pan_y, 0.0)
             
         if len(signal_list) > 0:
-            self.x_max = len(signal_list)*40
+            self.x_max = len(signal_list)*40 + 20/self.zoom  # set x_max to maximum + add some whitespace
             self.y_min = offset * trace_count - 20
 
         # We have been drawing to the back buffer, flush the graphics pipeline
@@ -267,6 +271,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            if self.zoom < 0.4:
+                self.zoom = 0.4
             # Adjust pan so as to zoom around the mouse position
             self.pan_x -= (self.zoom - old_zoom) * ox
             if self.pan_x > 0: # limit panning to the bounds of the trace
@@ -276,6 +282,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
         if event.GetWheelRotation() > 0:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            if self.zoom > 8:
+                self.zoom = 8
             # Adjust pan so as to zoom around the mouse position
             self.pan_x -= (self.zoom - old_zoom) * ox
             if self.pan_x < -(self.x_max*self.zoom - self.GetSize()[0]):
