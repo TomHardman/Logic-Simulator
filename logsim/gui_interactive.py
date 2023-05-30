@@ -654,7 +654,10 @@ class Xor_gate(Device_GL):
                                 (0.212, 0.271, 0.310))
             color = (0.0, 0.0, 0.0)
         if self.device.outputs[None]:
-            color = (0.617, 0.0, 0.0)
+            if dark_mode:
+                color = (0.647, 0.41, 0.77)
+            else:
+                color = (0.617, 0.0, 0.0)
         draw_circle(self.port_radius, self.x + self.box_width + self.straight_box_width -
                     self.x_CoM, self.y, color)
 
