@@ -144,7 +144,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, 1.0, 1.0)
 
-    def render(self, text):
+    def render(self):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
         if not self.init:    # Configure the viewport, modelview and projection matrices
@@ -236,6 +236,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
             # Configure the viewport, modelview and projection matrices
             self.init_gl()
             self.init = True
+
+        self.render()  # render the canvas
 
     def on_enter_window(self, event):
         """Handles the event where the mouse enters the canvas window - this is used
