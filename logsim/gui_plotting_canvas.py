@@ -13,7 +13,6 @@ import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 import random
 import numpy as np
-from gui_interactive import line_with_thickness
 
 from names import Names
 from devices import Devices
@@ -150,14 +149,12 @@ class TraceCanvas(wxcanvas.GLCanvas):
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
-        # Draw specified text at position (10, 10)
-        #self.render_text(text, 10, 10)
-
-        # Draw monitor traces
+        # Initialise variables for drawing monitor traces
         trace_count = 0
         offset = -100
-        y_0 = self.GetSize()[1] - 100
+        y_0 = self.GetSize()[1] - 100 
         height = 80
+        signal_list = []
 
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
@@ -192,9 +189,11 @@ class TraceCanvas(wxcanvas.GLCanvas):
             text = monitor_name  # label trace with name of monitor and make it invariant to zoom and pan
             GL.glMatrixMode(GL.GL_MODELVIEW)
             GL.glTranslate(-self.pan_x * 1/self.zoom, 0.0, 0.0)
-            self.render_text('HIGH', 10/self.zoom, y_0 + height + offset*trace_count, 
+            self.render_text('H', 10/self.zoom, y_0 + height + offset*trace_count - 5, 
                                 font=GLUT.GLUT_BITMAP_HELVETICA_12)
-            self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count)
+            self.render_text(text, 10/self.zoom, y_0 + height/2 + offset*trace_count - 7)
+            self.render_text('L', 10/self.zoom, y_0 + offset*trace_count - 5, 
+                                font=GLUT.GLUT_BITMAP_HELVETICA_12)
             GL.glTranslated(self.pan_x * 1/self.zoom, 0.0, 0.0)
 
             trace_count += 1
