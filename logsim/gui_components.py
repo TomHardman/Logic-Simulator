@@ -11,6 +11,32 @@ def error_pop_up(string):
     dlg.ShowModal()
     dlg.Destroy()
 
+
+class CustomDialog(wx.Dialog):
+    """Class that inherits  from the wx.Dialog class but creates a pop up box that
+    supports the setting of custom bitmaps"""
+    def __init__(self, parent, message, caption, bitmap):
+        super().__init__(parent, title=caption)
+
+        # Create the bitmap control to display the icon
+        icon_bitmap = wx.StaticBitmap(self, wx.ID_ANY, bitmap)
+
+        # Create the message text control
+        message_text = wx.StaticText(self, wx.ID_ANY, message)
+
+        # Create the OK button
+        ok_button = wx.Button(self, wx.ID_OK, "OK")
+
+        # Create a vertical box sizer to arrange the controls
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(icon_bitmap, 0, wx.ALIGN_CENTER | wx.ALL, 10)
+        sizer.Add(message_text, 0, wx.ALIGN_CENTER | wx.ALL, 10)
+        sizer.Add(ok_button, 0, wx.ALIGN_CENTER | wx.ALL, 10)
+
+        self.SetSizer(sizer)
+        self.Fit()
+
+
 class RoundedScrollWindow(wx.ScrolledWindow):
     """ Class that inherits from the wx.ScrolledWindow class to be used as a scrollable panel,
     however the OnPaint method has been rewritten to paint a rounded rectangular panel and

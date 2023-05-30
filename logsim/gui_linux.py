@@ -5,7 +5,7 @@ from wx.lib.agw.aquabutton import AquaButton as AB
 from gui_plotting_canvas import TraceCanvas
 from gui_interactive_canvas import InteractiveCanvas
 from wx.lib.buttons import GenButton
-from gui_components import error_pop_up, DeviceMenu, RoundedScrollWindow
+from gui_components import error_pop_up, DeviceMenu, RoundedScrollWindow, CustomDialog
 
 
 class Gui_linux(wx.Frame):
@@ -255,8 +255,12 @@ class Gui_linux(wx.Frame):
             self.Close(True)
 
         if Id == wx.ID_ABOUT:
-            wx.MessageBox("Logic Simulator\nCreated by bd432, al2008, th624\n2023",
-                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
+            icon = wx.Bitmap("/homes/th624/Documents/Logic-Simulator/logsim/doge.png", wx.BITMAP_TYPE_PNG)
+            mb = CustomDialog(None, "Logic Simulator\nCreated by bd432, al2008, th624\n2023",
+                          "About Logsim", icon)
+            mb.ShowModal()
+            mb.Destroy()
+    
         
         if Id == self.light_id or Id == self.dark_id:
             if Id == self.light_id:
@@ -401,17 +405,18 @@ class Gui_linux(wx.Frame):
                     run_sizer = self.run_sizer
                     panel_control = self.panel_control
 
-                    cont_button = wx.Button(
-                        panel_control, wx.ID_ANY, "Continue")
+                    cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
                     cont_button.SetFont(self.font_buttons)
                     cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
 
-                        run_sizer.Add(cont_button, 1, wx.ALL, 5)
-                        panel_control.Layout()
+                    if self.dark_mode:
+                        cont_button.SetForegroundColour(wx.Colour(100, 80, 100))
+
+                    run_sizer.Add(cont_button, 1, wx.ALL, 5)
+                    panel_control.Layout()
 
             else:
-                error_pop_up(
-                    'Run failed to execute - please make sure all devices are connected')
+                error_pop_up('Run failed to execute - please make sure all devices are connected')
 
         elif lab == 'Stop':
             button.SetLabel('Animate')
