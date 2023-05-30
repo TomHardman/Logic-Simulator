@@ -43,10 +43,13 @@ def plot_trace(vertices, t, colour):
             
     GL.glEnd()
 
-def choose_viable_colour(colours, tol):
+def choose_viable_colour(colours, tol, dark_mode):
     """Randomly generate colour for a trace and return if its euclidean distance
     to other trace colours is large enough that colours will be distinguishable"""
-    colour = (random.random(), random.random(), random.random())
+    if not dark_mode:
+        colour = (random.random(), random.random(), random.random())
+    else:
+        colour = (random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1))
     while True:
         dist = True
         for col in colours:
@@ -122,13 +125,17 @@ class TraceCanvas(wxcanvas.GLCanvas):
         self.monitors = monitors
         self.devices = devices
         self.monitor_colours = dict()
+        self.dark_mode = False
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
         self.SetCurrent(self.context)
         GL.glDrawBuffer(GL.GL_BACK)
-        GL.glClearColor(1.0, 1.0, 1.0, 0.0)
+        if self.dark_mode:
+            GL.glClearColor(0.2, 0.2, 0.2, 0.0)
+        else:
+            GL.glClearColor(1, 1, 1, 0.0)
         GL.glViewport(0, 0, size.width, size.height)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
@@ -163,10 +170,11 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
             if monitor_name not in self.monitor_colours:  # randomly choose colour for each monitor
                 if self.monitor_colours:
-                    colour = choose_viable_colour(self.monitor_colours.values(), 0.1/len(self.monitor_colours))
+                    colour = choose_viable_colour(self.monitor_colours.values(), 0.1/len(self.monitor_colours), self.dark_mode)
+                elif self.dark_mode:
+                    colour = (random.uniform(0.5, 1), random.uniform(0.5, 1), random.uniform(0.5, 1))
                 else:
                     colour = (random.random(), random.random(), random.random())
-                
                 self.monitor_colours[monitor_name] = colour
 
             for i in range(len(signal_list)):
@@ -198,13 +206,13 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
             trace_count += 1
 
-        for i in range(len(signal_list)):
+        for i in range(len(signal_list)):  # generate axes labels that are invariant to panningin the y-direction
             if self.zoom > 0.7:
-                GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
+                GL.glTranslate(0.0, -self.pan_y, 0.0) 
                 self.render_text(str(i+1), (i+1)*40-(5*len(str(i+1)))/self.zoom, 20)
                 GL.glTranslated(0.0, self.pan_y, 0.0)
-            elif i % 2:
-                GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
+            elif i % 2:  # if zoomed out only generate every other label to avoid clutter
+                GL.glTranslate(0.0, -self.pan_y, 0.0) 
                 self.render_text(str(i+1), (i+1)*40-(5*len(str(i+1)))/self.zoom, 20)
                 GL.glTranslated(0.0, self.pan_y, 0.0)
             
@@ -314,9 +322,12 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
     def render_text(self, text, x_pos, y_pos, font=GLUT.GLUT_BITMAP_HELVETICA_18):
         """Handle text drawing operations."""
-        GL.glColor3f(0.0, 0.0, 0.0)  # text is black
+        if self.dark_mode:
+            GL.glColor3f(0.7, 0.7, 0.7)
+        else:
+            GL.glColor3f(0.0, 0.0, 0.0)
         GL.glRasterPos2f(x_pos, y_pos)
-
+        
         for character in text:
             if character == '\n':
                 y_pos = y_pos - 20

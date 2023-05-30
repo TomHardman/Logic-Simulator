@@ -23,6 +23,7 @@ class Gui_linux(wx.Frame):
         self.connection_constraint = False
         self.monitor_constraint = False
         self.animation_constraint = False
+        self.dark_mode = False
 
         self.first_run = True
         self.cycles = 10
@@ -59,14 +60,15 @@ class Gui_linux(wx.Frame):
         sidebar_sizer = wx.BoxSizer(wx.VERTICAL)
         sidebar.SetSizer(sidebar_sizer)
         sidebar.SetMaxSize((100, -1))
+        self.sidebar = sidebar
 
         canvas_window = wx.SplitterWindow(
             main_splitter)  # set up canvas window
 
         main_splitter.SplitVertically(canvas_window, sidebar)
-        main_splitter.SetSashGravity(0.7)
-        # main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
-
+        main_splitter.SetSashGravity(0.6)
+        main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change_side)
+    
         # Set up panels for splitting canvas UI into circuit display and plotting window
         plotting_ui = wx.Panel(canvas_window)  # panel for plotting traces
         plotting_ui.SetBackgroundColour(wx.Colour(200, 200, 200))
@@ -80,25 +82,25 @@ class Gui_linux(wx.Frame):
 
         canvas_window.SplitHorizontally(circuit_ui, plotting_ui)
         canvas_window.SetSashGravity(0.65)
-        # canvas_window.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change)
+        canvas_window.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.on_sash_position_change_canvas)
 
         # Set up panels for sidebar
         # bg colour is set to that of parent panel so only the painted on rounded panel shape is visible
-        panel_control = RoundedScrollWindow(sidebar)
+        panel_control = RoundedScrollWindow(sidebar, self)
         panel_control.SetScrollRate(10, 0)
         panel_control.SetBackgroundColour(
             panel_control.GetParent().GetBackgroundColour())
         control_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_control.SetSizer(control_sizer)
 
-        panel_devices = RoundedScrollWindow(sidebar)
+        panel_devices = RoundedScrollWindow(sidebar, self)
         panel_devices.SetBackgroundColour(
             panel_devices.GetParent().GetBackgroundColour())
         panel_devices.SetScrollRate(0, 10)
         device_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_devices.SetSizer(device_sizer)
 
-        panel_monitors = RoundedScrollWindow(sidebar)
+        panel_monitors = RoundedScrollWindow(sidebar, self)
         panel_monitors.SetBackgroundColour(
             panel_monitors.GetParent().GetBackgroundColour())
         panel_monitors.SetScrollRate(0, 10)
@@ -157,31 +159,34 @@ class Gui_linux(wx.Frame):
         self.Bind(wx.EVT_TIMER, self.on_tick, self.timer)
 
         # Widgets and sizers for monitor panel
-        monitor_title = wx.StaticText(
-            panel_monitors, wx.ID_ANY, "Monitor Configuration:")
-        font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT,
-                          wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        monitor_title = wx.StaticText(panel_monitors, wx.ID_ANY, "Monitor Configuration:")
+        font_st = wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         monitor_title.SetFont(font_st)
         title_sizer = wx.BoxSizer(wx.HORIZONTAL)
         title_sizer.Add(monitor_title, 1, wx.ALL, 10)
 
-        add_zap_button = wx.Button(
-            panel_monitors, wx.ID_ANY, "Add/Zap\nMonitors")
+        add_zap_button = wx.Button(panel_monitors, wx.ID_ANY, "Add/Zap\nMonitors")
+        colour_button = wx.Button(panel_monitors, wx.ID_ANY, "Change\nTrace Colours")
         add_zap_button.SetFont(self.font_buttons)
+        colour_button.SetFont(self.font_buttons)
 
         add_zap_sizer = wx.BoxSizer(wx.HORIZONTAL)
         add_zap_sizer.Add(add_zap_button, 1, wx.ALL | wx.ALIGN_CENTRE, 10)
-
+        add_zap_sizer.Add(colour_button, 1, wx.ALL | wx.ALIGN_CENTRE, 10)
+  
         monitor_sizer.Add(title_sizer, 1, wx.ALL, 5)
         monitor_sizer.Add(add_zap_sizer, 1, wx.ALL | wx.ALIGN_CENTRE, 5)
 
         add_zap_button.Bind(wx.EVT_BUTTON, self.on_add_zap_button)
+        colour_button.Bind(wx.EVT_BUTTON, self.on_change_monitor_colours)
+
+        self.panel_monitors = panel_monitors
 
         # Widgets and sizers for device panel
         device_title = wx.StaticText(
             panel_devices, wx.ID_ANY, "Device Configuration:")  # create title
         device_title.SetFont(font_st)
-        device_sizer.Add(device_title, 1, wx.ALL, 5)
+        device_sizer.Add(device_title, 1, wx.ALL, 10)
 
         add_button_d = wx.Button(panel_devices, wx.ID_ANY, "Add\nDevice")
         add_button_d.SetFont(self.font_buttons)
@@ -232,26 +237,64 @@ class Gui_linux(wx.Frame):
         # Event handling:
     def on_size(self, event):
         """Handle resize events"""
-        # Ensure the splitter adjusts to the frame size
-        self.GetSizer().Layout()
+        self.GetSizer().Layout() # Ensure the splitter adjusts to the frame size
         event.Skip()
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
+        
         if Id == wx.ID_EXIT:
             self.Close(True)
+        
         if Id == wx.ID_ABOUT:
             wx.MessageBox("Logic Simulator\nCreated by bd432, al2008, th624\n2023",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
-        if Id == self.light_id:
-            self.circuit_canvas.dark_mode = False
+        
+        if Id == self.light_id or Id == self.dark_id:
+            if Id == self.light_id:
+                self.circuit_canvas.dark_mode = False
+                self.trace_canvas.dark_mode = False
+                self.dark_mode = False
+                self.sidebar.SetBackgroundColour(wx.Colour(200, 200, 200))
+
+                for panel in self.sidebar.GetChildren():
+                    panel.SetBackgroundColour(wx.Colour(200, 200, 200))
+                    for widget in panel.GetChildren():
+                        if str(type(widget)).split('.')[-1].split("'")[0] == 'StaticText':
+                            widget.SetForegroundColour(wx.BLACK)
+                        if str(type(widget)).split('.')[-1].split("'")[0] == 'SpinCtrl':
+                            widget.SetForegroundColour(wx.BLACK)
+                        if str(type(widget)).split('.')[-1].split("'")[0] == 'Button':
+                            widget.SetForegroundColour(wx.BLACK)
+
+            if Id == self.dark_id:
+                self.circuit_canvas.dark_mode = True
+                self.trace_canvas.dark_mode = True
+                self.dark_mode = True
+                self.sidebar.SetBackgroundColour(wx.Colour(100, 80, 100))
+            
+                for panel in self.sidebar.GetChildren():
+                    panel.SetBackgroundColour(wx.Colour(100, 80, 100))
+                    for widget in panel.GetChildren():
+                        if str(type(widget)).split('.')[-1].split("'")[0] == 'StaticText':
+                            widget.SetForegroundColour(wx.Colour(179, 179, 179))
+                        if str(type(widget)).split('.')[-1].split("'")[0] == 'SpinCtrl':
+                            widget.SetForegroundColour(wx.Colour(165, 105, 179))
+                        if str(type(widget)).split('.')[-1].split("'")[0] == 'Button':
+                            widget.SetForegroundColour(wx.Colour(100, 80, 100))
+                        
+            
             self.circuit_canvas.init = False
             self.circuit_canvas.Refresh()
-        if Id == self.dark_id:
-            self.circuit_canvas.dark_mode = True
-            self.circuit_canvas.init = False
-            self.circuit_canvas.Refresh()
+            self.trace_canvas.init = False
+            self.trace_canvas.monitor_colours.clear()
+            self.trace_canvas.Refresh()
+            self.Refresh()
+
+    def on_change_monitor_colours(self, event):
+        self.trace_canvas.monitor_colours.clear()
+        self.trace_canvas.Refresh()
 
     def on_run_button(self, event):
         """Handles the event when the user presses the run button - on first run it causes the continue
@@ -293,6 +336,9 @@ class Gui_linux(wx.Frame):
                 cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
                 cont_button.SetFont(self.font_buttons)
                 cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
+
+                if self.dark_mode:
+                    cont_button.SetForegroundColour(wx.Colour(100, 80, 100))
 
                 run_sizer.Add(cont_button, 1, wx.ALL, 5)
                 panel_control.Layout()
@@ -368,7 +414,7 @@ class Gui_linux(wx.Frame):
                 self.cycles_comp_text.SetLabel(
                     f"Cycles Completed: {self.cycles_completed}")
 
-    def on_sash_position_change(self, event):
+    def on_sash_position_change_side(self, event):
         """Handles the event where the sash position of the window changes - this
         is used to implement an upper size limit on the sidebar"""
         Id = event.GetId()
@@ -376,14 +422,18 @@ class Gui_linux(wx.Frame):
         current_width = self.GetSize().GetWidth()
         current_position = window.GetSashPosition()
 
-        min_sash_pos = current_width - 280
-        max_sash_pos = current_width - 10
+        min_sash_pos = current_width - 400
+        max_sash_pos = current_width - 20
 
         if current_position < min_sash_pos:  # places max size on sidebar
             window.SetSashPosition(min_sash_pos)
 
-        if current_position > max_sash_pos or current_position == 2:  # places min size on sidebar
+        if current_position > min_sash_pos or current_position == 2:  # places min size on sidebar
             window.SetSashPosition(max_sash_pos)
+
+    def on_sash_position_change_canvas(self, event):
+        pass
+
 
     def on_cycle_spin(self, event):
         """Handle the event when the user changes the no. cycles"""

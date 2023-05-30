@@ -11,8 +11,6 @@ def error_pop_up(string):
     dlg.ShowModal()
     dlg.Destroy()
 
-
-
 class RoundedScrollWindow(wx.ScrolledWindow):
     """ Class that inherits from the wx.ScrolledWindow class to be used as a scrollable panel,
     however the OnPaint method has been rewritten to paint a rounded rectangular panel and
@@ -23,11 +21,13 @@ class RoundedScrollWindow(wx.ScrolledWindow):
     Also contains method to set a border on the panel, however this is not very compatible
     with windows OS when resizing"""
 
-    def __init__(self, parent):
+    def __init__(self, parent, mother):
         super().__init__(parent)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.Panel_Border = False
+        self.Panel_Border = True
+        self.mother = mother
+        self.dark_mode = self.mother.dark_mode
 
     def set_border(self, border):
         if type(border) == bool:
@@ -37,12 +37,13 @@ class RoundedScrollWindow(wx.ScrolledWindow):
                 f"'border' must be type bool but got type {type(border)}")
 
     def OnPaint(self, event):
+        self.dark_mode = self.mother.dark_mode
         dc = wx.AutoBufferedPaintDC(self)
         dc.Clear()
         rect = self.GetClientRect()
         x, y, width, height = rect
 
-        w = 2
+        w = 3
         x += w/2
         y += w/2
         width -= w
@@ -50,7 +51,10 @@ class RoundedScrollWindow(wx.ScrolledWindow):
 
         # Draw filled rounded background
         radius = 10  # Adjust the radius for desired roundness
-        background_color = wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW)
+        if not self.dark_mode:
+            background_color = wx.WHITE
+        else:
+            background_color = wx.Colour(51, 51, 51)
         brush = wx.Brush(background_color)
         dc.SetBrush(brush)
         dc.SetPen(wx.TRANSPARENT_PEN)
@@ -59,7 +63,11 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         # Draw rounded border if set_border(True) has been called
         if self.Panel_Border:
             # Adjust the border colour as needed
-            border_color = wx.Colour(72, 50, 168)
+            if self.dark_mode:
+                border_color = wx.Colour(165, 105, 179)
+            else:
+                border_color = wx.Colour(20, 50, 180)
+            
             # Adjust the border width as needed
             pen = wx.Pen(border_color, width=w)
             dc.SetPen(pen)
