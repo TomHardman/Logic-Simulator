@@ -199,9 +199,14 @@ class TraceCanvas(wxcanvas.GLCanvas):
             trace_count += 1
 
         for i in range(len(signal_list)):
-            GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
-            self.render_text(str(i+1), (i+1)*40-5, 20)
-            GL.glTranslated(0.0, self.pan_y, 0.0)
+            if self.zoom > 0.7:
+                GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
+                self.render_text(str(i+1), (i+1)*40-(5*len(str(i+1)))/self.zoom, 20)
+                GL.glTranslated(0.0, self.pan_y, 0.0)
+            elif i % 2:
+                GL.glTranslate(0.0, -self.pan_y, 0.0) # generate axes labels that are invariant to translation in the y-direction
+                self.render_text(str(i+1), (i+1)*40-(5*len(str(i+1)))/self.zoom, 20)
+                GL.glTranslated(0.0, self.pan_y, 0.0)
             
         if len(signal_list) > 0:
             self.x_max = len(signal_list)*40 + 20/self.zoom  # set x_max to maximum + add some whitespace
@@ -266,6 +271,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            if self.zoom < 0.4:
+                self.zoom = 0.4
             # Adjust pan so as to zoom around the mouse position
             self.pan_x -= (self.zoom - old_zoom) * ox
             if self.pan_x > 0: # limit panning to the bounds of the trace
@@ -275,6 +282,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
         if event.GetWheelRotation() > 0:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            if self.zoom > 8:
+                self.zoom = 8
             # Adjust pan so as to zoom around the mouse position
             self.pan_x -= (self.zoom - old_zoom) * ox
             if self.pan_x < -(self.x_max*self.zoom - self.GetSize()[0]):
