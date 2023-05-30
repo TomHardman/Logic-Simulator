@@ -1,4 +1,4 @@
- #!/usr/bin/env python3
+#!/usr/bin/env python3
 """Parse command line options and arguments for the Logic Simulator.
 
 This script parses options and arguments specified on the command line, and
@@ -49,6 +49,14 @@ def main(arg_list):
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
 
+    if not options:
+        app = wx.App()
+        gui = Gui_linux("Logic Simulator", names, devices, network,
+                        monitors)
+        gui.Show(True)
+        app.MainLoop()
+        sys.exit()
+
     for option, path in options:
         if option == "-h":  # print the usage message
             print(usage_message)
@@ -70,7 +78,7 @@ def main(arg_list):
             if parser.parse_network():
                 # Initialise an instance of the gui.Gui() class
                 app = wx.App()
-                gui = Gui_linux("Logic Simulator", path, names, devices, network,
+                gui = Gui_linux("Logic Simulator", names, devices, network,
                                 monitors)
                 gui.Show(True)
                 app.MainLoop()
@@ -86,10 +94,12 @@ def main(arg_list):
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
-            gui = Gui_linux("Logic Simulator", path, names, devices, network,
-                      monitors)
+            gui = Gui_linux("Logic Simulator", names, devices, network,
+                            monitors)
             gui.Show(True)
             app.MainLoop()
+        sys.exit()
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
