@@ -708,7 +708,7 @@ class Xor_gate(Device_GL):
             input_ids = self.names.lookup(
                 ["I" + str(i) for i in range(1, self.inputs + 1)])
             index = input_ids.index(port_id)
-            x = self.x - self.x_CoM - self.gap_width
+            x = self.x - self.x_CoM
             y = self.y + self.input_height * \
                 (self.inputs/2 - 0.5) - self.input_height * index
         else:
@@ -1470,7 +1470,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         x = x_min
         if dark_mode:
             GL.glColor3f(0.4, 0.4, 0.4)
-        
+
         else:
             GL.glColor3f(0.7, 0.7, 0.7)
         GL.glLineWidth(1.0)
@@ -1531,6 +1531,3 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
         dlg.ShowModal()
         dlg.Destroy()
-
-
-
