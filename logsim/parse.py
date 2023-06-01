@@ -106,7 +106,8 @@ class Parser:
         return [node1, node2]
 
     def node(self):
-        """Returns the device_id and port_id or calls error() if incorrect"""
+        """Returns the device_id and port_id or
+            calls error() if node is incorrect"""
         device, device_id = self.device()
         port_id = None
         if not self.error_bool and self.symbol.type == self.scanner.DOT:
@@ -319,7 +320,6 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         state, device_id = self.number_unnamed()
         if not self.error_bool:
-            # Default switch is at 0
             error_type = self.devices.make_device(
                 device_id, self.devices.SWITCH, state)
             if error_type != self.devices.NO_ERROR:
@@ -329,7 +329,6 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             state, device_id = self.number_unnamed()
             if not self.error_bool:
-                # Default switch is at 0
                 error_type = self.devices.make_device(
                     device_id, self.devices.SWITCH, state)
                 if error_type != self.devices.NO_ERROR:
@@ -345,7 +344,6 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         device_id = self.unnamed_device()
         if not self.error_bool:
-            # Default switch is at 0
             error_type = self.devices.make_device(device_id, self.devices.XOR)
             if error_type != self.devices.NO_ERROR:
                 self.error(error_type)
@@ -354,7 +352,6 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
             if not self.error_bool:
-                # Default switch is at 0
                 error_type = self.devices.make_device(
                     device_id, self.devices.XOR)
                 if error_type != self.devices.NO_ERROR:
@@ -370,7 +367,6 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         device_id = self.unnamed_device()
         if not self.error_bool:
-            # Default switch is at 0
             error_type = self.devices.make_device(
                 device_id, self.devices.D_TYPE)
             if error_type != self.devices.NO_ERROR:
@@ -380,7 +376,6 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
             if not self.error_bool:
-                # Default switch is at 0
                 error_type = self.devices.make_device(
                     device_id, self.devices.D_TYPE)
                 if error_type != self.devices.NO_ERROR:
@@ -453,6 +448,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
 
     def display_error(self, error_code):
+        """Prints the error to command line"""
         def underline_text(text, index):
             if index[0] == index[1]:
                 idxlist = [index[1]]
@@ -478,36 +474,36 @@ class Parser:
                 return underline_text(line, symbol.linepos)
         print(highlight_error(self.symbol))
         if error_code == self.NAME_EXPECTED:
-            return('Error: Expected a Name')
+            return ('Error: Expected a Name')
         if error_code == self.SEMICOLON_EXPECTED:
-            return('Error: Expected a Semicolon')
+            return ('Error: Expected a Semicolon')
         if error_code == self.KEYWORD_EXPECTED:
-            return('Error: Expected a Keyword')
+            return ('Error: Expected a Keyword')
         if error_code == self.NUMBER_EXPECTED:
-            return('Error: Expected a Number')
+            return ('Error: Expected a Number')
         if error_code == self.ARROW_EXPECTED:
-            return('Error: Expected a Arrow')
+            return ('Error: Expected a Arrow')
         if error_code == self.devices.INVALID_QUALIFIER:
-            return('Error: Invalid Qualifer')
+            return ('Error: Invalid Qualifer')
         if error_code == self.devices.NO_QUALIFIER:
-            return('Error: No Qualifer')
+            return ('Error: No Qualifer')
         if error_code == self.devices.BAD_DEVICE:
-            return('Error: Bad Device')
+            return ('Error: Bad Device')
         if error_code == self.devices.QUALIFIER_PRESENT:
-            return('Error: Qualifier Present')
+            return ('Error: Qualifier Present')
         if error_code == self.devices.DEVICE_PRESENT:
-            return('Error: Device Present')
+            return ('Error: Device Present')
         if error_code == self.monitors.NOT_OUTPUT:
-            return('Error: Not an output')
+            return ('Error: Not an output')
         if error_code == self.monitors.MONITOR_PRESENT:
-            return('Error: Monitor Present')
+            return ('Error: Monitor Present')
         if error_code == self.network.INPUT_TO_INPUT:
-            return('Error: Connecting an input to input')
+            return ('Error: Connecting an input to input')
         if error_code == self.network.OUTPUT_TO_OUTPUT:
-            return('Error: Connecting an output to output')
+            return ('Error: Connecting an output to output')
         if error_code == self.network.INPUT_CONNECTED:
-            return('Error: Input connected')
+            return ('Error: Input connected')
         if error_code == self.network.PORT_ABSENT:
-            return('Error: Port Absent')
+            return ('Error: Port Absent')
         if error_code == self.network.DEVICE_ABSENT:
-            return('Error: Device Absent')
+            return ('Error: Device Absent')

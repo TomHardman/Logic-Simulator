@@ -68,7 +68,8 @@ class Network:
 
         [self.NO_ERROR, self.INPUT_TO_INPUT, self.OUTPUT_TO_OUTPUT,
          self.INPUT_CONNECTED, self.PORT_ABSENT,
-         self.DEVICE_ABSENT, self.INPUTS_NOT_CONNECTED, self.OSCILLATING] = self.names.unique_error_codes(8)
+         self.DEVICE_ABSENT, self.INPUTS_NOT_CONNECTED,
+         self.OSCILLATING] = self.names.unique_error_codes(8)
         self.steady_state = True  # for checking if signals have settled
 
     def get_connected_output(self, device_id, input_id):
@@ -387,22 +388,22 @@ class Network:
                     return error_code
             for device_id in and_devices:  # execute AND gate devices
                 error_code = self.execute_gate(device_id, self.devices.HIGH,
-                                         self.devices.HIGH)
+                                               self.devices.HIGH)
                 if error_code != self.NO_ERROR:
                     return error_code
             for device_id in or_devices:  # execute OR gate devices
                 error_code = self.execute_gate(device_id, self.devices.LOW,
-                                         self.devices.LOW)
+                                               self.devices.LOW)
                 if error_code != self.NO_ERROR:
                     return error_code
             for device_id in nand_devices:  # execute NAND gate devices
                 error_code = self.execute_gate(device_id, self.devices.HIGH,
-                                         self.devices.LOW)
+                                               self.devices.LOW)
                 if error_code != self.NO_ERROR:
                     return error_code
             for device_id in nor_devices:  # execute NOR gate devices
                 error_code = self.execute_gate(device_id, self.devices.LOW,
-                                         self.devices.HIGH)
+                                               self.devices.HIGH)
                 if error_code != self.NO_ERROR:
                     return error_code
             for device_id in xor_devices:  # execute XOR devices
