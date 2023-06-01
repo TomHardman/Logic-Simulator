@@ -120,7 +120,6 @@ class GuiLinux(wx.Frame):
         self.Maximize()
 
         # store Ids as instance variables for method access
-        self.help_id = fileMenu.FindItemByPosition(3).GetId()
         self.light_id = themeMenu.FindItemByPosition(0).GetId()
         self.dark_id = themeMenu.FindItemByPosition(1).GetId()
 
@@ -286,7 +285,7 @@ class GuiLinux(wx.Frame):
         add_button_c.Bind(wx.EVT_BUTTON, self.on_add_connection_button)
         add_button_d.Bind(wx.EVT_BUTTON, self.on_add_device_button)
 
-        # set certain objects as instance variables to allow method access
+        # set certain objects as class variables to allow method access
         self.panel_devices = panel_devices
         self.device_sizer = device_sizer
         self.add_button_d = add_button_d
