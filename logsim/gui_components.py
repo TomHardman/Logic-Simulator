@@ -1,10 +1,16 @@
+"""
+This module contains three classes that are used for custom windows
+in the Gui and a function for raising error pop up messages
+"""
+
 import wx
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
 def error_pop_up(string):
-    """Function used for creating error pop up windows in the Gui when an error is raised -
-    takes one argument which is the string to be displayed in the pop up"""
+    """Function used for creating error pop up windows in the Gui when
+    an error is raised - takes one argument which is the string to be
+    displayed in the pop up"""
     dlg = GMD(None, string, "Error", wx.OK | wx.ICON_ERROR | 0x40)
     dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
     dlg.ShowModal()
@@ -12,8 +18,16 @@ def error_pop_up(string):
 
 
 class CustomDialog(wx.Dialog):
-    """Class that inherits  from the wx.Dialog class but creates a pop up box that
-    supports the setting of custom bitmaps"""
+    """Class that inherits  from the wx.Dialog class but creates a pop
+    up box that supports the setting of custom bitmap icons
+
+    Parameters
+    ----------
+    parent: the parent window that the dialog box belongs to
+    message: the message to be displayed in the dialog box
+    caption: the caption for the dialog box
+    bitmap: custom bitmap icon to be displayed in the dialog box
+    """
     def __init__(self, parent, message, caption, bitmap):
         super().__init__(parent, title=caption)
 
@@ -38,14 +52,21 @@ class CustomDialog(wx.Dialog):
 
 class RoundedScrollWindow(wx.ScrolledWindow):
     """
-    Class that inherits from the wx.ScrolledWindow class to be used as a scrollable panel,
-    however the OnPaint method has been rewritten to paint a rounded rectangular panel and
-    hence display the panel as such. This needs the initial background colour of the panel
-    to be set to that of its parent panel which can be done externally in the main GUI
-    class
+    Class that inherits from the wx.ScrolledWindow class to be used as a
+    scrollable panel, however the OnPaint method has been rewritten to
+    paint a rounded rectangular panel and hence display the panel as
+    such.  This requires the initial background colour of the panel
+    to be set to that of its parent panel which can be done externally
+    in the main GUI class
 
-    Also contains method set_border set/remove a border on the panel, however this is not very compatible
-    with windows OS or Linux OS when resizing
+    Also contains method set_border to set/remove a border on the panel,
+    however this is not very compatible with windows OS or Linux OS
+    when resizing occurs
+
+    Parameters
+    ----------
+    parent: the parent window that the panel belongs to
+    mother: the main  GUI object that the panel belongs to
     """
 
     def __init__(self, parent, mother):
@@ -57,16 +78,19 @@ class RoundedScrollWindow(wx.ScrolledWindow):
         self.dark_mode = self.mother.dark_mode
 
     def set_border(self, border):
-        """Function that is used to set a panel border by changing the value of the boolean"""
+        """Function that is used to set a panel border by changing the
+        value of the boolean"""
         if type(border) == bool:
             self.Panel_Border = border
         else:
             raise AttributeError(
-                f"'border' must be type bool but got type {type(border)}")
+                f"'border' must be type bool but got type "
+                f"{type(border)}")
 
     def OnPaint(self, event):
-        """Handles paint events - when paint event is called it paints a panel with rounded corners
-        and (if self.Panel_Border = True) a border on top of the original panel background"""
+        """Handles paint events - when paint event is called it paints a
+        panel with rounded corners and (if self.Panel_Border = True) a
+        border on top of the original panel background"""
         self.dark_mode = self.mother.dark_mode
         dc = wx.AutoBufferedPaintDC(self)
         dc.Clear()
@@ -92,13 +116,11 @@ class RoundedScrollWindow(wx.ScrolledWindow):
 
         # Draw rounded border if set_border(True) has been called
         if self.Panel_Border:
-            # Adjust the border colour as needed
             if self.dark_mode:
-                border_color = wx.Colour(165, 105, 179)
+                border_color = wx.Colour(165, 105, 179)  # pink
             else:
-                border_color = wx.Colour(20, 50, 180)
-            
-            # Adjust the border width as needed
+                border_color = wx.Colour(20, 50, 180)  # blue
+
             pen = wx.Pen(border_color, width=w)
             dc.SetPen(pen)
             dc.SetBrush(wx.TRANSPARENT_BRUSH)
@@ -108,6 +130,71 @@ class RoundedScrollWindow(wx.ScrolledWindow):
 
 
 class DeviceMenu(wx.Dialog):
+    """
+    Class that inherits from the wx.Dialog class to create a pop up
+    window that is used for selecting the device type, characteristics
+    and name when the add device button is clicked on the main Gui.
+    The pop up can be thought of as in three different state for
+    choosing the device type, characteristics and name and these states
+    can be switched between limitlessly using 'confirm' and 'back'
+    buttons. Every time the pop up transfers to a new state all of its
+    widgets are destroyed and the menu is completely reconstructed to
+    fit the current state.
+
+    Parameters
+    --------------
+    parent: the parent window that the dialog box belongs to
+    title: title for the dialog box
+    devices: instance of the devices.Devices() class
+    canvas: instance of the gui_interactive_canvas.InteractiveCanvas()
+            class
+
+    Public Methods
+    -----------
+    choose_device(self):
+        Function that creates the pop up window to choose the
+        device type
+
+    choose_qualifier(self):
+        Function that creates the pop up window to choose the device
+        qualifier - this function is not called if the device is an XOR
+        or DTYPE
+
+    choose_name(self):
+        Function that creates the pop up window for entering
+        the device name
+
+    destroy_widgets_in_sizer(self, sizer):
+        Function to destroy all the widgets in a given sizer
+
+    on_drop_down(self, event):
+        Function that handles interactions with the drop down menu
+
+    on_confirm_dev(self, event):
+        Handles the event when the confirm button is clicked in the
+        choose device state
+
+    on_confirm_qual(self, event):
+        Handles the event when the confirm button is clicked in the
+        choose qualifier state
+
+    on_confirm_name(self, event):
+        Handles the event when the confirm button is clicked in the
+        choose name state
+
+    on_back_qual(self, event):
+        Handles the event when the back button is clicked in the
+        choose qualifier state
+
+    on_back_name(self, event):
+        Handles the event when the back button is clicked in the
+        choose name state
+
+    on_name_entry(self, event):
+        Handles the event when text is entered into the name input
+        text box
+    """
+
     def __init__(self, parent, title, devices, canvas):
         wx.Dialog.__init__(self, parent, title=title)
         self.devices = devices
@@ -158,8 +245,9 @@ class DeviceMenu(wx.Dialog):
         self.Fit()
 
     def choose_qualifier(self):
-        """Function that creates the pop up window to choose the device qualifier - this
-        function is not called if the device is an XOR or DTYPE"""
+        """Function that creates the pop up window to choose the device
+        qualifier - this function is not called if the device is an XOR
+        or DTYPE"""
         if self.device_chosen == 'CLOCK':
             choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
                                        'Enter half period:')
@@ -200,10 +288,11 @@ class DeviceMenu(wx.Dialog):
                                    wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self.panel_sizer.Add(self.choose_qual_sizer, 0, wx.ALL, 5)
         self.Layout()
-        self.Fit()
+        self.Fit()  # fit layout to widgets
 
     def choose_name(self):
-        """Function that creates the pop up window for entering the device name"""
+        """Function that creates the pop up window for entering
+        the device name"""
 
         phrases = {'CLOCK': 'Half Period: ', 'NAND': 'Number of inputs: ',
                    'AND': 'Number of inputs: ', 'NOR': 'Number of inputs: ',
@@ -245,7 +334,7 @@ class DeviceMenu(wx.Dialog):
                                    wx.ALL | wx.ALIGN_CENTRE_HORIZONTAL, 5)
         self.panel_sizer.Add(self.choose_name_sizer, 0, wx.ALL, 5)
         self.Layout()
-        self.Fit()
+        self.Fit()  # fit layout to widgets
 
     def destroy_widgets_in_sizer(self, sizer):
         """Function to destroy all the widgets in a given sizer"""
@@ -255,7 +344,7 @@ class DeviceMenu(wx.Dialog):
                 widget.Destroy()
 
     def on_drop_down(self, event):
-        """Function that handles interaction with the drop down menu"""
+        """Function that handles interactions with the drop down menu"""
         Id = event.GetId()
         widget = self.FindWindowById(Id)
 
@@ -272,7 +361,8 @@ class DeviceMenu(wx.Dialog):
         self.Fit()  # fit layout to widgets
 
     def on_confirm_dev(self, event):
-        """Handles the event when the confirm button is clicked in the choose device stage"""
+        """Handles the event when the confirm button is clicked in the
+        choose device stage"""
         self.destroy_widgets_in_sizer(self.choose_dev_sizer)
         self.panel_sizer.Detach(self.choose_dev_sizer)
 
@@ -283,14 +373,16 @@ class DeviceMenu(wx.Dialog):
             self.choose_qualifier()
 
     def on_confirm_qual(self, event):
-        """Handles the event when the confirm button is clicked in the choose qualifier stage"""
+        """Handles the event when the confirm button is clicked in the
+        choose qualifier stage"""
         self.qualifier = self.choose_ctrl.GetValue()
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
         self.panel_sizer.Detach(self.choose_qual_sizer)
         self.choose_name()
 
     def on_confirm_name(self, event):
-        """Handles the event when the confirm button is clicked in the choose name stage"""
+        """Handles the event when the confirm button is clicked in the
+        choose name stage"""
         if self.device_name[0].isalpha() and self.device_name.isalnum():
             if self.canvas.create_device(self.device_name,
                                          self.devices_dict[self.device_chosen],
@@ -301,7 +393,8 @@ class DeviceMenu(wx.Dialog):
             error_pop_up('Please enter a valid name')
 
     def on_back_qual(self, event):
-        """Handles the event when the back button is clicked in the choose qualifier stage"""
+        """Handles the event when the back button is clicked in the
+        choose qualifier stage"""
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
         self.panel_sizer.Detach(self.choose_qual_sizer)
         self.device_chosen = None
@@ -309,7 +402,8 @@ class DeviceMenu(wx.Dialog):
         self.choose_device()
 
     def on_back_name(self, event):
-        """Handles the event when the back button is clicked in the choose name stage"""
+        """Handles the event when the back button is clicked in the
+        choose name stage"""
         self.destroy_widgets_in_sizer(self.choose_name_sizer)
         self.panel_sizer.Detach(self.choose_name_sizer)
         self.qualifier = None
@@ -322,7 +416,8 @@ class DeviceMenu(wx.Dialog):
             self.choose_qualifier()
 
     def on_name_entry(self, event):
-        """Handles the event when text is entered into the name input text box"""
+        """Handles the event when text is entered into the name input
+        text box"""
         Id = event.GetId()
         widget = self.FindWindowById(Id)
         self.device_name = widget.GetValue()

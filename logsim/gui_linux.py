@@ -11,40 +11,40 @@ class GuiLinux(wx.Frame):
 
     Parameters
     ----------
-    title - the title of the Gui
-    names - Names object to pass the names to the Gui
-    devices - Devices object to pass the devices to the Gui
-    network - Network object to pass the network to the Gui
-    monitors - Monitors object to pass the monitors to the Gui
+    title: the title of the Gui
+    names: Names object to pass the names to the Gui
+    devices: Devices object to pass the devices to the Gui
+    network: Network object to pass the network to the Gui
+    monitors: Monitors object to pass the monitors to the Gui
 
     Public Methods
     -----------
-    on_size - Handles resize events
+    on_size: Handles resize events
 
-    on_menu - Handles the event when the user selects a menu item
+    on_menu: Handles the event when the user selects a menu item
 
-    on_change_monitor_colour -
+    on_change_monitor_colour:
         Handles the event when the user presses the change trace colours
         button by clearing the dictionary of colours in trace_canvas
         so they are reallocated
 
-    on_run_button -
+    on_run_button:
         Handles the event when the user presses the run button - on
         first run it causes the continue button to appear in the GUI -
         on all runs it runs the simulation from scratch for the
         specified number of cycles
 
-    on_animate -
+    on_animate:
         Handles the event where the animate button is pressed begins
         animation of plotting and circuit display until button, which
         will now display stop, is pressed again
 
-    on_tick -
+    on_tick:
         While animation is occurring, this function is called every time
         there is a tick to animate the logic circuit display and
         plotting of the monitor traces cycle by cycle.
 
-    on_sash_position_change_side -
+    on_sash_position_change_side:
         Handles the event where the sash position of the window changes
         - this is used to constrain the sidebar to either appear
         displayed to an ideal size or completely retracted.
@@ -52,27 +52,27 @@ class GuiLinux(wx.Frame):
         linux this sidebar is designed to only take these two positions
         and is not fully adjustable
 
-    on_sash_position_change_canvas -
+    on_sash_position_change_canvas:
         Function that is redundant in nature but is bound to the sash
         position change event for the canvas UI window in order to avoid
         interference between the sash position change events for the two
         separate splitter windows
 
-    on_continue_button - Handles the event when the user presses
+    on_continue_button: Handles the event when the user presses
                          the continue button
 
-    on_add_zap_button -
+    on_add_zap_button:
         Handle the event when the user presses the add monitor
         button - allows monitors to be added/zapped on the circuit
         canvas until the button, which will read 'Stop' after being
         pressed initially, is pressed again.
 
-    on_add_device_button -
+    on_add_device_button:
         Handle the event when the user presses the add device button -
         will generate a device menu pop up that allows the user to
         select the device type, characteristics and name
 
-    on_add_connection_button -
+    on_add_connection_button:
         Handles the event when the user presses the add connection
         button and allows connections to be made between devices on the
         circuit canvas
@@ -627,6 +627,10 @@ class GuiLinux(wx.Frame):
                     self.circuit_canvas.Refresh()
                     self.cycles_comp_text.SetLabel(
                         f"Cycles Completed: {self.cycles_completed}")
+
+                else:
+                    error_pop_up('Run failed to execute - '
+                             'please make sure all devices are connected')
 
         else:  # show error dialogue box if cycle no. is not valid
             error_pop_up('Please select valid '
