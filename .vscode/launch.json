@@ -49,10 +49,9 @@
             "type": "python",
             "request": "launch",
             "program": "logsim.py",
-            "cwd":"/homes/th624/Documents/Logic-Simulator/logsim",
+            "cwd": "C:\\Users\\Benedict Davies\\OneDrive - University of Cambridge\\IIA\\GF2 - Software\\Logic-Simulator\\logsim",
             "args": [
-                "/homes/bd432/Desktop/Logic-Simulator/text_inputs/definition_file2.txt"
-                "text_inputs/definiton_file1"
+                "C:\\Users\\Benedict Davies\\OneDrive - University of Cambridge\\IIA\\GF2 - Software\\Logic-Simulator\\text_inputs\\definition_file2.txt"
             ]
         }
     ]

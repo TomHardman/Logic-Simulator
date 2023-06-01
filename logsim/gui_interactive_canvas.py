@@ -186,6 +186,7 @@ class Connection_GL:
     """Class that renders a connection
     Inputs - input and output devices
             , input and output port_ids"""
+
     def __init__(
             self, input_device_GL, output_device_GL,
             input_port_id, output_port_id):
@@ -205,7 +206,7 @@ class Connection_GL:
             in_x, in_y = self.mouse_x, self.mouse_y
         else:
             in_x, in_y = self.input_device_GL.get_port_coor(
-                         self.input_port_id)
+                self.input_port_id)
         if self.output_device_GL is None:
             out_x, out_y = self.mouse_x, self.mouse_y
         else:
@@ -725,7 +726,7 @@ class D_type(Device_GL):
             color = (0.0, 0.0, 0.0)
         if self.device.outputs[self.names.query("Q")]:
             if dark_mode:
-                color = (0.48, 0, 1)
+                color = (0.647, 0.41, 0.77)
             else:
                 color = (0.617, 0.0, 0.0)
         draw_circle(self.port_radius, self.x + self.width/2,
@@ -738,7 +739,7 @@ class D_type(Device_GL):
             if not dark_mode:
                 color = (0.617, 0.0, 0.0)
             else:
-                color = (0.48, 0, 1)
+                color = (0.647, 0.41, 0.77)
         draw_circle(self.port_radius, self.x + self.width/2,
                     self.y - self.input_height/2, color)
 
