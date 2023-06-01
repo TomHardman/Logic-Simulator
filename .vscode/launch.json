@@ -45,13 +45,11 @@
             ],
         },
         {
-            "name": "Run Blank",
+            "name": "Run Logsim",
             "type": "python",
             "request": "launch",
-            "program": "logsim/logsim.py",
-            "args": [
-                "text_inputs/flip_flop.txt"
-            ]
+            "program": "logsim.py",
+            "cwd":"/homes/bd432/Desktop/Logic-Simulator/logsim"
         }
     ]
 }

@@ -283,7 +283,7 @@ class GuiLinux(wx.Frame):
 
         if Id == wx.ID_ABOUT:
             # Display pop up giving information about Logsim
-            icon = wx.Bitmap("/homes/th624/Documents/Logic-Simulator/logsim/doge.png", wx.BITMAP_TYPE_PNG)
+            icon = wx.Bitmap("doge.png", wx.BITMAP_TYPE_PNG)
             mb = CustomDialog(None, "Logic Simulator\nCreated by bd432, al2008, th624\n2023",
                               "About Logsim", icon)
             mb.ShowModal()
