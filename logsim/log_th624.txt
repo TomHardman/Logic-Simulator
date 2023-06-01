@@ -1,0 +1,724 @@
+commit bfc8bd33ff6b543dd60992506c3bc749cbe6ea47
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 30 21:48:13 2023 +0100
+
+    commenting and PEP8 - gui_components.py (still requires some more commenting)
+
+commit 1f42466213f4977424e55e1fa09c920b3dee4cc0
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 30 21:32:54 2023 +0100
+
+    Commenting and PEP8 - gui_linux.py
+
+commit 0d447fe1ebafecc77044f846118ba470e3350380
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 30 19:55:34 2023 +0100
+
+    Commenting and PEP8 - gui_plotting_canvas.py
+
+commit 02b997c90073b3bd787ecfbe591361d6e566fcf3
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 17:21:24 2023 +0100
+
+    custom dialog boxes
+
+commit a7e37a5816e9a294f1c97c07d2c4ed2bcfd403f6
+Merge: d822ac0 4b911a2
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 16:48:18 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit d822ac0536a2ee3af4b07fa0345278b0442493a6
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 16:47:15 2023 +0100
+
+    continue button dark mode bug fix
+
+commit fc07e5ba5dea439fa2cb8545e3475921f04256e4
+Merge: 08fbded b930960
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 16:24:05 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit 08fbded65fd16c1b98129a7604f750eee0de37cc
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 16:20:23 2023 +0100
+
+    Dark mode full implementation
+
+commit d95ad63d2484b15f4eac0abc7604800f1016f655
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 14:47:32 2023 +0100
+
+    Fix sash position change event handling bug and altered sidebar such that it is
+    either displayed or hidden to fix rendering issues
+
+commit cbe18c933064fbaf8154d517d7c9a5cb51834bb9
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 13:55:07 2023 +0100
+
+    edits to axes labels for trace plotting and added zoom limits
+
+commit 58bdc5c5203b447eab9029497e71bf3fdbbf3e15
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 13:35:11 2023 +0100
+
+    Change to file structure and edits to plotting of traces
+
+commit f38723071bddd353c1743f90606fb7c6d438f042
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 11:06:26 2023 +0100
+
+    animation functionality
+
+commit 3249c01b5a481677329d6586f111da0bd49eeb5a
+Merge: 10f8375 6c8f802
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 10:06:42 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit 10f8375739ca049d868008f4ed43b041a3928937
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 30 10:06:34 2023 +0100
+
+    commenting
+
+commit aba8c03daf3112f8a598eef7bfeafded74842a32
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Mon May 29 17:39:35 2023 +0100
+
+    File menu changes and structure for dark mode implementation through
+    file menu plus dark mode bug fix in gui_interactive
+
+commit f09046e0f1ab740922f426b5182d16d062f0d9fc
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Mon May 29 17:01:23 2023 +0100
+
+    plotting high labels
+
+commit b5f3fd15a9004047e089cbd9fb4985c59ef1999e
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Mon May 29 16:55:59 2023 +0100
+
+    fixes to panning limit implementation
+
+commit ab35d5e5f80f96092c185039a01786dbc134ddc1
+Merge: 181d3aa f7ae90f
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Mon May 29 16:17:30 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit 181d3aa5de98c0938d9a173f1dc3b3ac079b11f5
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Mon May 29 16:17:24 2023 +0100
+
+    panning limits in both directions for plot, making sure labels appear in front of traces,
+    other plotting fixes and removing redundant code from plotting_canvas module
+
+commit 92f5ad1b67e13200c6f4cc8760b90a0f75d5aabd
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Mon May 29 14:51:08 2023 +0100
+
+    device menu final touches and error handling
+
+commit a767d3db194b9be7614268397a164a69c227924d
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Mon May 29 14:33:16 2023 +0100
+
+    fixed plotting auto pan with zoom bug
+
+commit d366eb3a64582d0d4b4280c824349accd2dfa554
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Mon May 29 11:26:44 2023 +0100
+
+    Device menu pop up pretty much finished
+
+commit 02a0ade1c8159a61a00213b48ad97d98b47b3731
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Mon May 29 10:28:47 2023 +0100
+
+    further menu pop up debugging
+
+commit 7bf8d857cd7c29473c13b64197e18051105dbc58
+Merge: 5deff79 cb83856
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Sun May 28 20:33:09 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit 5deff798e2cd11c8d38f03173a436d471d25aa55
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Sun May 28 20:32:54 2023 +0100
+
+    device menu almost finished (bug with choose_name method) - pushing so I can switch to VSCode for debugging
+
+commit 094fceb5a55397fa983cff7eaa6e28fd47530878
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 26 13:11:40 2023 +0100
+
+    Add device menu pop up (work in progress)
+
+commit 2cb43c7d897cc9801a5d553056551880d35fc704
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 26 11:35:51 2023 +0100
+
+    fixed pan issue and cycles completed not dispalying properly on run issue
+
+commit 8b902eb861df62897176ff20737c68d83a2659b9
+Merge: f67804d 114f58b
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 26 11:24:33 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit f67804dc695be3fc3d4881501c3da0487483c8be
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 26 11:23:12 2023 +0100
+
+    last change didn't seem to commit properly?
+
+commit c2a0130277b15f96a49fac880f0c67212f51173a
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 26 11:22:51 2023 +0100
+
+    commit for debugging of pan not reseting on first occurence
+
+commit 02e0345eda8f7ae811edf7d6cbcf2c59229487aa
+Merge: 29ad703 301a632
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 17:44:41 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit 29ad7033263b7fcb96dd60a44a3af723ee171757
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 17:44:33 2023 +0100
+
+    cycles completed displayed in upper panel, functionality for auto pan on continue function (still slightly buggy-seems to have a delay)
+
+commit 87488e3e66f50f51b8ac456f55dea60c35beaf76
+Merge: 38817f0 ad2aa2c
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 16:28:18 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit 38817f04c77d8cf9e2a89834214d870e339ee784
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 16:28:13 2023 +0100
+
+    monitor button event handling and further error pop ups
+
+commit 043aa15162da97c0c2a1f16de16de9c63c3f72a9
+Merge: da1d62b 5ae0c9d
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 16:11:16 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit da1d62b2a54e60cba38cd350bd6f5c3997ea9ebc
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 16:11:12 2023 +0100
+
+    connection event handler refresh canvas
+
+commit dc9a6e820b77f40f925f026a62b4dd731a45cb60
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 16:04:03 2023 +0100
+
+    connection event handling
+
+commit bfccdc8f0a925dc3cbb8d67af2d2d8bd28cf71ef
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 15:43:41 2023 +0100
+
+    and again
+
+commit bc66e5b04bb7ed52c27cdf43633589a7e71ef340
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 15:41:48 2023 +0100
+
+    fixing my blunder
+
+commit c80f08c6e8c41f040f621ad950a83c147c585d0f
+Merge: 66dbdc9 b0e293b
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 15:40:23 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit 66dbdc94149d467567d4a9568e47e28f648db33a
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 15:40:19 2023 +0100
+
+    update launch
+
+commit 327606b4ad4fa820060bbd2871a470bbc6a50439
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 15:40:07 2023 +0100
+
+    passing main GUI to circuit canvas to fix bug
+
+commit b6bfc99b33007770db8281368868467db02951ad
+Merge: edbfc55 fc53765
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 15:00:43 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit edbfc55a4730ddeaa2eac608c64f3cd4964de103
+Merge: c39bd32 4813a80
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 15:00:27 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit c39bd32977ba74f5f19c75de04d9c9403a39eab9
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 15:00:19 2023 +0100
+
+    function to only generate distinguishable trace colours
+
+commit 74cffd8b77356d11fec6a0f53d9b4317fc5b162f
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Wed May 24 14:23:01 2023 +0100
+
+    Fixed issue with not plotting last two signal points
+
+commit 9a0a5a996aefefe5cde6d7eecfc84fd62bafe69e
+Merge: e7469ba e1d0ca7
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 18:37:54 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit e7469ba0da31b2bbeaed9afe8464d948dc710ad1
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 18:35:06 2023 +0100
+
+    Partial implementation of event handling for all remaning buttons - now need some logic from ben's side to continue
+
+commit 5a3ac092b0e043e6e857296c649d89883a6f4f34
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 18:34:24 2023 +0100
+
+    Merge
+
+commit ad071ba58541b6544cb3b372fc1c497adb67f56c
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 18:01:15 2023 +0100
+
+    aesthetic edits
+
+commit 2ebf3e914ea3687e1d0b0f7c10fb9a639ec9ae21
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 18:00:55 2023 +0100
+
+    changing txt input and aesthetic edits
+
+commit fb4ebecd497cd0f1e46a61491eadbf295a925fd7
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 17:46:55 2023 +0100
+
+    Added x-axes label for plotting
+
+commit a7d2e4ed95ff5b416effc038457154a3259e439d
+Merge: 46abe00 b2546d5
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 17:09:13 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit 46abe009af7c2d1d1e78e8d64547a14c2d2a5b57
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 17:09:05 2023 +0100
+
+    Trace positioning wrt sash and partially implemented event handling for add connection
+
+commit e543379be9eb3f086349137ca73387664bd794f9
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 17:08:18 2023 +0100
+
+    Error pop up box function
+
+commit 061c88b69e18721b8e40a905723aa19916a93783
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 15:42:43 2023 +0100
+
+    Fixed issue with trace label invariance
+
+commit 535d8d1df901b5e29c982c01581e1bc10b89e6d8
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Tue May 23 15:42:05 2023 +0100
+
+    Fixed invariance of trace labels issue
+
+commit 08b51a017918085ceb6807fc36caf4ab11ee2d39
+Merge: d8334b1 4eb8a08
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 15:07:25 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit d8334b16262f0c2216ddac7788946b83e21fbbda
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 15:06:01 2023 +0100
+
+    adding monitor labels to traces
+
+commit 1a31b82c9b9a61a4b3e85457e26945713da6545b
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 14:42:26 2023 +0100
+
+    fixed line plotting issue
+
+commit 575a04bc5ebeab39ed3c84f895031a548e855a56
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 14:33:26 2023 +0100
+
+    debugging line plotting
+
+commit b8165d82bcb4639d57b33aca63f3edf7138f29fd
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 13:53:54 2023 +0100
+
+    more panning fixes for zooming
+
+commit 448dcecbd361e5a6ddf391c729234b36a38b920a
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 13:49:23 2023 +0100
+
+    fixing trace pan and adding circuit canvas refresh in run/continue event
+
+commit 4c2d4985596ae75afa41411fe3987b1ad2488bf2
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 13:39:29 2023 +0100
+
+    bringing the interface together-added in circuit canvas
+
+commit 0ed51319472381ab5c52e51eeec6400a4cf9f9b0
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 13:27:52 2023 +0100
+
+    stop -ve panning
+
+commit 60c06d80d9afe4ae43d43bebe775e49b2bcf0d61
+Merge: 14a2979 e647a7c
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 13:25:08 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit 14a2979ed32b3ae92882f7bfa6d1bcac0ec3de2e
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 13:24:11 2023 +0100
+
+    temp bug fix - splitter resize issues caused by the event binding for the sidebar splitter -
+    commented out for now but will fix later
+
+commit 25549e4bb8b0697bd6a8261da318170f2cc51d2a
+Merge: 2a11a10 8750d54
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 13:18:23 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit 2a11a1033543267eb2e70b31f2103d1eb9263c44
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 13:17:53 2023 +0100
+
+    Redesign layout structure - double splitter window - contains some resizing bugs
+
+commit af10d7fbaefb2d70e48b9cb95c9a64f33aeab90f
+Merge: 203137f 98ba103
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 12:40:07 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+    
+    # Conflicts:
+    #       logsim/gui_linux.py
+    #       logsim/scanner.py
+
+commit 203137f724dee3cf85b5e7915a43a33a719560ce
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 12:39:22 2023 +0100
+
+    Switch config panel deleted, added device config panel and added widgets for monitor config panel
+
+commit 59d48485e25f530349025f2727ea54ccb2ffd7e4
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 10:36:53 2023 +0100
+
+    Fixed panning plots back to zero after run
+
+commit 1abf32f231f03b5a50b134cd59c865f2542b40c5
+Merge: 74f3e76 c566016
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 09:35:44 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+    
+    # Conflicts:
+    #       logsim/logsim.py
+
+commit 74f3e76abca72b9da957fd9627a49bae7f14eaa9
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 23 09:35:19 2023 +0100
+
+    Added functionality for plotting monitor traces and began creating monitor configuration panel
+
+commit b96feb72adf6a09f3cc348f7a08cd371aba49a4d
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Mon May 22 15:34:25 2023 +0100
+
+    modifying text inputs and debugging logsim
+
+commit 11318f67c5852090ce07ea7e118af82b5567c899
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Mon May 22 15:15:14 2023 +0100
+
+    debugging
+
+commit c5d0f13719141dad36dfcd12943189dcb630f5c1
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Mon May 22 15:07:27 2023 +0100
+
+    debugging issues with names not being added
+
+commit 74b3e9d5a356d05a716605209417a894824c7db8
+Merge: f477222 8adab4d
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 19 17:17:55 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit f4772223a5cad4d0169bf73aaa5cb6d4405405a6
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 19 17:17:16 2023 +0100
+
+    final comit friYAY
+
+commit be486be190498938c26f80cd80bf5c7699054676
+Merge: d6fea42 d63a06a
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 19 16:58:13 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit d63a06a258316635eeeb174448aa5ebe45f20be9
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 16:56:20 2023 +0100
+
+    editing gui_mac
+
+commit d6fea42a3358bdecaf5f4dd1243b35c01ef71904
+Merge: 2d3775c 185d043
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 19 16:55:33 2023 +0100
+
+    Merge branch 'main' of https://github.com/TomHardman/Logic-Simulator into main
+
+commit 2d3775c372ff86d36a45bb4f0bcc0ffee9da7293
+Author: TomHardman <th624@cam.ac.uk>
+Date:   Fri May 19 16:55:21 2023 +0100
+
+    canvas experimentation and amending logsim 4 linux
+
+commit 7e35e5cef332077458214c5147f6b661e8e3aa1f
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 14:19:05 2023 +0100
+
+    amending linux Gui  to remove error sound effects
+
+commit 25b39a94525516152f52306bea31434320b5ce54
+Merge: a5eb545 7031c8a
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 13:55:15 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit a5eb5454bb2f741940fc7dcb1851dba8f8ee9d56
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 13:53:56 2023 +0100
+
+    implemented error sounds to be paired with the error dialog boxes
+
+commit 90633a6a8a0218d776d043e8af06af1db274708d
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 12:43:53 2023 +0100
+
+    amended logsim to support loading up separate interfaces for mac and linux
+
+commit f3f58fbfbe2265d7a2b4097c5ae114dcad9087e9
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 12:12:19 2023 +0100
+
+    amending network fixture and toggle switch button fix
+
+commit b2cf35579a14ab1f6bf9ba1702f6d78c0148c98a
+Merge: ac0fbd0 5bc2e4a
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 12:09:20 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit ac0fbd06681fe26049a8cb1bd96a69ccf7efbdda
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 12:07:35 2023 +0100
+
+    commenting for toggle switch event handler
+
+commit f49868f16e4978c27382b98825e961b092289518
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Fri May 19 12:02:50 2023 +0100
+
+    continue button event handling, run button and continue button error dialog boxes,
+    implemented reading intial switch state into toggle button widget
+
+commit 64b49a4b8ea4cdf97046570222d9ca43aa7baa30
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Thu May 18 23:58:35 2023 +0100
+
+    run button event handling and cycle spin ctrl event handling complete (apart from error raising)
+
+commit 10c5a372e377915dc98f3a61177201f1de17940b
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Thu May 18 23:26:56 2023 +0100
+
+    sash position change event handling to limit size of sidebar and run button event handling to amend layout
+    to include continue button after first run execution
+
+commit aab3ce67664f45433a968557407c651a1ff8e409
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Thu May 18 21:28:36 2023 +0100
+
+    switch button event handling and amended rounded panel class to be able to add/remove a border
+    via class method plus other aesthetic adjustments for gui
+
+commit 3742c014406759a3d06365100ec755b2f6324081
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Thu May 18 19:24:22 2023 +0100
+
+    adjustable sidebar baby
+
+commit 2608078db74a36c8ce7eb377c877e763c89bb904
+Merge: 695fb6d 3ddd974
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Wed May 17 14:03:31 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit 695fb6de928f908981608948be0cde84bd5d444a
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Wed May 17 14:03:04 2023 +0100
+
+    Amended network fixture to include more switches to test scroll feature
+
+commit bf10cf8d87b7179c5fcf3ad4dfd09b29ebbb3cd6
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Wed May 17 13:56:04 2023 +0100
+
+    Switch config panel-(no event handling yet) and also added rounded panel for scrolled window
+
+commit 67de6c0fedcc0f25f7b6f4d52804fa0ceebc6405
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Wed May 17 13:14:42 2023 +0100
+
+    created rounded panel gui class and began crafting actual gui
+
+commit 5ce6498ecd8997c282cfede2bbb9b5d0fb0bfd68
+Merge: 1c49293 bbc73af
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Wed May 17 12:16:23 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit 1c49293238e964344ee048611dae62a6acfcc294
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Wed May 17 12:15:03 2023 +0100
+
+    gui experimentation
+
+commit 7f853c782e2b46dc4483b8c50c9ebfa79b2a7aa9
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Wed May 17 11:35:01 2023 +0100
+
+    gui experimentation
+
+commit 053e127677b0685050c530374d8ae1d1a7501fcd
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 15:12:07 2023 +0100
+
+    network fixture bug fix
+
+commit 17df2a28adc2463100141ab6115cb70f060e7995
+Merge: f34c923 446bf80
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 14:40:31 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+    
+    # Conflicts:
+    #       logsim/logsim.py
+    #       logsim/parse.py
+
+commit f34c92390976891c9d2a3a7d6adbddbd0a129eff
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 13:55:26 2023 +0100
+
+    forced commit
+
+commit d3ed5aea2af77ca415b0d42bd18ca04f93414da9
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 13:40:31 2023 +0100
+
+    forced commit
+
+commit f26a378a6ffb2fdba06f2fa51524bcc749915347
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 13:34:12 2023 +0100
+
+    amended run button event handling to change display and include continue option only
+    after first run has been completed
+
+commit d275719c5678418ee9fcc1ad150555232764483c
+Merge: fc6b219 992da36
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 12:21:53 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+
+commit fc6b21918c8dcde106d8627df4e386b4bb6f6448
+Merge: b45f60e c298ad4
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 11:31:55 2023 +0100
+
+    Merge remote-tracking branch 'origin/main' into main
+    
+    # Conflicts:
+    #       logsim/snide.txt
+
+commit b45f60ec103f6ef42e62401f6cb207a15d5cb9f2
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 10:43:19 2023 +0100
+
+    created new gui file
+
+commit 02ecd357127bac78ef3b15980ac134d5e7fedef3
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Tue May 16 09:24:29 2023 +0100
+
+    fixing benbugs
+
+commit 0d7bea49dffa4984019908195469b7ec264ccd33
+Author: Tom Hardman <th624@cam.ac.uk>
+Date:   Sat May 13 14:18:48 2023 +0100
+
+    test commit
+
+gjrijtritihrhtith h hh hhhhhh hh h h gjrijtritihrhtith h hh hhhhhh hh h h gjrijtritihrhtith h hh hhhhhh hh h h gjrijtritihrhtith h hh hhhhhh hh h h
