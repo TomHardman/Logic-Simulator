@@ -627,7 +627,7 @@ class GuiLinux(wx.Frame):
             # execute network for one cycle on tick then update canvases
             # and update cycles completed text widget
             for i in range(self.cycles):
-                if self.network.execute_network():
+                if self.network.execute_network() == self.network.NO_ERROR:
                     self.monitors.record_signals()
                     self.cycles_completed += 1
                     # change pan to include far right of plot if necessary

@@ -68,7 +68,7 @@ class Network:
 
         [self.NO_ERROR, self.INPUT_TO_INPUT, self.OUTPUT_TO_OUTPUT,
          self.INPUT_CONNECTED, self.PORT_ABSENT,
-         self.DEVICE_ABSENT] = self.names.unique_error_codes(6)
+         self.DEVICE_ABSENT, self.INPUTS_NOT_CONNECTED, self.OSCILLATING] = self.names.unique_error_codes(8)
         self.steady_state = True  # for checking if signals have settled
 
     def get_connected_output(self, device_id, input_id):
@@ -213,7 +213,7 @@ class Network:
             return False
         else:
             device.outputs[None] = updated_signal
-            return True
+            return self.NO_ERROR
 
     def execute_gate(self, device_id, x=None, y=None):
         """Simulate a logic gate and update its output signal value.
@@ -229,7 +229,7 @@ class Network:
         for input_id in device.inputs:
             input_signal = self.get_input_signal(device_id, input_id)
             if input_signal is None:  # this input is unconnected
-                return False
+                return self.INPUTS_NOT_CONNECTED
             input_signal_list.append(input_signal)
 
             if device.device_kind != self.devices.XOR:
@@ -252,7 +252,7 @@ class Network:
         if updated_signal is None:  # if the update is unsuccessful
             return False
         device.outputs[None] = updated_signal
-        return True
+        return self.NO_ERROR
 
     def execute_d_type(self, device_id):
         """Simulate a D-type device and update its output signal value.
@@ -264,7 +264,7 @@ class Network:
         for input_id in device.inputs:
             input_signal = self.get_input_signal(device_id, input_id)
             if input_signal is None:  # if the input is unconnected
-                return False
+                return self.INPUTS_NOT_CONNECTED
             if input_id == self.devices.CLK_ID:
                 clock_signal = input_signal
             elif input_id == self.devices.DATA_ID:
@@ -300,7 +300,7 @@ class Network:
         device.outputs[self.devices.Q_ID] = new_Q
         device.outputs[self.devices.QBAR_ID] = new_QBAR
 
-        return True
+        return self.NO_ERROR
 
     def execute_clock(self, device_id):
         """Simulate a clock and update its output signal value.
@@ -315,17 +315,17 @@ class Network:
             if new_signal is None:  # update is unsuccessful
                 return False
             device.outputs[None] = new_signal
-            return True
+            return self.NO_ERROR
 
         elif output_signal == self.devices.FALLING:
             new_signal = self.update_signal(output_signal, self.devices.LOW)
             if new_signal is None:  # update is unsuccessful
                 return False
             device.outputs[None] = new_signal
-            return True
+            return self.NO_ERROR
 
         elif output_signal in [self.devices.HIGH, self.devices.LOW]:
-            return True
+            return self.NO_ERROR
 
         else:
             return False
@@ -372,35 +372,46 @@ class Network:
             self.steady_state = True
 
             for device_id in switch_devices:  # execute switch devices
-                if not self.execute_switch(device_id):
-                    return False
+                error_code = self.execute_switch(device_id)
+                if error_code != self.NO_ERROR:
+                    return error_code
             # Execute D-type devices before clocks to catch the rising edge of
             # the clock
             for device_id in d_type_devices:  # execute DTYPE devices
+                error_code = self.execute_d_type(device_id)
                 if not self.execute_d_type(device_id):
                     return False
             for device_id in clock_devices:  # complete clock executions
-                if not self.execute_clock(device_id):
-                    return False
+                error_code = self.execute_clock(device_id)
+                if error_code != self.NO_ERROR:
+                    return error_code
             for device_id in and_devices:  # execute AND gate devices
-                if not self.execute_gate(device_id, self.devices.HIGH,
-                                         self.devices.HIGH):
-                    return False
+                error_code = self.execute_gate(device_id, self.devices.HIGH,
+                                         self.devices.HIGH)
+                if error_code != self.NO_ERROR:
+                    return error_code
             for device_id in or_devices:  # execute OR gate devices
-                if not self.execute_gate(device_id, self.devices.LOW,
-                                         self.devices.LOW):
-                    return False
+                error_code = self.execute_gate(device_id, self.devices.LOW,
+                                         self.devices.LOW)
+                if error_code != self.NO_ERROR:
+                    return error_code
             for device_id in nand_devices:  # execute NAND gate devices
-                if not self.execute_gate(device_id, self.devices.HIGH,
-                                         self.devices.LOW):
-                    return False
+                error_code = self.execute_gate(device_id, self.devices.HIGH,
+                                         self.devices.LOW)
+                if error_code != self.NO_ERROR:
+                    return error_code
             for device_id in nor_devices:  # execute NOR gate devices
-                if not self.execute_gate(device_id, self.devices.LOW,
-                                         self.devices.HIGH):
-                    return False
+                error_code = self.execute_gate(device_id, self.devices.LOW,
+                                         self.devices.HIGH)
+                if error_code != self.NO_ERROR:
+                    return error_code
             for device_id in xor_devices:  # execute XOR devices
-                if not self.execute_gate(device_id, None, None):
-                    return False
+                error_code = self.execute_gate(device_id, None, None)
+                if error_code != self.NO_ERROR:
+                    return error_code
             if self.steady_state:
                 break
-        return self.steady_state
+        if self.steady_state:
+            return self.NO_ERROR
+        else:
+            return self.OSCILLATING
