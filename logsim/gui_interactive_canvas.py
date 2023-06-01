@@ -593,7 +593,7 @@ class Or_gate(Device_GL):
             self.straight_box_width - mouse_x)**2 +
                 (self.y - mouse_y)**2 < self.port_radius**2):
             device_id = self.device.device_id
-            return (device_id, port_id)
+        return (device_id, port_id)
 
     def get_port_coor(self, port_id):
         if port_id is None:
@@ -718,7 +718,7 @@ class Xor_gate(Device_GL):
             self.straight_box_width - mouse_x)**2 +
                 (self.y - mouse_y)**2 < self.port_radius**2):
             device_id = self.device.device_id
-            return (device_id, port_id)
+        return (device_id, port_id)
 
     def get_port_coor(self, port_id):
         if port_id is None:
