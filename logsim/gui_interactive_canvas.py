@@ -1,7 +1,7 @@
-"""Implement the graphical user interface for the Logic Simulator.
+"""Implement the interactive graphical user interface for the Logic Simulator.
 
-Used in the Logic Simulator project to enable the user to run the simulation
-or adjust the network properties.
+Used in the Logic Simulator project to enable the user to
+visualise and move around the connected network.
 
 Classes:
 --------
@@ -44,7 +44,8 @@ def draw_text(x, y, text, dark_mode):
 
 
 def render_text(text, w, x_pos, y_pos, color, dark_mode):
-    """Handle text drawing operations."""
+    """Handle text drawing operations. Takes width, position,
+         colour and dark mode bool as inputs"""
     if dark_mode:
         GL.glColor3f(0.7, 0.7, 0.7)
     else:
@@ -105,7 +106,8 @@ def line_with_thickness(vertices, t, color):
 
 
 class Monitor():
-    """Class that renders a monitor point"""
+    """Class that renders a monitor point
+        Inputs: names, device (Device_GL class), port_id"""
 
     def __init__(self, names, device_GL, port_id):
         self.device_GL = device_GL
@@ -115,6 +117,7 @@ class Monitor():
         self.monitor_radius = 15
 
     def render(self, dark_mode):
+        """Render monitor point"""
         x, y = self.device_GL.get_port_coor(self.port_id)
 
         # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
@@ -168,66 +171,6 @@ class Monitor():
                 GL.glColor(1, 1, 1)
                 render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
                 GL.glFlush()
-
-
-def render(self, dark_mode):
-    dx = 10
-    dy = 10
-    x, y = self.device_GL.get_port_coor(self.port_id)
-
-    # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-    GL.glColor(1, 1, 1)
-    if dark_mode:
-        if self.port_id == self.names.query('QBAR'):
-            x -= 5
-            y -= 30
-            draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
-            GL.glColor(1, 1, 1)
-            render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1), dark_mode)
-            GL.glFlush()
-
-        elif self.port_id == self.names.query('Q'):
-            x -= 5
-            y += 30
-            draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
-            GL.glColor(1, 1, 1)
-            render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.1), dark_mode)
-            GL.glFlush()
-
-        else:
-            x -= 15
-            y += 25
-            draw_circle(self.monitor_radius, x, y, (0.537, 0.812, 0.941))
-            GL.glColor(1, 1, 1)
-            render_text('M', 2, x-5, y-5, (0.1, 0.1, 0.11), dark_mode)
-            GL.glFlush()
-
-    else:
-
-        if self.port_id == self.names.query('QBAR'):
-            x -= 5
-            y -= 30
-            draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
-            GL.glColor(1, 1, 1)
-            render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
-            GL.glFlush()
-
-        elif self.port_id == self.names.query('Q'):
-            x -= 5
-            y += 30
-            draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
-            GL.glColor(1, 1, 1)
-            render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
-            GL.glFlush()
-
-        else:
-            x -= 15
-            y += 25
-            draw_circle(self.monitor_radius, x, y, (0, 0.3, 0.87))
-            GL.glColor(1, 1, 1)
-            render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
-            GL.glFlush()
-
 
 class Connection_GL:
     def __init__(

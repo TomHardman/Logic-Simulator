@@ -48,7 +48,10 @@
             "name": "Run Blank",
             "type": "python",
             "request": "launch",
-            "program": "logsim/logsim.py"
+            "program": "logsim/logsim.py",
+            "args": [
+                "text_inputs/flip_flop.txt"
+            ]
         }
     ]
 }
