@@ -629,8 +629,8 @@ class GuiLinux(wx.Frame):
                         f"Cycles Completed: {self.cycles_completed}")
 
                 else:
-                    error_pop_up('Run failed to execute - '
-                             'please make sure all devices are connected')
+                    error_pop_up('Run failed to execute - please make sure'
+                                 'all devices are connected')
 
         else:  # show error dialogue box if cycle no. is not valid
             error_pop_up('Please select valid '
