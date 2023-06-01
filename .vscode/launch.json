@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
             "name": "Debug Pytest",
             "type": "python",
@@ -44,6 +43,15 @@
                 "-c",
                 "text_inputs/flip_flop.txt"
             ],
+        },
+        {
+            "name": "Run Blank",
+            "type": "python",
+            "request": "launch",
+            "program": "logsim/logsim.py",
+            "args": [
+                "text_inputs/flip_flop.txt"
+            ]
         }
     ]
 }

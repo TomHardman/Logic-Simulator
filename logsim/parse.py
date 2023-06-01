@@ -10,11 +10,14 @@ Parser - parses the definition file and builds the logic network.
 
 Format - Underlines parts of text to show general location of error
 """
+
+
 class Format:
     def __init__(self):
         self.end = '\033[0m'
         self.red = '\033[91m'
         self.underline = '\033[4m'
+
 
 class Parser:
 
@@ -49,8 +52,9 @@ class Parser:
         self.error_bool = False
         self.error_count = 0
 
-        [self.NAME_EXPECTED, self.SEMICOLON_EXPECTED, self.KEYWORD_EXPECTED,
-            self.NUMBER_EXPECTED, self.ARROW_EXPECTED] = self.names.unique_error_codes(5)
+        [self.NAME_EXPECTED, self.SEMICOLON_EXPECTED,
+            self.KEYWORD_EXPECTED, self.NUMBER_EXPECTED,
+            self.ARROW_EXPECTED] = self.names.unique_error_codes(5)
 
     def parse_network(self):
         """Parse the circuit definition file."""
@@ -91,7 +95,8 @@ class Parser:
             return False
 
     def connection(self):
-        """Checks the symbol for a valid connection and returns the 2 node points for a connection"""
+        """Checks the symbol for a valid connection and
+        returns the 2 node points for a connection"""
         node1 = self.node()
         node2 = None
         if not self.error_bool:
@@ -107,14 +112,15 @@ class Parser:
         if not self.error_bool and self.symbol.type == self.scanner.DOT:
             self.symbol = self.scanner.get_symbol()
             port_id = self.device_port(device)
-        elif not self.error_bool and not None in device.outputs:
+        elif not self.error_bool and None not in device.outputs:
             self.error(self.network.PORT_ABSENT)
         return [device_id, port_id]
 
     def device(self):
         """Returns the device and device_id"""
         # Add if clause to check device exists
-        if (self.symbol.type == self.scanner.NAME and self.devices.get_device(self.symbol.id)):
+        if (self.symbol.type == self.scanner.NAME
+                and self.devices.get_device(self.symbol.id)):
             device_id = self.symbol.id
             device = self.devices.get_device(device_id)
             self.symbol = self.scanner.get_symbol()
@@ -129,7 +135,8 @@ class Parser:
     def device_port(self, device):
         """Takes a device as an input and returns port_id"""
         if (device is not None and self.symbol.type == self.scanner.NAME):
-            if (self.symbol.id in device.inputs or self.symbol.id in device.outputs):
+            if (self.symbol.id in device.inputs
+                    or self.symbol.id in device.outputs):
                 port_id = self.symbol.id
                 self.symbol = self.scanner.get_symbol()
                 return port_id
@@ -168,8 +175,10 @@ class Parser:
             self.error(self.NUMBER_EXPECTED)
 
     def unnamed_device(self):
-        """Checks name symbol does not correspond to named device and returns id"""
-        if (self.symbol.type == self.scanner.NAME and not self.devices.get_device(self.symbol.id)):
+        """Checks name symbol does not correspond
+            to named device and returns id"""
+        if (self.symbol.type == self.scanner.NAME and
+                not self.devices.get_device(self.symbol.id)):
             name_id = self.symbol.id
             self.symbol = self.scanner.get_symbol()
             return name_id
@@ -187,7 +196,8 @@ class Parser:
         return number, device_id
 
     def connect_keyword(self):
-        """Checks for the CONNECT keyword and a valid connection label and attatches the 2 nodes"""
+        """Checks for the CONNECT keyword and a valid connection label
+            and attatches the 2 nodes"""
         self.scanner.temp_queue.append(self.symbol)
         self.symbol = self.scanner.get_symbol()
         connection = self.connection()
@@ -403,7 +413,8 @@ class Parser:
         return True
 
     def clock_keyword(self):
-        """Checks for the CLOCK keyword and creates clock with specified half period"""
+        """Checks for the CLOCK keyword and creates clock
+            with specified half period"""
         self.scanner.temp_queue.append(self.symbol)
         self.symbol = self.scanner.get_symbol()
         half_period, device_id = self.number_unnamed()
@@ -429,7 +440,9 @@ class Parser:
         error_message = self.display_error(error_code)
         print(error_message)
         print('---------')
-        while (self.symbol.type != self.scanner.SEMICOLON and self.symbol.type != self.scanner.EOF and self.symbol.type != stopping_symbol):
+        while (self.symbol.type != self.scanner.SEMICOLON and
+                self.symbol.type != self.scanner.EOF and
+                self.symbol.type != stopping_symbol):
             self.symbol = self.scanner.get_symbol()
         if self.symbol.type == stopping_symbol:
             # Add held symbols to stack
@@ -440,22 +453,18 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
 
     def display_error(self, error_code):
-        
         def underline_text(text, index):
-            
-            if index[0]==index[1]:
+            if index[0] == index[1]:
                 idxlist = [index[1]]
             else:
                 idxlist = [i for i in range(index[0], index[1])]
             print(idxlist)
             underline = ''
             for i, char in enumerate(text):
-                    
                 if i in idxlist:
                     underline += '\033[31;4m{}\033[0m'.format(char)
                 else:
                     underline += char
-
             return (underline)
 
         def highlight_error(symbol):
@@ -467,63 +476,38 @@ class Parser:
                 self.scanner.input_file.seek(position)
                 print(symbol.linenum)
                 return underline_text(line, symbol.linepos)
-        
         print(highlight_error(self.symbol))
-        
         if error_code == self.NAME_EXPECTED:
-            
             return('Error: Expected a Name')
-        
         if error_code == self.SEMICOLON_EXPECTED:
             return('Error: Expected a Semicolon')
-
         if error_code == self.KEYWORD_EXPECTED:
             return('Error: Expected a Keyword')
-
         if error_code == self.NUMBER_EXPECTED:
             return('Error: Expected a Number')
-
         if error_code == self.ARROW_EXPECTED:
             return('Error: Expected a Arrow')
-
         if error_code == self.devices.INVALID_QUALIFIER:
             return('Error: Invalid Qualifer')
-
         if error_code == self.devices.NO_QUALIFIER:
             return('Error: No Qualifer')
-
         if error_code == self.devices.BAD_DEVICE:
             return('Error: Bad Device')
-
         if error_code == self.devices.QUALIFIER_PRESENT:
             return('Error: Qualifier Present')
-
         if error_code == self.devices.DEVICE_PRESENT:
             return('Error: Device Present')
-
         if error_code == self.monitors.NOT_OUTPUT:
             return('Error: Not an output')
-
         if error_code == self.monitors.MONITOR_PRESENT:
             return('Error: Monitor Present')
-
         if error_code == self.network.INPUT_TO_INPUT:
             return('Error: Connecting an input to input')
-
         if error_code == self.network.OUTPUT_TO_OUTPUT:
             return('Error: Connecting an output to output')
-
         if error_code == self.network.INPUT_CONNECTED:
             return('Error: Input connected')
-
         if error_code == self.network.PORT_ABSENT:
             return('Error: Port Absent')
-
         if error_code == self.network.DEVICE_ABSENT:
             return('Error: Device Absent')
-
-        
-
-
-            
-
