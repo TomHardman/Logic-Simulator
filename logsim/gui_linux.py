@@ -492,7 +492,8 @@ class GuiLinux(wx.Frame):
 
             # start animation if network can be executed successfully
             # run network for one cycle
-            if self.network.execute_network() == self.network.NO_ERROR:
+            error_code = self.network.execute_network()
+            if error_code == self.network.NO_ERROR:
                 self.monitors.record_signals()
                 self.cycles_completed += 1
                 self.trace_canvas.continue_pan_reset = True
@@ -525,12 +526,10 @@ class GuiLinux(wx.Frame):
                     panel_control.Layout()
 
             # show error messages if run fails
-            elif self.network.execute_network() == \
-                    self.network.OSCILLATING:
+            elif error_code == self.network.OSCILLATING:
                 error_pop_up('Run failed to execute - network oscillating')
                 return
-            elif self.network.execute_network() == \
-                    self.network.INPUTS_NOT_CONNECTED:
+            elif error_code == self.network.INPUTS_NOT_CONNECTED:
                 error_pop_up('Run failed to execute - make sure all '
                              'devices are connected')
                 return
@@ -546,7 +545,8 @@ class GuiLinux(wx.Frame):
         plotting of the monitor traces"""
         # execute network for one cycle on tick then update canvases
         # and update cycles completed text widget
-        if self.network.execute_network():
+        error_code = self.network.execute_network()
+        if error_code == self.network.NO_ERROR:
             self.monitors.record_signals()
             self.cycles_completed += 1
             # change pan to include far right of plot if necessary
@@ -555,6 +555,15 @@ class GuiLinux(wx.Frame):
             self.circuit_canvas.Refresh()
             self.cycles_comp_text.SetLabel(
                 f"Cycles Completed: {self.cycles_completed}")
+
+        # show error messages if run fails
+        elif error_code == self.network.OSCILLATING:
+            error_pop_up('Run failed to execute - network oscillating')
+            return
+        elif error_code == self.network.INPUTS_NOT_CONNECTED:
+            error_pop_up('Run failed to execute - make sure all '
+                         'devices are connected')
+            return
 
     def on_sash_position_change_side(self, event):
         """Handles the event where the sash position of the window
