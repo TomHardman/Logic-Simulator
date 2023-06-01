@@ -627,7 +627,8 @@ class GuiLinux(wx.Frame):
             # execute network for one cycle on tick then update canvases
             # and update cycles completed text widget
             for i in range(self.cycles):
-                if self.network.execute_network() == self.network.NO_ERROR:
+                error_code = self.network.execute_network()
+                if error_code == self.network.NO_ERROR:
                     self.monitors.record_signals()
                     self.cycles_completed += 1
                     # change pan to include far right of plot if necessary
@@ -638,11 +639,11 @@ class GuiLinux(wx.Frame):
                         f"Cycles Completed: {self.cycles_completed}")
 
                 # show error messages if run fails
-                elif self.network.execute_network() == \
+                elif error_code == \
                         self.network.OSCILLATING:
                     error_pop_up('Run failed to execute - network oscillating')
                     return
-                elif self.network.execute_network() == \
+                elif error_code == \
                         self.network.INPUTS_NOT_CONNECTED:
                     error_pop_up('Run failed to execute - make sure all '
                                  'devices are connected')

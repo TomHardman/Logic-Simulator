@@ -49,7 +49,10 @@
             "type": "python",
             "request": "launch",
             "program": "logsim.py",
-            "cwd":"/homes/bd432/Desktop/Logic-Simulator/logsim"
+            "cwd":"/homes/bd432/Desktop/Logic-Simulator/logsim",
+            "args": [
+                "text_inputs/flip_flop.txt"
+            ]
         }
     ]
 }
