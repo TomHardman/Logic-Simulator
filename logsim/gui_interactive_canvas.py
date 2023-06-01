@@ -5,8 +5,17 @@ visualise and move around the connected network.
 
 Classes:
 --------
-MyGLCanvas - handles all canvas drawing operations.
-Gui - configures the main window and all the widgets.
+Monitor         - Animates monitor points
+Connection_GL   - Animates connections
+Device_GL       - Base class for all devices
+And_gate        - Animates AND and NAND gates
+Or_gate         - Animates OR and NOR gates
+Xor_gate        - Animates XOR gates
+D_type          - Animates D TYPE device
+Clock           - ANimates the clock
+Switch          - Animates the switch
+InteractiveCanvas  - GL canvas that contains all logic for
+    interacing with and displaying the logic network
 """
 import wx
 import wx.glcanvas as wxcanvas
@@ -172,7 +181,11 @@ class Monitor():
                 render_text('M', 2, x-5, y-5, (1, 1, 1), dark_mode)
                 GL.glFlush()
 
+
 class Connection_GL:
+    """Class that renders a connection
+    Inputs - input and output devices
+            , input and output port_ids"""
     def __init__(
             self, input_device_GL, output_device_GL,
             input_port_id, output_port_id):
@@ -187,6 +200,7 @@ class Connection_GL:
         self.mouse_y = None
 
     def render(self, dark_mode):
+        """Animates the connection"""
         if self.input_device_GL is None:
             in_x, in_y = self.mouse_x, self.mouse_y
         else:
@@ -210,11 +224,8 @@ class Connection_GL:
                 color = (0.617, 0.0, 0.0)
 
         draw_circle(7, in_x, in_y, color)
-        # draw_circle(7, out_x, out_y, color)
 
         GL.glColor3f(*color)
-        GL.glBegin(GL.GL_LINE_STRIP)
-        GL.glVertex2f(in_x, in_y)
         vertices = [(in_x, in_y)]
         if abs(in_x - out_x) > abs(in_y - out_y):
             if in_x > out_x:
@@ -222,43 +233,24 @@ class Connection_GL:
                     (out_x - (out_x - in_x - abs(out_y - in_y))/2, in_y))
                 vertices.append(
                     (in_x + (out_x - in_x - abs(out_y - in_y))/2, out_y))
-                GL.glVertex2f(
-                    out_x - (out_x - in_x - abs(out_y - in_y))/2, in_y)
-                GL.glVertex2f(
-                    in_x + (out_x - in_x - abs(out_y - in_y))/2, out_y)
             else:
                 vertices.append((
                     in_x + (out_x - in_x - abs(out_y - in_y))/2, in_y))
                 vertices.append((
                     out_x - (out_x - in_x - abs(out_y - in_y))/2, out_y))
-                GL.glVertex2f(
-                    in_x + (out_x - in_x - abs(out_y - in_y))/2, in_y)
-                GL.glVertex2f(
-                    out_x - (out_x - in_x - abs(out_y - in_y))/2, out_y)
         else:
             if in_y > out_y:
                 vertices.append((in_x,
                                  out_y - (out_y - in_y - abs(out_x - in_x))/2))
                 vertices.append((out_x,
                                  in_y + (out_y - in_y - abs(out_x - in_x))/2))
-                GL.glVertex2f(in_x,
-                              out_y - (out_y - in_y - abs(out_x - in_x))/2)
-                GL.glVertex2f(out_x,
-                              in_y + (out_y - in_y - abs(out_x - in_x))/2)
             else:
                 vertices.append((in_x,
                                  in_y + (out_y - in_y - abs(out_x - in_x))/2))
                 vertices.append((out_x,
                                  out_y - (out_y - in_y - abs(out_x - in_x))/2))
-                GL.glVertex2f(in_x,
-                              in_y + (out_y - in_y - abs(out_x - in_x))/2)
-                GL.glVertex2f(out_x,
-                              out_y - (out_y - in_y - abs(out_x - in_x))/2)
 
-        GL.glVertex2f(out_x, out_y)
-        GL.glEnd()
         vertices.append((out_x, out_y))
-        # Use when rasterisation is fixed
         line_with_thickness(vertices, self.line_thickness, color)
 
 
@@ -310,6 +302,7 @@ class And_gate(Device_GL):
         self.show_text = True
 
     def render(self, dark_mode):
+        """Animates AND/NAND gates"""
         if dark_mode:
             GL.glColor3f(0.03, 0.172, 0.422)
         else:
@@ -376,14 +369,13 @@ class And_gate(Device_GL):
             else:
                 draw_circle(self.port_radius, self.x -
                             self.x_CoM, y, (0.0, 0.0, 0.0))
-
-        # render_text(self.name_string, 2, self.x, self.y)
         if self.show_text:
 
             draw_text(self.x-5, self.y - self.input_height *
                       self.inputs/2 - 19, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
+        """Checks if device is clicked"""
         x_low = self.x - self.x_CoM
         x_high = self.x - self.x_CoM + self.box_width + self.input_height
         if (x_low < mouse_x < x_high and
@@ -394,6 +386,8 @@ class And_gate(Device_GL):
             return False
 
     def is_port_clicked(self, mouse_x, mouse_y):
+        """Checks if a port is clicked and returns
+         the device and port id"""
         device_id = None
         port_id = None
         for i in range(self.inputs):
@@ -410,6 +404,7 @@ class And_gate(Device_GL):
         return (device_id, port_id)
 
     def get_port_coor(self, port_id):
+        """Returns the coordinates of a port of the device"""
         if port_id is None:
             x = self.x - self.x_CoM + self.box_width + self.input_height
             y = self.y
@@ -512,6 +507,7 @@ class Or_gate(Device_GL):
                       self.inputs/2 - 19, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
+        """Checks if device is clicked"""
         x_low = self.x - self.x_CoM
         x_high = self.x - self.x_CoM + self.box_width + self.straight_box_width
         if (x_low < mouse_x < x_high and
@@ -522,6 +518,8 @@ class Or_gate(Device_GL):
             return False
 
     def is_port_clicked(self, mouse_x, mouse_y):
+        """Checks if a port is clicked and returns
+         the device and port id"""
         device_id = None
         port_id = None
         for i in range(self.inputs):
@@ -539,6 +537,7 @@ class Or_gate(Device_GL):
         return (device_id, port_id)
 
     def get_port_coor(self, port_id):
+        """Returns the coordinates of a port of the device"""
         if port_id is None:
             x = self.x - self.x_CoM + self.box_width + self.straight_box_width
             y = self.y
@@ -638,6 +637,7 @@ class Xor_gate(Device_GL):
                       self.inputs/2 - 19, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
+        """Checks if device is clicked"""
         x_low = self.x - self.x_CoM - self.gap_width
         x_high = self.x - self.x_CoM + self.box_width + self.straight_box_width
         if (x_low < mouse_x < x_high and
@@ -648,6 +648,8 @@ class Xor_gate(Device_GL):
             return False
 
     def is_port_clicked(self, mouse_x, mouse_y):
+        """Checks if a port is clicked and returns
+         the device and port id"""
         device_id = None
         port_id = None
         for i in range(2):
@@ -664,6 +666,7 @@ class Xor_gate(Device_GL):
         return (device_id, port_id)
 
     def get_port_coor(self, port_id):
+        """Returns the coordinates of a port of the device"""
         if port_id is None:
             x = self.x - self.x_CoM + self.box_width + self.straight_box_width
             y = self.y
@@ -769,6 +772,7 @@ class D_type(Device_GL):
                       self.inputs/2 - 19, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
+        """Checks if device is clicked"""
         x_low = self.x - self.width/2
         x_high = self.x + self.width
         if (x_low < mouse_x < x_high and
@@ -779,6 +783,8 @@ class D_type(Device_GL):
             return False
 
     def is_port_clicked(self, mouse_x, mouse_y):
+        """Checks if a port is clicked and returns
+         the device and port id"""
         device_id = self.device.device_id
         port_id = None
         if ((self.x - self.width/2 - mouse_x)**2 +
@@ -814,6 +820,7 @@ class D_type(Device_GL):
         return (None, port_id)
 
     def get_port_coor(self, port_id):
+        """Returns the coordinates of a port of the device"""
         if port_id == self.names.query("CLK"):
             x = self.x - self.width/2
             y = self.y + self.input_height * 0.5
@@ -852,6 +859,7 @@ class Clock(Device_GL):
         self.show_text = True
 
     def render(self, dark_mode):
+        """Animates the clock"""
         if dark_mode:
             GL.glColor3f(0.03, 0.172, 0.422)
         else:
@@ -919,6 +927,7 @@ class Clock(Device_GL):
                       2 - 5, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
+        """Checks if device is clicked"""
         x_low = self.x - self.width/2
         x_high = self.x + self.width
         if (x_low < mouse_x < x_high and
@@ -929,6 +938,8 @@ class Clock(Device_GL):
             return False
 
     def is_port_clicked(self, mouse_x, mouse_y):
+        """Checks if a port is clicked and returns
+         the device and port id"""
         device_id = None
         port_id = None
         if ((self.x + self.width/2 - mouse_x)**2 +
@@ -937,6 +948,7 @@ class Clock(Device_GL):
         return (device_id, port_id)
 
     def get_port_coor(self, port_id):
+        """Returns the coordinates of a port of the device"""
         if port_id is None:
             x = self.x + self.width/2
             y = self.y
@@ -962,6 +974,7 @@ class Switch(Device_GL):
         self.device.outputs[None] = self.device.switch_state
 
     def render(self, dark_mode):
+        """Animates the switch"""
         if dark_mode:
             color = (0.7, 0.7, 0.7)
         else:
@@ -1000,6 +1013,7 @@ class Switch(Device_GL):
                       2.5, self.name_string, dark_mode)
 
     def is_clicked(self, mouse_x, mouse_y):
+        """Checks if device is clicked"""
         x_low = self.x - self.x_CoM
         x_high = self.x - self.x_CoM + self.width
         if (x_low < mouse_x < x_high and
@@ -1010,12 +1024,15 @@ class Switch(Device_GL):
             return False
 
     def get_port_coor(self, port_id):
+        """Returns the coordinates of a port of the device"""
         if port_id is None:
             return (self.x - self.x_CoM + self.width, self.y)
         else:
             raise IndexError("Port does not exist")
 
     def is_port_clicked(self, mouse_x, mouse_y):
+        """Checks if a port is clicked and returns
+         the device and port id"""
         device_id = None
         port_id = None
         if ((self.x - self.x_CoM + self.width - mouse_x)**2 +
@@ -1088,7 +1105,6 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_double_click)
-        self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
         self.Bind(wx.EVT_ENTER_WINDOW, self. on_enter_window)
 
         self.init_objects(devices, names)
@@ -1112,6 +1128,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def init_objects(self, devices, names):
+        """Create all the initial devices as classes to animate"""
         self.objects = []
         self.devices_GL_list = []
         self.switch_GL_list = []
@@ -1273,6 +1290,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         ox = (event.GetX() - self.pan_x) / self.zoom
         oy = (size.height - event.GetY() - self.pan_y) / self.zoom
         old_zoom = self.zoom
+
+        # Updates the half made connections coordinates
         if self.temp_connection is not None:
             self.temp_connection.mouse_x = ox
             self.temp_connection.mouse_y = oy
@@ -1281,16 +1300,16 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.last_mouse_y = event.GetY()
             text = "".join(["Mouse button pressed at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
-
+            # Checks for objects clicked
             for ob in self.devices_GL_list:
                 if ob.is_clicked(ox, oy):
                     ob.clicked = True
                     self.object_clicked = True
                     break
-
+            # Checks for new connection if in connection mode
             if self.connection_list[0]:
                 self.check_connection_made(ox, oy)
-
+            # Checks for new monitor points in monitor mode
             if self.choose_monitor:
                 for ob in self.devices_GL_list:
                     device_id, port_id = ob.is_port_clicked(ox, oy)
@@ -1315,7 +1334,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             self.mother.trace_canvas.Refresh()
                         else:
                             self.raise_error("Choose a valid monitor point")
-
+        # Sets all devices to not clicked
         if event.ButtonUp():
             text = "".join(["Mouse button released at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
@@ -1323,7 +1342,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
                     ob.clicked = False
-
+        # Sets all devices to not clicked
         if event.Leaving():
             text = "".join(["Mouse left canvas at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
@@ -1331,6 +1350,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
                     ob.clicked = False
+        # Scrolls canvas or moves device
         if event.Dragging():
             if self.object_clicked:
                 for ob in self.devices_GL_list:
@@ -1370,6 +1390,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.Refresh()  # triggers the paint event
 
     def check_connection_made(self, ox, oy):
+        """Handles click events when in connection mode to
+         create a temporary connection or make a connection"""
         for ob in self.devices_GL_list:
             device_id, port_id = ob.is_port_clicked(ox, oy)
             if device_id is not None:
@@ -1412,6 +1434,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 break
 
     def on_double_click(self, event):
+        """Changes switches on a double click"""
         size = self.GetClientSize()
         ox = (event.GetX() - self.pan_x) / self.zoom
         oy = (size.height - event.GetY() - self.pan_y) / self.zoom
@@ -1425,24 +1448,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                     switch.device.outputs[None] = 1
                 break
 
-    def on_key_down(self, event):
-        keycode = event.GetUnicodeKey()
-
-        if keycode == 67:
-            # When c is pressed
-            if self.connection_list[0]:
-                self.connection_list = [False, None, None]
-                self.temp_connection = None
-            elif not self.choose_monitor:
-                self.connection_list = [True, None, None]
-            self.Refresh()
-        if keycode == 77:
-            if self.choose_monitor:
-                self.choose_monitor = False
-            elif not self.connection_list[0]:
-                self.choose_monitor = True
-
     def on_enter_window(self, event):
+        """Sets focus to this canvas on mouse entering"""
         self.SetFocus()
 
     def render_text(self, text, x_pos, y_pos, dark_mode):
@@ -1459,6 +1466,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 GLUT.glutBitmapCharacter(font, ord(character))
 
     def render_grid(self, dark_mode):
+        """Animates the background grid"""
 
         grid_spacing = 50
         width, height = self.GetSize()
@@ -1493,28 +1501,29 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         GL.glEnd()
 
     def create_device(self, device_name, device_type, qualifier=None):
+        """Creates a new device"""
         [device_id] = self.names.lookup([device_name])
         error_code = self.devices.make_device(
             device_id, device_type, qualifier)
         if error_code == self.devices.NO_ERROR:
             device = self.devices.get_device(device_id)
             if device_type == self.devices.AND:
-                device_GL = And_gate(0, 0, device, self.names, False)
+                device_GL = And_gate(400, 100, device, self.names, False)
             elif device_type == self.devices.NAND:
-                device_GL = And_gate(0, 0, device, self.names, True)
+                device_GL = And_gate(400, 100, device, self.names, True)
             elif device_type == self.devices.OR:
-                device_GL = Or_gate(0, 0, device, self.names, False)
+                device_GL = Or_gate(400, 100, device, self.names, False)
             elif device_type == self.devices.NOR:
-                device_GL = Or_gate(0, 0, device, self.names, True)
+                device_GL = Or_gate(400, 100, device, self.names, True)
             elif device_type == self.devices.SWITCH:
-                device_GL = Switch(0, 0, device, self.names)
+                device_GL = Switch(400, 100, device, self.names)
                 self.switch_GL_list.append(device_GL)
             elif device_type == self.devices.XOR:
-                device_GL = Xor_gate(0, 0, device, self.names)
+                device_GL = Xor_gate(400, 100, device, self.names)
             elif device_type == self.devices.D_TYPE:
-                device_GL = D_type(0, 0, device, self.names)
+                device_GL = D_type(400, 100, device, self.names)
             elif device_type == self.devices.CLOCK:
-                device_GL = Clock(0, 0, device, self.names)
+                device_GL = Clock(400, 100, device, self.names)
             self.objects.append(device_GL)
             self.devices_GL_list.append(device_GL)
         elif error_code == self.devices.INVALID_QUALIFIER:
@@ -1528,6 +1537,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         return True
 
     def raise_error(self, string):
+        """Pop up with an error message"""
         dlg = GMD(None, string,
                   "Error", wx.OK | wx.ICON_ERROR | 0x40)
         dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))

@@ -1,5 +1,5 @@
 import os
-
+import sys
 """Read the circuit definition file and translate the characters into symbols.
 
 Used in the Logic Simulator project to read the characters in the definition
@@ -101,11 +101,11 @@ class Scanner:
     def open_file(self, path):
         """Open and return the file specified by path."""
 
-        try: 
+        try:
             f = open(path, 'r')
-        
-        except:
-            print('Error: File not found')
+        except FileNotFoundError:
+            print('Error: File not found - Check the given path is valid')
+            sys.exit()
 
         if os.path.getsize(path) == 0:
             print('File is empty')

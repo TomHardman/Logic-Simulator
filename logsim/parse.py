@@ -106,7 +106,8 @@ class Parser:
         return [node1, node2]
 
     def node(self):
-        """Returns the device_id and port_id or calls error() if incorrect"""
+        """Returns the device_id and port_id or
+            calls error() if node is incorrect"""
         device, device_id = self.device()
         port_id = None
         if not self.error_bool and self.symbol.type == self.scanner.DOT:
@@ -319,7 +320,6 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         state, device_id = self.number_unnamed()
         if not self.error_bool:
-            # Default switch is at 0
             error_type = self.devices.make_device(
                 device_id, self.devices.SWITCH, state)
             if error_type != self.devices.NO_ERROR:
@@ -329,7 +329,6 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             state, device_id = self.number_unnamed()
             if not self.error_bool:
-                # Default switch is at 0
                 error_type = self.devices.make_device(
                     device_id, self.devices.SWITCH, state)
                 if error_type != self.devices.NO_ERROR:
@@ -345,7 +344,6 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         device_id = self.unnamed_device()
         if not self.error_bool:
-            # Default switch is at 0
             error_type = self.devices.make_device(device_id, self.devices.XOR)
             if error_type != self.devices.NO_ERROR:
                 self.error(error_type)
@@ -354,7 +352,6 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
             if not self.error_bool:
-                # Default switch is at 0
                 error_type = self.devices.make_device(
                     device_id, self.devices.XOR)
                 if error_type != self.devices.NO_ERROR:
@@ -370,7 +367,6 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         device_id = self.unnamed_device()
         if not self.error_bool:
-            # Default switch is at 0
             error_type = self.devices.make_device(
                 device_id, self.devices.D_TYPE)
             if error_type != self.devices.NO_ERROR:
@@ -380,7 +376,6 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             device_id = self.unnamed_device()
             if not self.error_bool:
-                # Default switch is at 0
                 error_type = self.devices.make_device(
                     device_id, self.devices.D_TYPE)
                 if error_type != self.devices.NO_ERROR:
@@ -453,6 +448,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
 
     def display_error(self, error_code):
+        """Prints the error to command line"""
         def underline_text(text, index):
             if index[0] == index[1]:
                 idxlist = [index[1]]
