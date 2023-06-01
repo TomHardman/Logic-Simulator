@@ -30,7 +30,6 @@ def plot_trace(vertices, t, colour):
             # extend final vertex horizontally so that trace is required length
             x_next = x + 40
             GL.glVertex2f(x_next, y)
-            
     GL.glEnd()
 
 
@@ -162,7 +161,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         # Initialise variables for drawing monitor traces
         trace_count = 0
         offset = -100
-        y_0 = self.GetSize()[1] - 100 
+        y_0 = self.GetSize()[1] - 100
         height = 80
         signal_list = []
 
@@ -228,14 +227,14 @@ class TraceCanvas(wxcanvas.GLCanvas):
         # generate axes labels that are invariant to panning in the y-direction
         for i in range(len(signal_list)):
             if self.zoom > 0.7:
-                GL.glTranslate(0.0, -self.pan_y, 0.0) 
+                GL.glTranslate(0.0, -self.pan_y, 0.0)
                 self.render_text(str(i+1),
                                  (i+1)*40-(5*len(str(i+1)))/self.zoom, 20)
                 GL.glTranslated(0.0, self.pan_y, 0.0)
             # if zoomed out only generate every even cycle number labels
             # to avoid clutter
             elif i % 2:
-                GL.glTranslate(0.0, -self.pan_y, 0.0) 
+                GL.glTranslate(0.0, -self.pan_y, 0.0)
                 self.render_text(str(i+1),
                                  (i+1)*40-(5*len(str(i+1)))/self.zoom, 20)
                 GL.glTranslated(0.0, self.pan_y, 0.0)
@@ -252,7 +251,8 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
         # if continue event occurs and far edge is off screen auto pan to
         # bring right edge of trace to the right hand edge of the screen
-        if self.continue_pan_reset and self.x_max*self.zoom > self.GetSize()[0]:
+        if self.continue_pan_reset and self.x_max*self.zoom \
+                > self.GetSize()[0]:
             self.pan_x = -(self.x_max*self.zoom - self.GetSize()[0])
             self.init = False
             self.Refresh()
@@ -287,7 +287,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         ox = (event.GetX() - self.pan_x) / self.zoom
         oy = (size.height - event.GetY() - self.pan_y) / self.zoom
         old_zoom = self.zoom
-    
+
         if event.Dragging():  # dragging only has effects in the x-direction
             self.pan_x += event.GetX() - self.last_mouse_x
             self.last_mouse_x = event.GetX()
@@ -302,7 +302,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
         if event.ButtonDown():
             self.last_mouse_x = event.GetX()
-            
+
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -316,7 +316,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
             if self.pan_x > 0:  # limit panning to the bounds of the trace
                 self.pan_x = 0
             self.init = False
-       
+
         if event.GetWheelRotation() > 0:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -331,7 +331,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
                 self.pan_x = min(0,
                                  -(self.x_max*self.zoom - self.GetSize()[0]))
             self.init = False
-        
+
         else:
             self.Refresh()  # triggers the paint event
 
@@ -362,7 +362,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
         else:
             GL.glColor3f(0.0, 0.0, 0.0)
         GL.glRasterPos2f(x_pos, y_pos)
-        
+
         for character in text:
             if character == '\n':
                 y_pos = y_pos - 20

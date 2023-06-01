@@ -429,13 +429,19 @@ class GuiLinux(wx.Frame):
 
             # execute run for specified no. cycles
             for i in range(self.cycles):
-                if self.network.execute_network():
+                if self.network.execute_network() == self.network.NO_ERROR:
                     self.monitors.record_signals()
                     self.cycles_completed += 1
 
-                else:  # raise error if there are unconnected devices
-                    error_pop_up('Run failed to execute - '
-                                 'please make sure all devices are connected')
+                # show error messages if run fails
+                elif self.network.execute_network() == \
+                        self.network.OSCILLATING:
+                    error_pop_up('Run failed to execute - network oscillating')
+                    return
+                elif self.network.execute_network() == \
+                        self.network.INPUTS_NOT_CONNECTED:
+                    error_pop_up('Run failed to execute - make sure all '
+                                 'devices are connected')
                     return
 
             # adds continue button to GUI after first run has been executed
@@ -490,7 +496,7 @@ class GuiLinux(wx.Frame):
 
             # start animation if network can be executed successfully
             # run network for one cycle
-            if self.network.execute_network():
+            if self.network.execute_network() == self.network.NO_ERROR:
                 self.monitors.record_signals()
                 self.cycles_completed += 1
                 self.trace_canvas.continue_pan_reset = True
@@ -522,9 +528,16 @@ class GuiLinux(wx.Frame):
                     run_sizer.Add(cont_button, 1, wx.ALL, 5)
                     panel_control.Layout()
 
-            else:  # raise error if run can't execute successfully
-                error_pop_up('Run failed to execute - '
-                             'please make sure all devices are connected')
+            # show error messages if run fails
+            elif self.network.execute_network() == \
+                    self.network.OSCILLATING:
+                error_pop_up('Run failed to execute - network oscillating')
+                return
+            elif self.network.execute_network() == \
+                    self.network.INPUTS_NOT_CONNECTED:
+                error_pop_up('Run failed to execute - make sure all '
+                             'devices are connected')
+                return
 
         elif lab == 'Stop':
             button.SetLabel('Animate')
@@ -628,9 +641,16 @@ class GuiLinux(wx.Frame):
                     self.cycles_comp_text.SetLabel(
                         f"Cycles Completed: {self.cycles_completed}")
 
-                else:
-                    error_pop_up('Run failed to execute - please make sure'
-                                 'all devices are connected')
+                # show error messages if run fails
+                elif self.network.execute_network() == \
+                        self.network.OSCILLATING:
+                    error_pop_up('Run failed to execute - network oscillating')
+                    return
+                elif self.network.execute_network() == \
+                        self.network.INPUTS_NOT_CONNECTED:
+                    error_pop_up('Run failed to execute - make sure all '
+                                 'devices are connected')
+                    return
 
         else:  # show error dialogue box if cycle no. is not valid
             error_pop_up('Please select valid '
