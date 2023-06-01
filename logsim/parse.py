@@ -521,9 +521,3 @@ class Parser:
 
         if error_code == self.network.DEVICE_ABSENT:
             return('Error: Device Absent')
-
-        
-
-
-            
-

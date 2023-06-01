@@ -52,7 +52,8 @@ commit d95ad63d2484b15f4eac0abc7604800f1016f655
 Author: TomHardman <th624@cam.ac.uk>
 Date:   Tue May 30 14:47:32 2023 +0100
 
-    Fix sash position change event handling bug and altered sidebar such that it is either displayed or hidden to fix rendering issues
+    Fix sash position change event handling bug and altered sidebar such that it is
+    either displayed or hidden to fix rendering issues
 
 commit cbe18c933064fbaf8154d517d7c9a5cb51834bb9
 Author: TomHardman <th624@cam.ac.uk>
@@ -89,7 +90,8 @@ commit aba8c03daf3112f8a598eef7bfeafded74842a32
 Author: TomHardman <th624@cam.ac.uk>
 Date:   Mon May 29 17:39:35 2023 +0100
 
-    File menu changes and structure for dark mode implementation through file menu plus dark mode bug fix in gui_interactive
+    File menu changes and structure for dark mode implementation through
+    file menu plus dark mode bug fix in gui_interactive
 
 commit f09046e0f1ab740922f426b5182d16d062f0d9fc
 Author: TomHardman <th624@cam.ac.uk>
@@ -114,7 +116,8 @@ commit 181d3aa5de98c0938d9a173f1dc3b3ac079b11f5
 Author: TomHardman <th624@cam.ac.uk>
 Date:   Mon May 29 16:17:24 2023 +0100
 
-    panning limits in both directions for plot, making sure labels appear in front of traces, other plotting fixes and removing redundant code from plotting_canvas module
+    panning limits in both directions for plot, making sure labels appear in front of traces,
+    other plotting fixes and removing redundant code from plotting_canvas module
 
 commit 92f5ad1b67e13200c6f4cc8760b90a0f75d5aabd
 Author: TomHardman <th624@cam.ac.uk>
@@ -252,7 +255,7 @@ commit 66dbdc94149d467567d4a9568e47e28f648db33a
 Author: TomHardman <th624@cam.ac.uk>
 Date:   Wed May 24 15:40:19 2023 +0100
 
-    update launc
+    update launch
 
 commit 327606b4ad4fa820060bbd2871a470bbc6a50439
 Author: TomHardman <th624@cam.ac.uk>
@@ -717,3 +720,5 @@ Author: Tom Hardman <th624@cam.ac.uk>
 Date:   Sat May 13 14:18:48 2023 +0100
 
     test commit
+
+gjrijtritihrhtith h hh hhhhhh hh h h gjrijtritihrhtith h hh hhhhhh hh h h gjrijtritihrhtith h hh hhhhhh hh h h gjrijtritihrhtith h hh hhhhhh hh h h
