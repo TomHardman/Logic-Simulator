@@ -31,7 +31,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-l",
-                "text_inputs/master_slave.txt"
+                "text_inputs/definition_file1.txt"
             ],
         },
         {
@@ -49,9 +49,10 @@
             "type": "python",
             "request": "launch",
             "program": "logsim.py",
-            "cwd":"/homes/bd432/Desktop/Logic-Simulator/logsim",
+            "cwd":"/homes/th624/Documents/Logic-Simulator/logsim",
             "args": [
                 "/homes/bd432/Desktop/Logic-Simulator/text_inputs/definition_file2.txt"
+                "text_inputs/definiton_file1"
             ]
         }
     ]

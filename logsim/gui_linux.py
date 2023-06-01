@@ -116,7 +116,7 @@ class GuiLinux(wx.Frame):
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.AppendSubMenu(themeMenu, "&Theme")
         fileMenu.Append(wx.ID_ANY, "&Help")
-        menuBar.Append(fileMenu, "&File")
+        menuBar.Append(fileMenu, "&Menu")
         self.SetMenuBar(menuBar)
         self.Maximize()
 
