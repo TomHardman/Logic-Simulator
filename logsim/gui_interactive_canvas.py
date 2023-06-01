@@ -1346,46 +1346,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                     break
 
             if self.connection_list[0]:
-                for ob in self.devices_GL_list:
-                    device_id, port_id = ob.is_port_clicked(ox, oy)
-                    if device_id is not None:
-                        if self.connection_list[1] is not None:
-                            error_code = self.network.make_connection(
-                                *self.connection_list[1:], device_id, port_id)
-                            if error_code == self.network.NO_ERROR:
-                                # Raise error message otherwise
-                                [device_GL] = [
-                                    i for i in self.devices_GL_list
-                                    if i.id == device_id]
-                                if port_id in device_GL.device.inputs:
-                                    self.temp_connection.input_device_GL = device_GL
-                                    self.temp_connection.input_port_id = port_id
-                                else:
-                                    self.temp_connection.output_device_GL = device_GL
-                                    self.temp_connection.output_port_id = port_id
-                                self.objects.append(
-                                    self.temp_connection)
-                                self.connections.append(
-                                    self.temp_connection)
-                            else:
-                                self.raise_error("Connection invalid")
-                            self.temp_connection = None
-                            self.connection_list = [True, None, None]
-                        else:
-                            self.connection_list[1] = device_id
-                            self.connection_list[2] = port_id
-                            [device_GL] = [
-                                i for i in self.devices_GL_list
-                                if i.id == device_id]
-                            if port_id in device_GL.device.inputs:
-                                self.temp_connection = Connection_GL(
-                                    device_GL, None, port_id, None)
-                            else:
-                                self.temp_connection = Connection_GL(
-                                    None, device_GL, None, port_id)
-                            self.temp_connection.mouse_x = ox
-                            self.temp_connection.mouse_y = oy
-                        break
+                self.check_connection_made(ox, oy)
 
             if self.choose_monitor:
                 for ob in self.devices_GL_list:
@@ -1464,6 +1425,48 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.render(text)
         else:
             self.Refresh()  # triggers the paint event
+
+    def check_connection_made(self, ox, oy):
+        for ob in self.devices_GL_list:
+            device_id, port_id = ob.is_port_clicked(ox, oy)
+            if device_id is not None:
+                if self.connection_list[1] is not None:
+                    error_code = self.network.make_connection(
+                        *self.connection_list[1:], device_id, port_id)
+                    if error_code == self.network.NO_ERROR:
+                        # Raise error message otherwise
+                        [device_GL] = [
+                            i for i in self.devices_GL_list
+                            if i.id == device_id]
+                        if port_id in device_GL.device.inputs:
+                            self.temp_connection.input_device_GL = device_GL
+                            self.temp_connection.input_port_id = port_id
+                        else:
+                            self.temp_connection.output_device_GL = device_GL
+                            self.temp_connection.output_port_id = port_id
+                        self.objects.append(
+                            self.temp_connection)
+                        self.connections.append(
+                            self.temp_connection)
+                    else:
+                        self.raise_error("Connection invalid")
+                    self.temp_connection = None
+                    self.connection_list = [True, None, None]
+                else:
+                    self.connection_list[1] = device_id
+                    self.connection_list[2] = port_id
+                    [device_GL] = [
+                        i for i in self.devices_GL_list
+                        if i.id == device_id]
+                    if port_id in device_GL.device.inputs:
+                        self.temp_connection = Connection_GL(
+                            device_GL, None, port_id, None)
+                    else:
+                        self.temp_connection = Connection_GL(
+                            None, device_GL, None, port_id)
+                    self.temp_connection.mouse_x = ox
+                    self.temp_connection.mouse_y = oy
+                break
 
     def on_double_click(self, event):
         size = self.GetClientSize()
