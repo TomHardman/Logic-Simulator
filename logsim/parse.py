@@ -372,7 +372,7 @@ class Parser:
             if not self.error_bool:
                 # Default switch is at 0
                 error_type = self.devices.make_device(
-                    device_id, self.devices.DTYPE)
+                    device_id, self.devices.D_TYPE)
                 if error_type != self.devices.NO_ERROR:
                     self.error(error_type)
 
