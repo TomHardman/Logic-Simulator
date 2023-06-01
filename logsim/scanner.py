@@ -49,18 +49,35 @@ class Scanner:
 
     Public methods
     -------------
+    open_file(self, path): Open and returns specified file.
+
+    blank_symbol(self): Returns a blank symbol.
+
     get_symbol(self): Translates the next sequence of characters into a symbol
                       and returns the symbol.
+
+    skip_spaces(self): Skips tto next point in file which is not a blank space.
+
+    get_name(self): Translate next sequence of letters into a name
+                    and returns the name.
+
+    get_number(self): Translates next sequence of digits into a number and
+                      returns the number.
+
+    advance(self): Skips forward in the file by one space.
     """
 
     def __init__(self, path, names):
         """Open specified file and initialise reserved words and IDs."""
         self.names = names
-        self.symbol_type_list = [self.DOT, self.SEMICOLON, self.ARROW, self.COMMA,
-                                 self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(8)
+        self.symbol_type_list = [self.DOT, self.SEMICOLON,
+                                 self.ARROW, self.COMMA,
+                                 self.KEYWORD, self.NUMBER,
+                                 self.NAME, self.EOF] = range(8)
         self.keywords_list = ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
                               "AND", "NAND", "OR", "NOR", "DTYPE", "XOR"]
-        [self.CONNECT_ID, self.SWITCH_ID, self.MONITOR_ID, self.CLOCK_ID, self.AND_ID, self.NAND_ID, self.OR_ID, self.NOR_ID,
+        [self.CONNECT_ID, self.SWITCH_ID, self.MONITOR_ID, self.CLOCK_ID,
+         self.AND_ID, self.NAND_ID, self.OR_ID, self.NOR_ID,
             self.DTYPE_ID, self.XOR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
         self.input_file = self.open_file(path)
@@ -85,41 +102,14 @@ class Scanner:
         """Open and return the file specified by path."""
 
         f = open(path, 'r')
-        if os.path.getsize(path) == 0: 
+        if os.path.getsize(path) == 0:
             print('File is empty')
-            raise(OSError)
-            
-        
+            raise (OSError)
+
         return f
 
     def blank_symbol(self):
         return Symbol()
-    '''
-    def get_position(self, symbol):
-        """Gets position of symbol which file object is currently pointing at"""
-        position = self.input_file.tell()
-        self.input_file.seek(0)
-
-        contents = self.input_file.read(position)
-        linenum = contents.count('\n') + 1
-        linepos = position - contents.rfind('\n') - 2
-
-        symbol.linenum = linenum
-        symbol.linepos = linepos
-    
-        
-    def get_linenum(self):
-        position = self.input_file.tell()
-        self.input_file.seek(0)
-
-        contents = self.input_file.read(position)
-        linenum = contents.count('\n')
-
-        self.input_file.seek(position)
-
-        return linenum
-        '''
-
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
@@ -164,7 +154,7 @@ class Scanner:
         else:
             self.advance()
         if symbol.type != self.EOF:
-            if symbol.type !=  self.KEYWORD and symbol.type != self.NAME:
+            if symbol.type != self.KEYWORD and symbol.type != self.NAME:
                 symbol.linenum = self.linecount
                 symbol.linepos = [self.poscount, self.poscount]
                 self.poscount += self.countcarry
@@ -193,7 +183,6 @@ class Scanner:
             raise ValueError("Charcter is not a letter")
 
         name_string = ""
-        #self.poscount +=1
         while self.current_character.isalnum():
             name_string += self.current_character
             self.current_character = self.input_file.read(1)
@@ -217,4 +206,4 @@ class Scanner:
     def advance(self):
         """Skips by 1 charcter"""
         self.current_character = self.input_file.read(1)
-        self.poscount +=1
+        self.poscount += 1

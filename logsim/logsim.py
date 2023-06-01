@@ -4,7 +4,7 @@
 This script parses options and arguments specified on the command line, and
 runs either the command line user interface or the graphical user interface.
 
-Usage 
+Usage
 -----
 Show help: logsim.py -h
 Command line user interface: logsim.py -c <file path>
@@ -24,7 +24,6 @@ from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
 from gui_linux import GuiLinux
-from network_fixture import create_network_fixture
 
 
 def main(arg_list):
@@ -49,12 +48,7 @@ def main(arg_list):
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
 
-    if not options:
-        app = wx.App()
-        gui = GuiLinux("Logic Simulator", names, devices, network, monitors)
-        gui.Show(True)
-        app.MainLoop()
-        sys.exit()
+    
 
     for option, path in options:
         if option == "-h":  # print the usage message
@@ -78,7 +72,7 @@ def main(arg_list):
                 # Initialise an instance of the gui.Gui() class
                 app = wx.App()
                 gui = GuiLinux("Logic Simulator", names, devices, network,
-                                monitors)
+                               monitors)
                 gui.Show(True)
                 app.MainLoop()
 
@@ -87,17 +81,24 @@ def main(arg_list):
             print(usage_message)
             sys.exit()
 
-        [path] = arguments
-        scanner = Scanner(path, names)
-        parser = Parser(names, devices, network, monitors, scanner)
-        if parser.parse_network():
-            # Initialise an instance of the gui.Gui() class
-            app = wx.App()
-            gui = GuiLinux("Logic Simulator", names, devices, network,
-                            monitors)
-            gui.Show(True)
-            app.MainLoop()
+    if not arguments:
+        app = wx.App()
+        gui = GuiLinux("Logic Simulator", names, devices, network, monitors)
+        gui.Show(True)
+        app.MainLoop()
         sys.exit()
+
+    [path] = arguments
+    scanner = Scanner(path, names)
+    parser = Parser(names, devices, network, monitors, scanner)
+    if parser.parse_network():
+        # Initialise an instance of the gui.Gui() class
+        app = wx.App()
+        gui = GuiLinux("Logic Simulator", names, devices, network,
+                       monitors)
+        gui.Show(True)
+        app.MainLoop()
+    sys.exit()
 
 
 if __name__ == "__main__":
