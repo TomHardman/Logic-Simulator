@@ -1,8 +1,9 @@
 
 """
 This module contains the TraceCanvas class which is used for plotting
-monitor traces in the Gui. The plot_trace and choose_viable_colour functions
-are defined outside the Class but are used by the TraceCanvas for plotting
+monitor traces in the Gui. The plot_trace and choose_viable_colour
+functions are defined outside the Class but are used by the TraceCanvas
+for plotting
 """
 import wx
 import wx.glcanvas as wxcanvas
@@ -11,7 +12,8 @@ import random
 
 
 def plot_trace(vertices, t, colour):
-    """Function for plotting trace of a specified thickness given a list of vertices"""
+    """Function for plotting trace of a specified thickness given a list
+    of vertices"""
     if not vertices:
         return
 
@@ -33,9 +35,10 @@ def plot_trace(vertices, t, colour):
 
 
 def choose_viable_colour(colours, tol, dark_mode):
-    """Randomly generates a colour for a trace and returns the colour if its euclidean
-    distance to other trace colours is less than a specified tolerance - can be used
-    to generate random trace colours that are distinguishable from one another"""
+    """Randomly generates a colour for a trace and returns the colour if
+    its euclidean distance to other trace colours is less than a
+    specified tolerance - can be used to generate random trace colours
+    that are distinguishable from one another"""
     if not dark_mode:
         colour = (random.random(), random.random(), random.random())
     else:
@@ -61,33 +64,33 @@ class TraceCanvas(wxcanvas.GLCanvas):
 
     Parameters
     ----------
-    parent: parent window.
-    devices: instance of the devices.Devices() class.
-    monitors: instance of the monitors.Monitors() class.
+    parent - parent window.
+    devices - instance of the devices.Devices() class.
+    monitors - instance of the monitors.Monitors() class.
 
     Public methods
     --------------
-    init_gl(self): Configures the OpenGL context.
+    init_gl(self) - Configures the OpenGL context.
 
-    render(self, text): Handles all drawing operations.
+    render(self, text) - Handles all drawing operations.
 
-    on_paint(self, event): Handles the paint event.
+    on_paint(self, event) - Handles the paint event.
 
-    on_size(self, event): Handles the canvas resize event.
+    on_size(self, event) - Handles the canvas resize event.
 
-    on_mouse(self, event): Handles mouse events.
+    on_mouse(self, event) - Handles mouse events.
 
-    render_text(self, text, x_pos, y_pos): Handles text drawing
+    render_text(self, text, x_pos, y_pos) - Handles text drawing
                                            operations.
 
-    on_key_down(self, event): Handles events where the up key and down key
-                              are pressed - used for scrolling in the canvas
-                              window
+    on_key_down(self, event) -
+        Handles events where the up key and down key are pressed -
+        used for scrolling in the canvas window
 
-    on_enter_window(self, event): Handles events where the mouse enters the
-                                  canvas window - used to avoid conflicts
-                                  between the two separate canvas windows
-                                  that make up the Gui
+    on_enter_window(self, event):
+        Handles events where the mouse enters the canvas window - used
+        to avoid event handling conflicts between the two separate
+        canvas windows that make up the Gui
     """
 
     def __init__(self, parent, devices, monitors):
@@ -240,9 +243,9 @@ class TraceCanvas(wxcanvas.GLCanvas):
         self.render()  # render the canvas
 
     def on_enter_window(self, event):
-        """Handles the event where the mouse enters the canvas window - this is used
-        to avoid interference between events relating to the two separate canvas
-        windows"""
+        """Handles the event where the mouse enters the canvas window -
+        this is used to avoid interference between events relating to
+        the two separate canvas windows"""
         self.SetFocus()
 
     def on_size(self, event):
