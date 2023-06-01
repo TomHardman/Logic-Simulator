@@ -479,16 +479,6 @@ class GuiLinux(wx.Frame):
 
     def on_cycle_spin(self, event):
         """Handle the event when the user changes the no. cycles"""
-        if self.connection_constraint:
-            error_pop_up('Finish adding connections before trying to execute another action')
-            return
-        if self.monitor_constraint:
-            error_pop_up('Finish adding/zapping monitors before trying to execute another action')
-            return
-        if self.animation_constraint:
-            error_pop_up('End animation before trying to execute another action')
-            return
-
         Id = event.GetId()
         widget = self.FindWindowById(Id)
         self.cycles = widget.GetValue()  # read value from widget
