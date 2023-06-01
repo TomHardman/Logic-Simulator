@@ -101,7 +101,12 @@ class Scanner:
     def open_file(self, path):
         """Open and return the file specified by path."""
 
-        f = open(path, 'r')
+        try: 
+            f = open(path, 'r')
+        
+        except:
+            print('Error: File not found')
+
         if os.path.getsize(path) == 0:
             print('File is empty')
             raise (OSError)
