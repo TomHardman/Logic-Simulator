@@ -915,13 +915,16 @@ class Clock(Device_GL):
         draw_circle(self.thickness/2, self.x + self.width /
                     4 - self.thickness/2, self.y, color)
         if dark_mode:
-            draw_circle(self.port_radius, self.x +
-                        self.width/2, self.y, (0.7, 0.7, 0.7))
-
+            if self.device.outputs[None]:
+                color = (0.647, 0.41, 0.77)
+            else:
+                color = (0.7, 0.7, 0.7)
+        elif self.device.outputs[None]:
+            color = (0.617, 0, 0)
         else:
-            draw_circle(self.port_radius, self.x +
-                        self.width/2, self.y, (0.0, 0.0, 0.0))
-
+            color = (0,0,0)
+        draw_circle(self.port_radius, self.x +
+                    self.width/2, self.y, color)
         if self.show_text:
 
             draw_text(self.x-15, self.y - self.half_height *
