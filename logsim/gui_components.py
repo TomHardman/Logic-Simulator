@@ -21,14 +21,7 @@ def error_pop_up(string, style=wx.OK | wx.ICON_ERROR | 0x40):
     displayed in the pop up"""
     dlg = GMD(None, string, "Error", style)
     dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
-    
-    if style ==wx.YES | wx.NO | 0x40:
-        result = dlg.ShowModal()
-        if result == wx.ID_YES:
-            return True
-        elif result == wx.ID_NO:
-            return False
-        dlg.Destroy()
+    dlg.ShowModal()
     dlg.Destroy()
 
 

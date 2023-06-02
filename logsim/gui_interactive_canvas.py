@@ -846,6 +846,116 @@ class D_type(Device_GL):
         return [x, y]
 
 
+class RC(Device_GL):
+    """Creates an RC Device for animation"""
+
+    def __init__(self, x, y, device, names):
+        super().__init__(x, y, device, names)
+
+        self.width = 45
+        self.half_height = 20
+        self.port_radius = 7
+        self.no_segments = 100
+        self.thickness = 2
+        self.show_text = True
+
+    def render(self, dark_mode):
+        """Animates the RC device"""
+        if dark_mode:
+            GL.glColor3f(0.03, 0.172, 0.422)
+            draw_circle(self.half_height, self.x - self.width/2, self.y, (0.03, 0.172, 0.422))
+        else:
+            GL.glColor3f(0.212, 0.271, 0.310)
+            draw_circle(self.half_height, self.x - self.width/2, self.y, (0.212, 0.271, 0.310))
+        GL.glBegin(GL.GL_POLYGON)
+        GL.glVertex2f(self.x - self.width/2, self.y + self.half_height)
+        GL.glVertex2f(self.x + self.width/2, self.y + self.half_height)
+        GL.glVertex2f(self.x + self.width/2, self.y - self.half_height)
+        GL.glVertex2f(self.x - self.width/2, self.y - self.half_height)
+        GL.glEnd()
+
+
+        if self.device.outputs[None]:
+            if dark_mode:
+                GL.glColor3f(0.647, 0.41, 0.77)
+                color = (0.647, 0.41, 0.77)
+            else:
+                GL.glColor3f(0.617, 0.0, 0.0)
+                color = (0.617, 0.0, 0.0)
+        else:
+            if dark_mode:
+                GL.glColor3f(0.7, 0.7, 0.7)
+                color = (0.7, 0.7, 0.7)
+            else:
+                GL.glColor3f(0.0, 0.0, 0.0)
+                color = (0.0, 0.0, 0.0)
+
+        GL.glLineWidth(3)
+        GL.glBegin(GL.GL_LINES)
+
+        GL.glVertex2f(self.x - self.width/2 + 4 - self.half_height/2, self.y)
+        GL.glVertex2f(self.x - self.width/10 - self.half_height/2, self.y)
+        GL.glVertex2f(self.x - self.width/10 - self.half_height/2, self.y + self.half_height*(2/3))
+        GL.glVertex2f(self.x - self.width/10 - self.half_height/2, self.y - self.half_height*(2/3))
+
+        GL.glEnd()
+
+        GL.glBegin(GL.GL_LINES)
+    
+        GL.glVertex2f(self.x + self.width/2 - 4 - self.half_height/2, self.y)
+        GL.glVertex2f(self.x + self.width/10 - self.half_height/2, self.y)
+        GL.glVertex2f(self.x + self.width/10 - self.half_height/2, self.y + self.half_height*(2/3))
+        GL.glVertex2f(self.x + self.width/10 - self.half_height/2, self.y - self.half_height*(2/3))
+
+        GL.glEnd()
+
+        if dark_mode:
+            if self.device.outputs[None]:
+                color = (0.647, 0.41, 0.77)
+            else:
+                color = (0.7, 0.7, 0.7)
+        elif self.device.outputs[None]:
+            color = (0.617, 0, 0)
+        else:
+            color = (0,0,0)
+        draw_circle(self.port_radius, self.x +
+                    self.width/2, self.y, color)
+        if self.show_text:
+
+            draw_text(self.x-15, self.y - self.half_height *
+                      2 - 5, self.name_string, dark_mode)
+
+    def is_clicked(self, mouse_x, mouse_y):
+        """Checks if device is clicked"""
+        x_low = self.x - self.width/2
+        x_high = self.x + self.width
+        if (x_low < mouse_x < x_high and
+            self.y - self.half_height < mouse_y <
+                self.y + self.half_height):
+            return True
+        else:
+            return False
+
+    def is_port_clicked(self, mouse_x, mouse_y):
+        """Checks if a port is clicked and returns
+         the device and port id"""
+        device_id = None
+        port_id = None
+        if ((self.x + self.width/2 - mouse_x)**2 +
+                (self.y - mouse_y)**2 < (self.port_radius+3)**2):
+            device_id = self.device.device_id
+        return (device_id, port_id)
+
+    def get_port_coor(self, port_id):
+        """Returns the coordinates of a port of the device"""
+        if port_id is None:
+            x = self.x + self.width/2
+            y = self.y
+        else:
+            raise ValueError(("Port not valid"))
+
+        return [x, y]
+
 class Clock(Device_GL):
     """Creates an Clock for animation"""
 
@@ -887,6 +997,7 @@ class Clock(Device_GL):
                 GL.glColor3f(0.0, 0.0, 0.0)
                 color = (0.0, 0.0, 0.0)
         GL.glBegin(GL.GL_TRIANGLE_STRIP)
+        
         GL.glVertex2f(self.x - self.width/4, self.y)
         GL.glVertex2f(self.x - self.width/4 + self.thickness, self.y)
 
@@ -908,6 +1019,7 @@ class Clock(Device_GL):
 
         GL.glVertex2f(self.x - self.thickness + self.width/4, self.y)
         GL.glVertex2f(self.x + self.width/4, self.y)
+        
         GL.glEnd()
 
         draw_circle(self.thickness/2, self.x - self.width /
@@ -960,6 +1072,126 @@ class Clock(Device_GL):
             raise ValueError(("Port not valid"))
 
         return [x, y]
+
+class Sig_gen(Device_GL):
+    """Creates an SIGGEN for animation"""
+
+    def __init__(self, x, y, device, names):
+        super().__init__(x, y, device, names)
+
+        self.width = 60
+        self.half_height = 20
+        self.port_radius = 7
+        self.no_segments = 100
+        self.thickness = 3
+        self.show_text = True
+
+    def render(self, dark_mode):
+        """Animates the clock"""
+        if dark_mode:
+            GL.glColor3f(0.03, 0.172, 0.422)
+        else:
+            GL.glColor3f(0.212, 0.271, 0.310)
+        GL.glBegin(GL.GL_POLYGON)
+        GL.glVertex2f(self.x - self.width/2, self.y + self.half_height)
+        GL.glVertex2f(self.x + self.width/2, self.y + self.half_height)
+        GL.glVertex2f(self.x + self.width/2, self.y - self.half_height)
+        GL.glVertex2f(self.x - self.width/2, self.y - self.half_height)
+        GL.glVertex2f(self.x -self.width/2 - 8, self.y)
+        GL.glEnd()
+
+        if self.device.outputs[None]:
+            if dark_mode:
+                GL.glColor3f(0.647, 0.41, 0.77)
+                color = (0.647, 0.41, 0.77)
+            else:
+                GL.glColor3f(0.617, 0.0, 0.0)
+                color = (0.617, 0.0, 0.0)
+        else:
+            if dark_mode:
+                GL.glColor3f(0.7, 0.7, 0.7)
+                color = (0.7, 0.7, 0.7)
+            else:
+                GL.glColor3f(0.0, 0.0, 0.0)
+                color = (0.0, 0.0, 0.0)
+        GL.glLineWidth(self.thickness)
+        GL.glBegin(GL.GL_LINES)
+        
+        GL.glVertex2f(self.x - self.width/4 - 4, self.y)
+        GL.glVertex2f(self.x - self.width/4 - 4, self.y + self.half_height/2)
+
+        GL.glVertex2f(self.x - self.width/4 - 4, self.y + self.half_height/2)
+        GL.glVertex2f(self.x - self.width/8 , self.y + self.half_height/2)
+
+        GL.glVertex2f(self.x - self.width/8 , self.y + self.half_height/2)
+        GL.glVertex2f(self.x - self.width/8, self.y - self.half_height/2)
+
+        GL.glVertex2f(self.x - self.width/8, self.y - self.half_height/2)
+        GL.glVertex2f(self.x + self.width/4, self.y - self.half_height/2)
+
+        GL.glVertex2f(self.x + self.width/4, self.y - self.half_height/2)
+        GL.glVertex2f(self.x + self.width/4, self.y)
+        
+
+        GL.glEnd()
+
+        corners = [(self.x - self.width/4 - 4, self.y + self.half_height/2),
+                   (self.x - self.width/8, self.y + self.half_height/2),
+                   (self.x - self.width/8, self.y - self.half_height/2),
+                   (self.x + self.width/4, self.y - self.half_height/2)]
+
+        for (x,y) in corners:
+            draw_circle(self.thickness/4, x, y, color)
+
+
+        if dark_mode:
+            if self.device.outputs[None]:
+                color = (0.647, 0.41, 0.77)
+            else:
+                color = (0.7, 0.7, 0.7)
+        elif self.device.outputs[None]:
+            color = (0.617, 0, 0)
+        else:
+            color = (0,0,0)
+        draw_circle(self.port_radius, self.x +
+                    self.width/2, self.y, color)
+        if self.show_text:
+
+            draw_text(self.x-15, self.y - self.half_height *
+                      2 - 5, self.name_string, dark_mode)
+
+    def is_clicked(self, mouse_x, mouse_y):
+        """Checks if device is clicked"""
+        x_low = self.x - self.width/2
+        x_high = self.x + self.width
+        if (x_low < mouse_x < x_high and
+            self.y - self.half_height < mouse_y <
+                self.y + self.half_height):
+            return True
+        else:
+            return False
+
+    def is_port_clicked(self, mouse_x, mouse_y):
+        """Checks if a port is clicked and returns
+         the device and port id"""
+        device_id = None
+        port_id = None
+        if ((self.x + self.width/2 - mouse_x)**2 +
+                (self.y - mouse_y)**2 < (self.port_radius+3)**2):
+            device_id = self.device.device_id
+        return (device_id, port_id)
+
+    def get_port_coor(self, port_id):
+        """Returns the coordinates of a port of the device"""
+        if port_id is None:
+            x = self.x + self.width/2
+            y = self.y
+        else:
+            raise ValueError(("Port not valid"))
+
+        return [x, y]
+
+
 
 
 class Switch(Device_GL):
@@ -1148,6 +1380,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         xor_gate_ids = devices.find_devices(devices.XOR)
         clock_ids = devices.find_devices(devices.CLOCK)
         dtype_ids = devices.find_devices(devices.D_TYPE)
+        rc_ids = devices.find_devices(devices.RC)
+        siggen_ids = devices.find_devices(devices.SIGGEN)
         x = 100
         y = 100
 
@@ -1157,6 +1391,20 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             y += 200
             self.objects.append(clock)
             self.devices_GL_list.append(clock)
+        
+        for id in rc_ids:
+            device = devices.get_device(id)
+            rc = RC(x, y, device, names)
+            y += 200
+            self.objects.append(rc)
+            self.devices_GL_list.append(rc)
+        
+        for id in siggen_ids:
+            device = devices.get_device(id)
+            rc = Sig_gen(x, y, device, names)
+            y += 200
+            self.objects.append(rc)
+            self.devices_GL_list.append(rc)
 
         for id in switch_ids:
             device = devices.get_device(id)
@@ -1165,7 +1413,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.objects.append(switch)
             self.devices_GL_list.append(switch)
             self.switch_GL_list.append(switch)
-
+        
         y = 100
         x += 200
 
