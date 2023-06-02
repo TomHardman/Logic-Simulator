@@ -107,10 +107,6 @@ class Scanner:
             print('Error: File not found - Check the given path is valid')
             sys.exit()
 
-        if os.path.getsize(path) == 0:
-            print('File is empty')
-            raise (OSError)
-
         return f
 
     def blank_symbol(self):

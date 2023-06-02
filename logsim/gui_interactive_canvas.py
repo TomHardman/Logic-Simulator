@@ -1670,3 +1670,124 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
         dlg.ShowModal()
         dlg.Destroy()
+
+    def create_file_string(self):
+        file_string = ""
+        switch_ids = self.devices.find_devices(self.devices.SWITCH)
+        if switch_ids:
+            file_string += "SWITCH "
+            for i, switch_id in enumerate(switch_ids):
+                if i:
+                    file_string += ", "
+                switch_name = self.names.get_name_string(switch_id)
+                device = self.devices.get_device(switch_id)
+                switch_state = device.outputs[None]
+                file_string +=  str(switch_state) + " " + switch_name
+            file_string += ";\n"
+
+        clock_ids = self.devices.find_devices(self.devices.CLOCK)
+        if clock_ids:
+            file_string += "CLOCK "
+            for i, clock_id in enumerate(clock_ids):
+                if i:
+                    file_string += ", "
+                clock_name = self.names.get_name_string(clock_id)
+                device = self.devices.get_device(clock_id)
+                file_string +=  str(device.clock_half_period) + " " + clock_name
+            file_string += ";\n"
+
+        and_ids = self.devices.find_devices(self.devices.AND)
+        if and_ids:
+            file_string += "AND "
+            for i, and_id in enumerate(and_ids):
+                if i:
+                    file_string += ", "
+                and_name = self.names.get_name_string(and_id)
+                device = self.devices.get_device(and_id)
+                inputs = len(device.inputs.keys())
+                file_string +=  str(inputs) + " " + and_name
+            file_string += ";\n"
+
+        nand_ids = self.devices.find_devices(self.devices.NAND)
+        if nand_ids:
+            file_string += "NAND "
+            for i, nand_id in enumerate(nand_ids):
+                if i:
+                    file_string += ", "
+                nand_name = self.names.get_name_string(nand_id)
+                device = self.devices.get_device(nand_id)
+                inputs = len(device.inputs.keys())
+                file_string +=  str(inputs) + " " + nand_name
+            file_string += ";\n"
+
+        or_ids = self.devices.find_devices(self.devices.OR)
+        if or_ids:
+            file_string += "OR "
+            for i, or_id in enumerate(or_ids):
+                if i:
+                    file_string += ", "
+                or_name = self.names.get_name_string(or_id)
+                device = self.devices.get_device(or_id)
+                inputs = len(device.inputs.keys())
+                file_string +=  str(inputs) + " " + or_name
+            file_string += ";\n"
+        
+        nor_ids = self.devices.find_devices(self.devices.NOR)
+        if nor_ids:
+            file_string += "NOR "
+            for i, nor_id in enumerate(nor_ids):
+                if i:
+                    file_string += ", "
+                nor_name = self.names.get_name_string(nor_id)
+                device = self.devices.get_device(nor_id)
+                inputs = len(device.inputs.keys())
+                file_string +=  str(inputs) + " " + nor_name
+            file_string += ";\n"
+
+        xor_ids = self.devices.find_devices(self.devices.XOR)
+        if xor_ids:
+            file_string += "XOR "
+            for i, xor_id in enumerate(xor_ids):
+                if i:
+                    file_string += ", "
+                xor_name = self.names.get_name_string(xor_id)
+                device = self.devices.get_device(xor_id)
+                file_string += xor_name
+            file_string += ";\n"
+        
+        dtype_ids = self.devices.find_devices(self.devices.D_TYPE)
+        if dtype_ids:
+            file_string += "DTYPE "
+            for i, dtype_id in enumerate(dtype_ids):
+                if i:
+                    file_string += ", "
+                dtype_name = self.names.get_name_string(dtype_id)
+                device = self.devices.get_device(dtype_id)
+                file_string += dtype_name
+            file_string += ";\n"
+        
+        if bool(self.monitors.monitors_dictionary):
+            file_string += "MONITOR "
+            i = 0
+            for device_id, port_id in self.monitors.monitors_dictionary:
+                if i:
+                    file_string += ", "
+                file_string += self.get_port_string(device_id, port_id)
+                i += 1
+            file_string += ";\n"
+        
+        if self.connections:
+            file_string += "CONNECT "
+            for i, connection in enumerate(self.connections):
+                if i:
+                    file_string += ", "
+                file_string += self.get_port_string(connection.input_device_GL.device.device_id, connection.input_port_id) + " > " + self.get_port_string(connection.output_device_GL.device.device_id, connection.output_port_id)
+            file_string += ";\n"
+        return file_string
+
+    def get_port_string(self, device_id, port_id):
+        port_string = self.names.get_name_string(device_id)
+        if port_id is None:
+            return port_string
+        port_string += "." + self.names.get_name_string(port_id)
+        return port_string
