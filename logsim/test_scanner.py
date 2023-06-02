@@ -10,7 +10,7 @@ from scanner import Scanner
 def new_scanner():
     """Return a Scanner with input -> scan_test_input.txt"""
     names = Names()
-    newscanner = Scanner('logsim/scan_test_input.txt', names)
+    newscanner = Scanner('scan_test_input.txt', names)
     return newscanner
 
 
@@ -18,7 +18,7 @@ def new_scanner():
 def new_scanner2():
     """Return a Scanner with input -> scan_test_input2.txt"""
     names = Names()
-    newscanner = Scanner('logsim/scan_test_input2.txt', names)
+    newscanner = Scanner('scan_test_input2.txt', names)
     return newscanner
 
 

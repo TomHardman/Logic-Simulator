@@ -31,7 +31,7 @@
             "program": "logsim/logsim.py",
             "args": [
                 "-l",
-                "text_inputs/master_slave.txt"
+                "text_inputs/definition_file1.txt"
             ],
         },
         {
@@ -45,12 +45,13 @@
             ],
         },
         {
-            "name": "Run Blank",
+            "name": "Run Logsim",
             "type": "python",
             "request": "launch",
-            "program": "logsim/logsim.py",
+            "program": "logsim.py",
+            "cwd": "/homes/bd432/Desktop/Logic-Simulator/logsim",
             "args": [
-                "text_inputs/flip_flop.txt"
+                "/homes/bd432/Desktop/Logic-Simulator/logsim/definition_file2.txt"
             ]
         }
     ]

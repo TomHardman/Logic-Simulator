@@ -16,7 +16,7 @@ def system_with_test_data():
     devices = Devices(names)
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
-    path = 'logsim/parse_test_input.txt'
+    path = 'parse_test_input.txt'
 
     scanner = Scanner(path, names)
     parser = Parser(names, devices, network, monitors, scanner)

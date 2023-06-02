@@ -1,6 +1,14 @@
 """
 This module contains three classes that are used for custom windows
 in the Gui and a function for raising error pop up messages
+
+Classes
+----------
+CustomDialog(parent, message, caption, bitmap)
+
+RoundedScrollWindow(parent, title, devices, canvas)
+
+DeviceMenu(parent, title, devices, canvas)
 """
 
 import wx

@@ -115,13 +115,11 @@ class GuiLinux(wx.Frame):
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.AppendSubMenu(themeMenu, "&Theme")
-        fileMenu.Append(wx.ID_ANY, "&Help")
-        menuBar.Append(fileMenu, "&File")
+        menuBar.Append(fileMenu, "&Menu")
         self.SetMenuBar(menuBar)
         self.Maximize()
 
         # store Ids as instance variables for method access
-        self.help_id = fileMenu.FindItemByPosition(3).GetId()
         self.light_id = themeMenu.FindItemByPosition(0).GetId()
         self.dark_id = themeMenu.FindItemByPosition(1).GetId()
 
@@ -287,7 +285,7 @@ class GuiLinux(wx.Frame):
         add_button_c.Bind(wx.EVT_BUTTON, self.on_add_connection_button)
         add_button_d.Bind(wx.EVT_BUTTON, self.on_add_device_button)
 
-        # set certain objects as instance variables to allow method access
+        # set certain objects as class variables to allow method access
         self.panel_devices = panel_devices
         self.device_sizer = device_sizer
         self.add_button_d = add_button_d
@@ -331,13 +329,10 @@ class GuiLinux(wx.Frame):
 
         if Id == wx.ID_ABOUT:
             # Display pop up giving information about Logsim
-            icon = wx.Bitmap(
-                "/homes/th624/Documents/Logic-Simulator/logsim/doge.png",
-                wx.BITMAP_TYPE_PNG)
-            mb = CustomDialog(
-                None, "Logsim - a program for building and simulating logic"
-                "circuits \nCreated by bd432, al2008, th624\n2023",
-                "About Logsim", icon)
+            icon = wx.Bitmap("doge.png", wx.BITMAP_TYPE_PNG)
+            mb = CustomDialog(None, "Logic Simulator "
+                              "\nCreated by bd432, al2008, th624\n2023",
+                              "About Logsim", icon)
             mb.ShowModal()
             mb.Destroy()
 
@@ -429,13 +424,19 @@ class GuiLinux(wx.Frame):
 
             # execute run for specified no. cycles
             for i in range(self.cycles):
-                if self.network.execute_network():
+                if self.network.execute_network() == self.network.NO_ERROR:
                     self.monitors.record_signals()
                     self.cycles_completed += 1
 
-                else:  # raise error if there are unconnected devices
-                    error_pop_up('Run failed to execute - '
-                                 'please make sure all devices are connected')
+                # show error messages if run fails
+                elif self.network.execute_network() == \
+                        self.network.OSCILLATING:
+                    error_pop_up('Run failed to execute - network oscillating')
+                    return
+                elif self.network.execute_network() == \
+                        self.network.INPUTS_NOT_CONNECTED:
+                    error_pop_up('Run failed to execute - make sure all '
+                                 'devices are connected')
                     return
 
             # adds continue button to GUI after first run has been executed
@@ -490,7 +491,8 @@ class GuiLinux(wx.Frame):
 
             # start animation if network can be executed successfully
             # run network for one cycle
-            if self.network.execute_network():
+            error_code = self.network.execute_network()
+            if error_code == self.network.NO_ERROR:
                 self.monitors.record_signals()
                 self.cycles_completed += 1
                 self.trace_canvas.continue_pan_reset = True
@@ -522,9 +524,14 @@ class GuiLinux(wx.Frame):
                     run_sizer.Add(cont_button, 1, wx.ALL, 5)
                     panel_control.Layout()
 
-            else:  # raise error if run can't execute successfully
-                error_pop_up('Run failed to execute - '
-                             'please make sure all devices are connected')
+            # show error messages if run fails
+            elif error_code == self.network.OSCILLATING:
+                error_pop_up('Run failed to execute - network oscillating')
+                return
+            elif error_code == self.network.INPUTS_NOT_CONNECTED:
+                error_pop_up('Run failed to execute - make sure all '
+                             'devices are connected')
+                return
 
         elif lab == 'Stop':
             button.SetLabel('Animate')
@@ -537,7 +544,8 @@ class GuiLinux(wx.Frame):
         plotting of the monitor traces"""
         # execute network for one cycle on tick then update canvases
         # and update cycles completed text widget
-        if self.network.execute_network():
+        error_code = self.network.execute_network()
+        if error_code == self.network.NO_ERROR:
             self.monitors.record_signals()
             self.cycles_completed += 1
             # change pan to include far right of plot if necessary
@@ -546,6 +554,15 @@ class GuiLinux(wx.Frame):
             self.circuit_canvas.Refresh()
             self.cycles_comp_text.SetLabel(
                 f"Cycles Completed: {self.cycles_completed}")
+
+        # show error messages if run fails
+        elif error_code == self.network.OSCILLATING:
+            error_pop_up('Run failed to execute - network oscillating')
+            return
+        elif error_code == self.network.INPUTS_NOT_CONNECTED:
+            error_pop_up('Run failed to execute - make sure all '
+                         'devices are connected')
+            return
 
     def on_sash_position_change_side(self, event):
         """Handles the event where the sash position of the window
@@ -618,7 +635,8 @@ class GuiLinux(wx.Frame):
             # execute network for one cycle on tick then update canvases
             # and update cycles completed text widget
             for i in range(self.cycles):
-                if self.network.execute_network():
+                error_code = self.network.execute_network()
+                if error_code == self.network.NO_ERROR:
                     self.monitors.record_signals()
                     self.cycles_completed += 1
                     # change pan to include far right of plot if necessary
@@ -628,9 +646,16 @@ class GuiLinux(wx.Frame):
                     self.cycles_comp_text.SetLabel(
                         f"Cycles Completed: {self.cycles_completed}")
 
-                else:
-                    error_pop_up('Run failed to execute - '
-                             'please make sure all devices are connected')
+                # show error messages if run fails
+                elif error_code == \
+                        self.network.OSCILLATING:
+                    error_pop_up('Run failed to execute - network oscillating')
+                    return
+                elif error_code == \
+                        self.network.INPUTS_NOT_CONNECTED:
+                    error_pop_up('Run failed to execute - make sure all '
+                                 'devices are connected')
+                    return
 
         else:  # show error dialogue box if cycle no. is not valid
             error_pop_up('Please select valid '
