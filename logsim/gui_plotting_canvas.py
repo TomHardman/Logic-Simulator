@@ -316,6 +316,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
             if self.pan_x > 0:  # limit panning to the bounds of the trace
                 self.pan_x = 0
             self.init = False
+            self.Refresh()
 
         if event.GetWheelRotation() > 0:
             self.zoom /= (1.0 - (
@@ -331,6 +332,7 @@ class TraceCanvas(wxcanvas.GLCanvas):
                 self.pan_x = min(0,
                                  -(self.x_max*self.zoom - self.GetSize()[0]))
             self.init = False
+            self.Refresh()
 
         else:
             self.Refresh()  # triggers the paint event
