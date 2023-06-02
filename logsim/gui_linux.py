@@ -1,4 +1,12 @@
+from names import Names
+from devices import Devices
+from network import Network
+from monitors import Monitors
+from scanner import Scanner
+from parse import Parser
+
 import wx
+
 from gui_plotting_canvas import TraceCanvas
 from gui_interactive_canvas import InteractiveCanvas
 from gui_components import error_pop_up, DeviceMenu, RoundedScrollWindow, \
@@ -116,6 +124,7 @@ class GuiLinux(wx.Frame):
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.AppendSubMenu(themeMenu, "&Theme")
         fileMenu.Append(wx.ID_ANY, "&Save Circuit")
+        fileMenu.Append(wx.ID_ANY, "&Load Circuit")
         menuBar.Append(fileMenu, "&Menu")
         self.SetMenuBar(menuBar)
         self.Maximize()
@@ -124,6 +133,7 @@ class GuiLinux(wx.Frame):
         self.light_id = themeMenu.FindItemByPosition(0).GetId()
         self.dark_id = themeMenu.FindItemByPosition(1).GetId()
         self.save_id = fileMenu.FindItemByPosition(3).GetId()
+        self.load_id = fileMenu.FindItemByPosition(4).GetId()
 
         # Set up panels to split window into
         # canvas UI window and adjustable sidebar
@@ -144,23 +154,29 @@ class GuiLinux(wx.Frame):
         main_splitter.SetSashGravity(0.6)
         main_splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED,
                            self.on_sash_position_change_side)
+        self.main_splitter = main_splitter
 
-        # Set up panels for splitting canvas UI into
-        # circuit display and monitor trace display
+        # Set up panels for splitting canvas UI into circuit display and 
+        # monitor trace display and make instance variables for access
         plotting_ui = wx.Panel(canvas_window)  # panel for plotting traces
         plotting_ui.SetBackgroundColour(wx.Colour(200, 200, 200))
         plotting_sizer = wx.BoxSizer(wx.VERTICAL)
         plotting_ui.SetSizer(plotting_sizer)
+        self.plotting_ui = plotting_ui
+        self.plotting_sizer = plotting_sizer
 
         circuit_ui = wx.Panel(canvas_window)  # panel for displaying circuit
         circuit_ui.SetBackgroundColour(wx.Colour(200, 200, 200))
         circuit_sizer = wx.BoxSizer(wx.VERTICAL)
         circuit_ui.SetSizer(circuit_sizer)
+        self.circuit_ui = circuit_ui
+        self.circuit_sizer = circuit_sizer
 
         canvas_window.SplitHorizontally(circuit_ui, plotting_ui)
         canvas_window.SetSashGravity(0.65)
         canvas_window.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED,
                            self.on_sash_position_change_canvas)
+        self.canvas_window = canvas_window
 
         # Set up panels for sidebar - bg colour is set to that of parent panel
         # so only the painted on rounded panel shape is visible
@@ -298,14 +314,14 @@ class GuiLinux(wx.Frame):
         sidebar_sizer.Add(panel_devices, 1, wx.EXPAND | wx.ALL, 10)
         sidebar_sizer.Add(panel_monitors, 1, wx.EXPAND | wx.ALL, 10)
 
-        # Add canvas widgets - include as instance  for method access
-        self.trace_canvas = TraceCanvas(plotting_ui, devices, monitors)
-        self.circuit_canvas = InteractiveCanvas(circuit_ui, self, devices,
+        # Add canvas widgets - include as instance variables for method access
+        self.trace_canvas = TraceCanvas(self.plotting_ui, devices, monitors)
+        self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self, devices,
                                                 monitors, names, network)
 
         # Add canvases to respective panels
-        plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
-        circuit_sizer.Add(self.circuit_canvas, 1, wx.EXPAND, 5)
+        self.plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
+        self.circuit_sizer.Add(self.circuit_canvas, 1, wx.EXPAND, 5)
 
         # Configure main sizer layout
         main_sizer.Add(main_splitter, 1, wx.EXPAND)
@@ -345,11 +361,35 @@ class GuiLinux(wx.Frame):
             
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
+                text_file = open(file_path, 'w')
+                text_file.write(circuit_string)
+            
             dialog.Destroy()
             
-            text_file = open(file_path, 'w')
-            text_file.write(circuit_string)
 
+        if Id == self.load_id:
+            circuit_string = self.circuit_canvas.create_file_string()
+            dialog = wx.FileDialog(self, message="Choose a file to load",
+                    style=wx.FD_OPEN)
+            
+            if dialog.ShowModal() == wx.ID_OK:
+                file_path = dialog.GetPath()
+                text_file = open(file_path)
+
+                names = Names()
+                devices = Devices(names)
+                network = Network(names, devices)
+                monitors = Monitors(names, devices, network)
+                scanner = Scanner(file_path, names)
+                parser = Parser(names, devices, network, monitors, scanner)
+                
+                if parser.parse_network():
+                    self.load_circuit(names, devices, network, monitors)
+                else:
+                    error_pop_up('Circuit could not be loaded from file')
+            
+            dialog.Destroy()
+        
         # if light mode or dark mode selected
         if Id == self.light_id or Id == self.dark_id:
             if Id == self.light_id:
@@ -761,3 +801,31 @@ class GuiLinux(wx.Frame):
             self.circuit_canvas.temp_connection = None
             self.circuit_canvas.Refresh()
             self.connection_constraint = False
+
+    def load_circuit(self, names, devices, network, monitors):
+        self.devices = devices
+        self.names = names
+        self.monitors = monitors
+        self.network = network
+        self.first_run = True
+        self.cycles = 10
+        self.cycles_completed = 0
+
+        self.plotting_sizer.Detach(self.trace_canvas)
+        self.circuit_sizer.Detach(self.circuit_canvas)
+        self.trace_canvas.Destroy()
+        self.circuit_canvas.Destroy()
+        
+        self.trace_canvas = TraceCanvas(self.plotting_ui, devices, monitors)
+        self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self, devices,
+                                                monitors, names, network)
+
+        self.plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
+        self.circuit_sizer.Add(self.circuit_canvas, 1, wx.EXPAND, 5)
+
+        self.Layout()
+        self.trace_canvas.Refresh()
+        self.circuit_canvas.Refresh()
+        self.SetSize(self.GetSize().GetWidth()-10, self.GetSize().GetHeight()-10)
+        self.main_splitter.SetSashPosition(self.GetSize().GetWidth()-400)
+        self.Maximize()
