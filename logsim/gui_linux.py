@@ -806,6 +806,8 @@ class GuiLinux(wx.Frame):
         self.trace_canvas = TraceCanvas(self.plotting_ui, devices, monitors)
         self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self, devices,
                                                 monitors, names, network)
+        self.trace_canvas.dark_mode = self.dark_mode
+        self.circuit_canvas.dark_mode = self.dark_mode
 
         self.plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
         self.circuit_sizer.Add(self.circuit_canvas, 1, wx.EXPAND, 5)
