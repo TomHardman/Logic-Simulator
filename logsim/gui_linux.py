@@ -115,6 +115,7 @@ class GuiLinux(wx.Frame):
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.AppendSubMenu(themeMenu, "&Theme")
+        fileMenu.Append(wx.ID_ANY, "&Save Circuit")
         menuBar.Append(fileMenu, "&Menu")
         self.SetMenuBar(menuBar)
         self.Maximize()
@@ -122,6 +123,7 @@ class GuiLinux(wx.Frame):
         # store Ids as instance variables for method access
         self.light_id = themeMenu.FindItemByPosition(0).GetId()
         self.dark_id = themeMenu.FindItemByPosition(1).GetId()
+        self.save_id = Menu.FindItemByPosition(3).GetId()
 
         # Set up panels to split window into
         # canvas UI window and adjustable sidebar
@@ -335,6 +337,19 @@ class GuiLinux(wx.Frame):
                               "About Logsim", icon)
             mb.ShowModal()
             mb.Destroy()
+
+        if Id == self.save_id:
+            circuit_string = self.circuit_canvas.create_file_string()
+            print(circuit_string)
+            '''try:
+                text_file = open(path_to_file, x)
+            except FileExistsError:
+                if error_pop_up('File with this name already exists. Would you like to overwrite?', 
+                                style=wx.YES | wx.NO | 0x40):
+                            text_file = open(path_to_file, w)
+                else:
+                    pass'''
+
 
         # if light mode or dark mode selected
         if Id == self.light_id or Id == self.dark_id:
