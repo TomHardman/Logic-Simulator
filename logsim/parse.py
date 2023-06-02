@@ -86,6 +86,10 @@ class Parser:
                 self.monitor_keyword()
             elif self.symbol.id == self.scanner.CLOCK_ID:
                 self.clock_keyword()
+            elif self.symbol.id == self.scanner.RC_ID:
+                self.RC_keyword()
+            elif self.symbol.id == self.scanner.SIGGEN_ID:
+                self.siggen_keyword()
             else:
                 self.error(self.KEYWORD_EXPECTED)
 
@@ -174,6 +178,15 @@ class Parser:
             return number_val
         else:
             self.error(self.NUMBER_EXPECTED)
+    
+    def number_string(self):
+        """Checks and returns string of number if a symbol is a number"""
+        if (self.symbol.type == self.scanner.NUMBER):
+            number_string = self.symbol.num_string
+            self.symbol = self.scanner.get_symbol()
+            return number_string
+        else:
+            self.error(self.NUMBER_EXPECTED)
 
     def unnamed_device(self):
         """Checks name symbol does not correspond
@@ -188,10 +201,13 @@ class Parser:
         else:
             self.error(self.NAME_EXPECTED)
 
-    def number_unnamed(self):
+    def number_unnamed(self, string = False):
         """Check for a number/unnamed device and returns value and ID"""
         device_id = None
-        number = self.number()
+        if string:
+            number = self.number_string()
+        else:
+            number = self.number()
         if not self.error_bool:
             device_id = self.unnamed_device()
         return number, device_id
@@ -423,6 +439,46 @@ class Parser:
             if not self.error_bool:
                 self.devices.make_device(
                     device_id, self.devices.CLOCK, half_period)
+        if not self.error_bool:
+            self.semicolon()
+        return True
+    
+    def RC_keyword(self):
+        """Checks for the RC keyword and creates an RC device
+            with specified half period"""
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        high_period, device_id = self.number_unnamed()
+        if not self.error_bool:
+            self.devices.make_device(
+                device_id, self.devices.RC, high_period)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
+            self.symbol = self.scanner.get_symbol()
+            half_period, device_id = self.number_unnamed()
+            if not self.error_bool:
+                self.devices.make_device(
+                    device_id, self.devices.RC, high_period)
+        if not self.error_bool:
+            self.semicolon()
+        return True
+    
+    def siggen_keyword(self):
+        """Checks for the RC keyword and creates an RC device
+            with specified half period"""
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        sequence, device_id = self.number_unnamed(True)
+        if not self.error_bool:
+            self.devices.make_device(
+                device_id, self.devices.SIGGEN, sequence)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
+            self.symbol = self.scanner.get_symbol()
+            half_period, device_id = self.number_unnamed()
+            if not self.error_bool:
+                self.devices.make_device(
+                    device_id, self.devices.SIGGEN, sequence)
         if not self.error_bool:
             self.semicolon()
         return True

@@ -860,7 +860,7 @@ class RC(Device_GL):
         self.show_text = True
 
     def render(self, dark_mode):
-        """Animates the clock"""
+        """Animates the RC device"""
         if dark_mode:
             GL.glColor3f(0.03, 0.172, 0.422)
             draw_circle(self.half_height, self.x - self.width/2, self.y, (0.03, 0.172, 0.422))
@@ -1380,6 +1380,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         xor_gate_ids = devices.find_devices(devices.XOR)
         clock_ids = devices.find_devices(devices.CLOCK)
         dtype_ids = devices.find_devices(devices.D_TYPE)
+        rc_ids = devices.find_devices(devices.RC)
+        siggen_ids = devices.find_devices(devices.SIGGEN)
         x = 100
         y = 100
 
@@ -1389,6 +1391,20 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             y += 200
             self.objects.append(clock)
             self.devices_GL_list.append(clock)
+        
+        for id in rc_ids:
+            device = devices.get_device(id)
+            rc = RC(x, y, device, names)
+            y += 200
+            self.objects.append(rc)
+            self.devices_GL_list.append(rc)
+        
+        for id in siggen_ids:
+            device = devices.get_device(id)
+            rc = Sig_gen(x, y, device, names)
+            y += 200
+            self.objects.append(rc)
+            self.devices_GL_list.append(rc)
 
         for id in switch_ids:
             device = devices.get_device(id)
@@ -1397,7 +1413,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.objects.append(switch)
             self.devices_GL_list.append(switch)
             self.switch_GL_list.append(switch)
-
+        
         y = 100
         x += 200
 
