@@ -15,11 +15,11 @@ import wx
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
-def error_pop_up(string):
+def error_pop_up(string, style=wx.OK | wx.ICON_ERROR | 0x40):
     """Function used for creating error pop up windows in the Gui when
     an error is raised - takes one argument which is the string to be
     displayed in the pop up"""
-    dlg = GMD(None, string, "Error", wx.OK | wx.ICON_ERROR | 0x40)
+    dlg = GMD(None, string, "Error", style)
     dlg.SetIcon(wx.ArtProvider.GetIcon(wx.ART_WARNING))
     dlg.ShowModal()
     dlg.Destroy()
