@@ -345,14 +345,14 @@ class Network:
                 elif output_signal == self.devices.LOW:
                     device.outputs[None] = self.devices.RISING
             device.clock_counter += 1
-    
+
     def update_RC(self):
         """If it is time to do so, set clock signals to FALLING."""
         RC_devices = self.devices.find_devices(self.devices.RC)
         for device_id in RC_devices:
             device = self.devices.get_device(device_id)
             output_signal = self.get_output_signal(device_id,
-                                                       output_id=None)
+                                                   output_id=None)
             if output_signal == self.devices.HIGH and device.clock_counter == device.high_period:
                 device.outputs[None] = self.devices.FALLING
             device.clock_counter += 1
@@ -362,18 +362,18 @@ class Network:
         siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
         for device_id in siggen_devices:
             device = self.devices.get_device(device_id)
-            device.clock_counter += 1
+
             if device.clock_counter >= len(device.sequence):
                 device.clock_counter = 0
             target_signal = device.sequence[device.clock_counter]
             output_signal = self.get_output_signal(device_id,
-                                                    output_id=None)
+                                                   output_id=None)
             if target_signal != output_signal:
                 if output_signal == self.devices.HIGH:
                     device.outputs[None] = self.devices.FALLING
                 elif output_signal == self.devices.LOW:
                     device.outputs[None] = self.devices.RISING
-            
+            device.clock_counter += 1
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.

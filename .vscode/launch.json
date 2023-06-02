@@ -48,10 +48,9 @@
             "name": "Run Logsim",
             "type": "python",
             "request": "launch",
-            "program": "logsim.py",
-            "cwd": "/homes/bd432/Desktop/Logic-Simulator/logsim",
+            "program": "logsim\\logsim.py",
             "args": [
-                "/homes/th624/Documents/Logic-Simulator/logsim/definition_file1.txt"
+                "logsim\\text_inputs\\rc_input.txt"
             ]
         }
     ]

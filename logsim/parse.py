@@ -178,7 +178,7 @@ class Parser:
             return number_val
         else:
             self.error(self.NUMBER_EXPECTED)
-    
+
     def number_string(self):
         """Checks and returns string of number if a symbol is a number"""
         if (self.symbol.type == self.scanner.NUMBER):
@@ -201,7 +201,7 @@ class Parser:
         else:
             self.error(self.NAME_EXPECTED)
 
-    def number_unnamed(self, string = False):
+    def number_unnamed(self, string=False):
         """Check for a number/unnamed device and returns value and ID"""
         device_id = None
         if string:
@@ -430,19 +430,23 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         half_period, device_id = self.number_unnamed()
         if not self.error_bool:
-            self.devices.make_device(
+            error_type = self.devices.make_device(
                 device_id, self.devices.CLOCK, half_period)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             half_period, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_device(
+                error_type = self.devices.make_device(
                     device_id, self.devices.CLOCK, half_period)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
         return True
-    
+
     def RC_keyword(self):
         """Checks for the RC keyword and creates an RC device
             with specified half period"""
@@ -450,19 +454,23 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         high_period, device_id = self.number_unnamed()
         if not self.error_bool:
-            self.devices.make_device(
+            error_type = self.devices.make_device(
                 device_id, self.devices.RC, high_period)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
-            half_period, device_id = self.number_unnamed()
+            high_period, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_device(
+                error_type = self.devices.make_device(
                     device_id, self.devices.RC, high_period)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
         return True
-    
+
     def siggen_keyword(self):
         """Checks for the RC keyword and creates an RC device
             with specified half period"""
@@ -470,15 +478,19 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         sequence, device_id = self.number_unnamed(True)
         if not self.error_bool:
-            self.devices.make_device(
+            error_type = self.devices.make_device(
                 device_id, self.devices.SIGGEN, sequence)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
-            half_period, device_id = self.number_unnamed()
+            sequence, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_device(
+                error_type = self.devices.make_device(
                     device_id, self.devices.SIGGEN, sequence)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
         return True
@@ -510,7 +522,8 @@ class Parser:
                 idxlist = [index[1]]
             else:
                 idxlist = [i for i in range(index[0], index[1])]
-            print(idxlist)
+            if idxlist:
+                print(f"Character {idxlist[0]} to {idxlist[-1]}")
             underline = ''
             for i, char in enumerate(text):
                 if i in idxlist:
@@ -526,7 +539,7 @@ class Parser:
                 lines = self.scanner.input_file.readlines()
                 line = lines[symbol.linenum]
                 self.scanner.input_file.seek(position)
-                print(symbol.linenum)
+                print(f"Line - {symbol.linenum}")
                 return underline_text(line, symbol.linepos)
         print(highlight_error(self.symbol))
         if error_code == self.NAME_EXPECTED:
