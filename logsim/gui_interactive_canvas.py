@@ -1610,7 +1610,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             file_string += ";\n"
         
         nor_ids = self.devices.find_devices(self.devices.NOR)
-        if and_ids:
+        if nor_ids:
             file_string += "NOR "
             for i, nor_id in enumerate(nor_ids):
                 if i:
