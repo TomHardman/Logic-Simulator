@@ -51,7 +51,7 @@
             "program": "logsim.py",
             "cwd": "/homes/bd432/Desktop/Logic-Simulator/logsim",
             "args": [
-                "/homes/bd432/Desktop/Logic-Simulator/logsim/definition_file2.txt"
+                "/homes/th624/Documents/Logic-Simulator/logsim/definition_file1.txt"
             ]
         }
     ]
