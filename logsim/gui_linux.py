@@ -340,16 +340,15 @@ class GuiLinux(wx.Frame):
 
         if Id == self.save_id:
             circuit_string = self.circuit_canvas.create_file_string()
-            print(circuit_string)
-            '''try:
-                text_file = open(path_to_file, x)
-            except FileExistsError:
-                if error_pop_up('File with this name already exists. Would you like to overwrite?', 
-                                style=wx.YES | wx.NO | 0x40):
-                            text_file = open(path_to_file, w)
-                else:
-                    pass'''
-
+            dialog = wx.FileDialog(self, message="Choose a file location",
+                    style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+            
+            if dialog.ShowModal() == wx.ID_OK:
+                file_path = dialog.GetPath()
+            dialog.Destroy()
+            
+            text_file = open(file_path, 'w')
+            text_file.write(circuit_string)
 
         # if light mode or dark mode selected
         if Id == self.light_id or Id == self.dark_id:
