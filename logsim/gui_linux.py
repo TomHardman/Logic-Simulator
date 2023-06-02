@@ -123,7 +123,7 @@ class GuiLinux(wx.Frame):
         # store Ids as instance variables for method access
         self.light_id = themeMenu.FindItemByPosition(0).GetId()
         self.dark_id = themeMenu.FindItemByPosition(1).GetId()
-        self.save_id = Menu.FindItemByPosition(3).GetId()
+        self.save_id = fileMenu.FindItemByPosition(3).GetId()
 
         # Set up panels to split window into
         # canvas UI window and adjustable sidebar
