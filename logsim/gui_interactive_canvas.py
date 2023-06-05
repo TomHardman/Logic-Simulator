@@ -1493,7 +1493,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.monitors_GL.append(monitor)
             self.objects.append(monitor)
 
-    def render(self, text):
+    def render(self):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
         if not self.init:
@@ -1529,7 +1529,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         size = self.GetClientSize()
         text = "".join(["Canvas redrawn on paint event, size is ",
                         str(size.width), ", ", str(size.height)])
-        self.render(text)
+        self.render()
 
     def on_size(self, event):
         """Handle the canvas resize event."""
@@ -1539,7 +1539,6 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
 
     def on_mouse(self, event):
         """Handle mouse events."""
-        text = ""
         # Calculate object coordinates of the mouse position
         size = self.GetClientSize()
         ox = (event.GetX() - self.pan_x) / self.zoom
@@ -1553,8 +1552,6 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         if event.ButtonDown():
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
-            text = "".join(["Mouse button pressed at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
             # Checks for objects clicked
             for ob in self.devices_GL_list:
                 if ob.is_clicked(ox, oy):
@@ -1591,16 +1588,12 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             self.raise_error("Choose a valid monitor point")
         # Sets all devices to not clicked
         if event.ButtonUp():
-            text = "".join(["Mouse button released at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
             if self.object_clicked:
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
                     ob.clicked = False
         # Sets all devices to not clicked
         if event.Leaving():
-            text = "".join(["Mouse left canvas at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
             if self.object_clicked:
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
@@ -1618,9 +1611,6 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
             self.init = False
-            text = "".join(["Mouse dragged to: ", str(event.GetX()),
-                            ", ", str(event.GetY()), ". Pan is now: ",
-                            str(self.pan_x), ", ", str(self.pan_y)])
         if event.GetWheelRotation() < 0 and self.zoom > 0.5:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -1628,8 +1618,6 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.pan_y -= (self.zoom - old_zoom) * oy
             self.init = False
-            text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
-                            str(self.zoom)])
         if event.GetWheelRotation() > 0 and self.zoom < 2:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -1637,12 +1625,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.pan_y -= (self.zoom - old_zoom) * oy
             self.init = False
-            text = "".join(["Positive mouse wheel rotation. Zoom is now: ",
-                            str(self.zoom)])
-        if text:
-            self.render(text)
-        else:
-            self.Refresh()  # triggers the paint event
+        self.Refresh()  # triggers the paint event
 
     def check_connection_made(self, ox, oy):
         """Handles click events when in connection mode to
