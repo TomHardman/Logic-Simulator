@@ -3,92 +3,113 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-06 17:10+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2023-06-06 18:49+0100\n"
+"Last-Translator: th624 <th624@cam.ac.uk>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: German\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: gui_linux.py:129
 msgid "Light"
-msgstr ""
+msgstr "Hell"
+
+msgid "About"
+msgstr "Über"
 
 #: gui_linux.py:130
 msgid "Dark"
-msgstr ""
+msgstr "Dunkel"
 
 #: gui_linux.py:132
 msgid "&Exit"
-msgstr ""
+msgstr "&Beenden"
 
 #: gui_linux.py:134
 msgid "&Theme"
-msgstr ""
+msgstr "&FarbThema"
 
 #: gui_linux.py:135
 msgid "&Save Circuit"
-msgstr ""
+msgstr "&Schaltung speichern"
 
 #: gui_linux.py:136
 msgid "&Load Circuit"
-msgstr ""
+msgstr "&Schaltung laden"
 
 #: gui_linux.py:137
 msgid "&Menu"
-msgstr ""
+msgstr "&Menü"
 
 #: gui_linux.py:212
 msgid "Cycles:"
-msgstr ""
+msgstr "Zyklen:"
 
 #: gui_linux.py:220
 msgid "Run"
-msgstr ""
+msgstr "Ausführen"
 
-#: gui_linux.py:229 gui_linux.py:556 gui_linux.py:608 gui_linux.py:632
+#: gui_linux.py:229
+#: gui_linux.py:556
+#: gui_linux.py:608
+#: gui_linux.py:632
 #: gui_linux.py:639
 msgid "Animate"
-msgstr ""
+msgstr "Animieren"
+
+#: gui_linux.py:229
+msgid "Cycles Completed"
+msgstr "Zyklen abgeschlossen"
 
 #: gui_linux.py:267
 msgid "Monitor Configuration:"
-msgstr ""
+msgstr "Monitor-Konfiguration:"
 
-#: gui_linux.py:273 gui_linux.py:753 gui_linux.py:761
+#: gui_linux.py:273
+#: gui_linux.py:753
+#: gui_linux.py:761
 msgid ""
 "Add/Zap\n"
 "Monitors"
 msgstr ""
+"Hinzufügen/\n"
+"zappen"
 
 #: gui_linux.py:275
 msgid ""
 "Change\n"
 "Trace Colours"
 msgstr ""
+"Spurfarben\n"
+"ändern"
 
 #: gui_linux.py:293
 msgid "Device Configuration:"
-msgstr ""
+msgstr "Geräte-Konfiguration:"
 
 #: gui_linux.py:297
 msgid ""
 "Add\n"
 "Device"
 msgstr ""
+"Gerät\n"
+"hinzufügen"
 
-#: gui_linux.py:301 gui_linux.py:807 gui_linux.py:815
+#: gui_linux.py:301
+#: gui_linux.py:807
+#: gui_linux.py:815
 msgid ""
 "Add\n"
 "Connections"
 msgstr ""
+"Verbindungen\n"
+"hinzufügen"
 
 #: gui_linux.py:363
 msgid ""
@@ -96,131 +117,157 @@ msgid ""
 "Created by bd432, al2008, th624\n"
 "2023"
 msgstr ""
+"Logiksimulator\n"
+"Erstellt von bd432, al2008, th624\n"
+"2023"
 
 #: gui_linux.py:364
 msgid "About Logsim"
-msgstr ""
+msgstr "Über Logsim"
 
 #: gui_linux.py:370
 msgid "Choose a file location"
-msgstr ""
+msgstr "Wählen Sie einen Dateispeicherort"
 
 #: gui_linux.py:383
 msgid "Choose a file to load"
-msgstr ""
+msgstr "Wählen Sie eine Datei zum Laden"
 
 #: gui_linux.py:390
 msgid "Circuit file must be .txt"
-msgstr ""
+msgstr "Die Schaltungsdatei muss .txt sein"
 
 #: gui_linux.py:404
 msgid "Circuit could not be loaded from file"
-msgstr ""
+msgstr "Die Schaltung konnte nicht aus der Datei geladen werden"
 
 #: gui_linux.py:476
-msgid "Finish adding connectionsbefore trying to execute another action"
-msgstr ""
+msgid "Finish adding connections before trying to execute another action"
+msgstr "Beenden Sie das Hinzufügen von Verbindungen, bevor Sie eine andere Aktion ausführen"
 
-#: gui_linux.py:480 gui_linux.py:548 gui_linux.py:697 gui_linux.py:775
+#: gui_linux.py:480
+#: gui_linux.py:548
+#: gui_linux.py:697
+#: gui_linux.py:775
 #: gui_linux.py:795
 msgid "Finish adding/zapping monitors before trying to execute another action"
-msgstr ""
+msgstr "Beenden Sie das Hinzufügen/Löschen von Monitoren, bevor Sie eine andere Aktion ausführen"
 
-#: gui_linux.py:484 gui_linux.py:701 gui_linux.py:745 gui_linux.py:779
+#: gui_linux.py:484
+#: gui_linux.py:701
+#: gui_linux.py:745
+#: gui_linux.py:779
 #: gui_linux.py:799
 msgid "End animation before trying to execute another action"
-msgstr ""
+msgstr "Beenden Sie die Animation, bevor Sie eine andere Aktion ausführen"
 
-#: gui_linux.py:503 gui_linux.py:600 gui_linux.py:631 gui_linux.py:723
+#: gui_linux.py:503
+#: gui_linux.py:600
+#: gui_linux.py:631
+#: gui_linux.py:723
 msgid "Run failed to execute - network oscillating"
-msgstr ""
+msgstr "Die Ausführung des Programms ist fehlgeschlagen - Das Netzwerk schwingt"
 
-#: gui_linux.py:507 gui_linux.py:603 gui_linux.py:637 gui_linux.py:727
+#: gui_linux.py:507
+#: gui_linux.py:603
+#: gui_linux.py:637
+#: gui_linux.py:727
 msgid "Run failed to execute - make sure all devices are connected"
-msgstr ""
+msgstr "Die Ausführung des Programms ist fehlgeschlagen - Stellen Sie sicher, dass alle Geräte verbunden sind"
 
-#: gui_linux.py:517 gui_linux.py:585
+#: gui_linux.py:517
+#: gui_linux.py:585
 msgid "Continue"
-msgstr ""
+msgstr "Weitermachen"
 
-#: gui_linux.py:536 gui_linux.py:732
+#: gui_linux.py:536
+#: gui_linux.py:732
 msgid "Please select valid number of cycles greater than zero"
-msgstr ""
+msgstr "Bitte wählen Sie eine gültige Anzahl von Zyklen größer als Null"
 
-#: gui_linux.py:544 gui_linux.py:693 gui_linux.py:741 gui_linux.py:771
-msgid "Finish adding connections before trying to execute another action"
-msgstr ""
-
-#: gui_linux.py:573 gui_linux.py:607 gui_linux.py:754 gui_linux.py:760
-#: gui_linux.py:808 gui_linux.py:814
+#: gui_linux.py:573
+#: gui_linux.py:607
+#: gui_linux.py:754
+#: gui_linux.py:760
+#: gui_linux.py:808
+#: gui_linux.py:814
 msgid "Stop"
-msgstr ""
+msgstr "Stop"
 
 #: gui_linux.py:784
 msgid "Device Menu"
-msgstr ""
+msgstr "Geräte-Menü"
 
 #: gui_components.py:246
 msgid "Choose Device:"
-msgstr ""
+msgstr "Gerät wählen:"
 
 #: gui_components.py:265
 msgid "Enter half period:"
-msgstr ""
+msgstr "Geben Sie die halbe Periode ein:"
 
 #: gui_components.py:271
 msgid "Enter time til drop off:"
-msgstr ""
+msgstr "Geben Sie die Zeit bis zum Ausschalten ein:"
 
 #: gui_components.py:277
 msgid "Enter signal sequence:"
-msgstr ""
+msgstr "Geben Sie die Signalsequenz ein:"
 
 #: gui_components.py:282
 msgid "Enter initial switch state:"
-msgstr ""
+msgstr "Geben Sie den anfänglichen Schaltzustand ein:"
 
 #: gui_components.py:288
 msgid "Enter number of inputs:"
-msgstr ""
+msgstr "Geben Sie die Anzahl der Eingänge ein:"
 
-#: gui_components.py:294 gui_components.py:337 gui_components.py:377
+#: gui_components.py:294
+#: gui_components.py:337
+#: gui_components.py:377
 msgid "Confirm"
-msgstr ""
+msgstr "Bestätigen"
 
-#: gui_components.py:295 gui_components.py:338
+#: gui_components.py:294
+msgid "Device chosen"
+msgstr "Gerät gewählt"
+
+#: gui_components.py:295
+#: gui_components.py:338
 msgid "Back"
-msgstr ""
+msgstr "Zurück"
 
 #: gui_components.py:318
 msgid "Half Period: "
-msgstr ""
+msgstr "Halbe Periode: "
 
-#: gui_components.py:318 gui_components.py:319 gui_components.py:320
+#: gui_components.py:318
+#: gui_components.py:319
+#: gui_components.py:320
 msgid "Number of inputs: "
-msgstr ""
+msgstr "Anzahl der Eingänge: "
 
 #: gui_components.py:320
 msgid "Initial State: "
-msgstr ""
+msgstr "Anfangszustand: "
 
 #: gui_components.py:321
 msgid "Time til dropoff:"
-msgstr ""
+msgstr "Zeit bis zum Ausschalten:"
 
 #: gui_components.py:321
 msgid "Signal Sequence: "
-msgstr ""
+msgstr "Signalsequenz: "
 
 #: gui_components.py:335
 msgid "Enter device name:"
-msgstr ""
+msgstr "Geben Sie den Gerätenamen ein:"
 
 #: gui_components.py:404
 msgid "SIGGEN signal must be a sequence of 1s and 0s"
-msgstr ""
+msgstr "Das SIGGEN-Signal muss eine Sequenz von 1en und 0en sein"
 
 #: gui_components.py:420
 msgid "Please enter a valid name"
-msgstr ""
+msgstr "Bitte geben Sie einen gültigen Namen ein"
 

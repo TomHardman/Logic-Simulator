@@ -120,17 +120,18 @@ class GuiLinux(wx.Frame):
         menuBar = wx.MenuBar()
 
         # set up locale for language options
-        self.locale = wx.Locale(wx.LANGUAGE_CHINESE_SIMPLIFIED)
-        self.locale.AddCatalog('translate')
+        self.locale = wx.Locale(wx.LANGUAGE_GERMAN)
         builtins.__dict__['_'] = wx.GetTranslation
-        print(self.locale.GetCanonicalName())
+        #print(self.locale.GetCanonicalName())
+        self.locale.AddCatalogLookupPathPrefix('locales')
+        self.locale.AddCatalog('translate')
 
         # sub-menu for choosing colour theme
         themeMenu.Append(wx.ID_ANY, _("Light"))
         themeMenu.Append(wx.ID_ANY, _("Dark"))
 
         fileMenu.Append(wx.ID_EXIT, _("&Exit"))
-        fileMenu.Append(wx.ID_ABOUT, "&About")
+        fileMenu.Append(wx.ID_ABOUT, _("&About"))
         fileMenu.AppendSubMenu(themeMenu, _("&Theme"))
         fileMenu.Append(wx.ID_ANY, _("&Save Circuit"))
         fileMenu.Append(wx.ID_ANY, _("&Load Circuit"))
@@ -222,11 +223,11 @@ class GuiLinux(wx.Frame):
 
         cycles_comp_text = wx.StaticText(
             panel_control, wx.ID_ANY,
-            f"Cycles Completed: {self.cycles_completed}")
+            f"{_('Cycles Completed')}: {self.cycles_completed}")
         cycles_comp_text.SetFont(self.font_buttons)
 
         animate_button = wx.Button(panel_control, wx.ID_ANY,
-                                   _("Animate"), size=(120, 40))
+                                   _("Animate"), size=(130, 40))
         animate_button.SetFont(self.font_buttons)
         self.animate_button = animate_button
         self.timer = wx.Timer(self)  # timer object to be used for animation
@@ -300,7 +301,7 @@ class GuiLinux(wx.Frame):
 
         add_button_c = wx.Button(panel_devices, wx.ID_ANY, _("Add\nConnections"))
         add_button_c.SetFont(self.font_buttons)
-        add_button_c.SetInitialSize(wx.Size(150, 60))
+        add_button_c.SetInitialSize(wx.Size(160, 60))
 
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)  # sizer for buttons
         button_sizer.Add(add_button_d, 0, wx.ALL, 10)
@@ -360,15 +361,16 @@ class GuiLinux(wx.Frame):
             # Display pop up giving information about Logsim
             icon = wx.Bitmap("doge.png", wx.BITMAP_TYPE_PNG)
             mb = CustomDialog(
-                None, _("Logic Simulator \nCreated by bd432, al2008, th624\n2023"),
-                _("About Logsim"), icon)
+                None, wx.GetTranslation("Logic Simulator \nCreated by bd432, al2008, th624\n2023"),
+                wx.GetTranslation("About Logsim"), icon)
             mb.ShowModal()
             mb.Destroy()
 
         if Id == self.save_id:
             circuit_string = self.circuit_canvas.create_file_string()
-            dialog = wx.FileDialog(self, message=_("Choose a file location"),
-                    style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+            dialog = wx.FileDialog(
+                self, message= wx.GetTranslation("Choose a file location"),
+                style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
             
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
@@ -377,11 +379,11 @@ class GuiLinux(wx.Frame):
             
             dialog.Destroy()
             
-
         if Id == self.load_id:
             circuit_string = self.circuit_canvas.create_file_string()
-            dialog = wx.FileDialog(self, message=_("Choose a file to load"),
-                    style=wx.FD_OPEN)
+            dialog = wx.FileDialog(
+                self, message= wx.GetTranslation("Choose a file to load"),
+                style=wx.FD_OPEN)
             
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
