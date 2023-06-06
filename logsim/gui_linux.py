@@ -105,9 +105,10 @@ class GuiLinux(wx.Frame):
             14, wx.FONTFAMILY_DEFAULT,    # font to be used for all buttons
             wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         self.retracted_sidebar = False
+        self.resizing = False
 
-        # Booleans used to stop other buttons from being
-        # executed during certain processes
+        # Booleans used to stop other events being triggered
+        # during certain processes
         self.connection_constraint = False
         self.monitor_constraint = False
         self.animation_constraint = False
@@ -184,7 +185,6 @@ class GuiLinux(wx.Frame):
         # Set up panels for sidebar - bg colour is set to that of parent panel
         # so only the painted on rounded panel shape is visible
         panel_control = RoundedScrollWindow(sidebar, self)
-        panel_control.SetScrollRate(10, 0)
         panel_control.SetBackgroundColour(
             panel_control.GetParent().GetBackgroundColour())
         control_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -193,14 +193,12 @@ class GuiLinux(wx.Frame):
         panel_devices = RoundedScrollWindow(sidebar, self)
         panel_devices.SetBackgroundColour(
             panel_devices.GetParent().GetBackgroundColour())
-        panel_devices.SetScrollRate(10, 0)
         device_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_devices.SetSizer(device_sizer)
 
         panel_monitors = RoundedScrollWindow(sidebar, self)
         panel_monitors.SetBackgroundColour(
             panel_monitors.GetParent().GetBackgroundColour())
-        panel_monitors.SetScrollRate(10, 0)
         monitor_sizer = wx.BoxSizer(wx.VERTICAL)
         panel_monitors.SetSizer(monitor_sizer)
 
@@ -340,10 +338,8 @@ class GuiLinux(wx.Frame):
         """Handle resize events"""
         self.GetSizer().Layout()  # Ensure splitter adjusts to the frame size
         size = self.GetSize()
+        self.resizing = True
 
-        if self.retracted_sidebar == False:
-            self.main_splitter.SetSashPosition(size[0]-15)
-            self.main_splitter.SetSashPosition(size[0]-400)
         event.Skip()
 
     def on_menu(self, event):
@@ -583,6 +579,7 @@ class GuiLinux(wx.Frame):
                                             "Continue")
                     cont_button.SetFont(self.font_buttons)
                     cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
+                    self.cont_button = cont_button
 
                     # if in dark mode set button to dark mode style
                     if self.dark_mode:
@@ -647,9 +644,9 @@ class GuiLinux(wx.Frame):
         min_sash_pos = current_width - 400  # set displayed position of sidebar
         max_sash_pos = current_width - 15   # set retracted position of sidebar
 
-        # sidebar set back to displayed position if
-        # sash dragged out any further than displayed position
-        if current_position < min_sash_pos or current_position<current_width-30 and self.retracted_sidebar==True:
+        # sidebar set back to displayed position if sash dragged out any 
+        # further than displayed position or dragged to left when retracted
+        if current_position < min_sash_pos or current_position<current_width-20 and self.retracted_sidebar==True:
             window.SetSashPosition(min_sash_pos)
             self.retracted_sidebar = False
 
@@ -658,6 +655,10 @@ class GuiLinux(wx.Frame):
         elif current_position > min_sash_pos:
             window.SetSashPosition(max_sash_pos)
             self.retracted_sidebar = True
+
+        if self.resizing:
+            window.SetSashPosition(max_sash_pos)
+            self.resizing = False
         
 
     def on_sash_position_change_canvas(self, event):
@@ -838,5 +839,5 @@ class GuiLinux(wx.Frame):
         self.trace_canvas.Refresh()
         self.circuit_canvas.Refresh()
         self.SetSize(self.GetSize().GetWidth()-10, self.GetSize().GetHeight()-10)
-        self.main_splitter.SetSashPosition(self.GetSize().GetWidth()-400)
+        self.cycles_comp_text.SetLabel(f"Cycles Completed: {self.cycles_completed}")
         self.Maximize()
