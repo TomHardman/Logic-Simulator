@@ -348,3 +348,40 @@ def test_oscillating_network(new_network):
     network.make_connection(NOR1, None, NOR1, I1)
 
     assert not network.execute_network()
+
+def test_transient_devices(new_network):
+    network = new_network
+    new_devices = network.devices
+    names = new_devices.names
+    # Make a RC
+    [RC_ID] = names.lookup(["RC1"])
+    new_devices.make_device(RC_ID, new_devices.RC, 2)
+    RC_object = new_devices.get_device(RC_ID)
+
+    # Make a SIGGEN
+    [SIGGEN_ID] = names.lookup(["S1"])
+    new_devices.make_device(SIGGEN_ID, new_devices.SIGGEN, '110')
+    sig_object = new_devices.get_device(SIGGEN_ID)
+
+    network.execute_network()
+    RC_out = network.get_output_signal(RC_ID, None)
+    SIGGEN_out= network.get_output_signal(SIGGEN_ID, None)
+    assert RC_out == new_devices.HIGH and SIGGEN_out == new_devices.HIGH
+
+    network.execute_network()
+    RC_out = network.get_output_signal(RC_ID, None)
+    SIGGEN_out= network.get_output_signal(SIGGEN_ID, None)
+    assert RC_out == new_devices.HIGH and SIGGEN_out == new_devices.HIGH
+
+
+    network.execute_network()
+    RC_out = network.get_output_signal(RC_ID, None)
+    SIGGEN_out= network.get_output_signal(SIGGEN_ID, None)
+    assert RC_out == new_devices.LOW and SIGGEN_out == new_devices.LOW
+
+    network.execute_network()
+    RC_out = network.get_output_signal(RC_ID, None)
+    SIGGEN_out= network.get_output_signal(SIGGEN_ID, None)
+    assert RC_out == new_devices.LOW and SIGGEN_out == new_devices.HIGH
+
+

@@ -159,3 +159,13 @@ def test_set_SIGGEN(new_devices):
 
     assert sig_object.sequence == [new_devices.HIGH, new_devices.LOW]
 
+
+def test_set_RC(new_devices):
+    """Test if RC is initisalised correctly."""
+    names = new_devices.names
+    # Make a RC
+    [RC_ID] = names.lookup(["RC1"])
+    new_devices.make_device(RC_ID, new_devices.RC, 4)
+    RC_object = new_devices.get_device(RC_ID)
+
+    assert RC_object.high_period == 4
