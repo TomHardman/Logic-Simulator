@@ -231,8 +231,11 @@ class Network:
             input_signal = self.get_input_signal(device_id, input_id)
             if input_signal is None:  # this input is unconnected
                 return self.INPUTS_NOT_CONNECTED
-            input_signal_list.append(input_signal)
+            #input_signal_list.append(input_signal)
 
+        for input_id in device.inputs:
+            input_signal = self.get_input_signal(device_id, input_id)
+            input_signal_list.append(input_signal)
             if device.device_kind != self.devices.XOR:
                 if input_signal != x:
                     output_signal = self.invert_signal(y)
