@@ -120,8 +120,9 @@ class Scanner:
 
         symbol = Symbol()
         self.skip_spaces()
-        if self.current_character == "#":
+        while self.current_character == "#":
             self.advance_to_new_line()
+            self.skip_spaces()
 
         if self.current_character.isalpha():
             name_string = self.get_name()
