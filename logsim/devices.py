@@ -43,6 +43,7 @@ class Device:
         self.clock_counter = None
         self.switch_state = None
         self.dtype_memory = None
+        self.sequence = None
 
 
 class Devices:
@@ -261,14 +262,14 @@ class Devices:
         for output_id in self.dtype_output_ids:
             self.add_output(device_id, output_id)
         self.cold_startup()  # D-type initialised to a random state
-    
+
     def make_RC(self, device_id, high_period):
         """Make an RC device"""
         self.add_device(device_id, self.RC)
         device = self.get_device(device_id)
         device.high_period = high_period
         self.cold_startup()  # RC initialised to High
-    
+
     def make_siggen(self, device_id, sequence):
         """Make an SIGGEN device"""
         self.add_device(device_id, self.SIGGEN)
@@ -332,7 +333,7 @@ class Devices:
             else:
                 self.make_clock(device_id, device_property)
                 error_type = self.NO_ERROR
-        
+
         elif device_kind == self.RC:
             # Device property is the high period > 0
             if device_property is None:
@@ -342,7 +343,7 @@ class Devices:
             else:
                 self.make_RC(device_id, device_property)
                 error_type = self.NO_ERROR
-        
+
         elif device_kind == self.SIGGEN:
             # Device property is sequence of 1 and 0
             if device_property is None:

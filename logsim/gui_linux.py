@@ -6,6 +6,7 @@ from scanner import Scanner
 from parse import Parser
 
 import wx
+import os
 
 from gui_plotting_canvas import TraceCanvas
 from gui_interactive_canvas import InteractiveCanvas
@@ -374,6 +375,10 @@ class GuiLinux(wx.Frame):
             
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
+                _, file_extension = os.path.splitext(file_path)
+                if file_extension.lower() != ".txt":
+                    error_pop_up('File selected is not a txt')
+                    return
                 text_file = open(file_path)
 
                 names = Names()
