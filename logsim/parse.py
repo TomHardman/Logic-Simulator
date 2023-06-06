@@ -65,31 +65,6 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         while self.symbol.type != self.scanner.EOF:
             self.error_bool = False
-
-            # if self.symbol.id == self.scanner.CONNECT_ID:
-            #     self.connect_keyword()
-            # elif self.symbol.id == self.scanner.AND_ID:
-            #     self.and_keyword()
-            # elif self.symbol.id == self.scanner.NAND_ID:
-            #     self.nand_keyword()
-            # elif self.symbol.id == self.scanner.OR_ID:
-            #     self.or_keyword()
-            # elif self.symbol.id == self.scanner.NOR_ID:
-            #     self.nor_keyword()
-            # elif self.symbol.id == self.scanner.SWITCH_ID:
-            #     self.switch_keyword()
-            # elif self.symbol.id == self.scanner.XOR_ID:
-            #     self.xor_keyword()
-            # elif self.symbol.id == self.scanner.DTYPE_ID:
-            #     self.dtype_keyword()
-            # elif self.symbol.id == self.scanner.MONITOR_ID:
-            #     self.monitor_keyword()
-            # elif self.symbol.id == self.scanner.CLOCK_ID:
-            #     self.clock_keyword()
-            # elif self.symbol.id == self.scanner.RC_ID:
-            #     self.rc_keyword()
-            # elif self.symbol.id == self.scanner.SIGGEN_ID:
-            #     self.siggen_keyword()
             if self.symbol.type == self.scanner.KEYWORD:
                 keyword_string = self.names.get_name_string(self.symbol.id)
                 eval("self." + keyword_string.lower() + "_keyword()")
@@ -548,7 +523,7 @@ class Parser:
         if error_code == self.NAME_EXPECTED:
             return ('Error: Expected a Name')
         if error_code == self.SEMICOLON_EXPECTED:
-            return ('Error: Expected a Semicolon')
+            return ('Error: Expected a Semicolon or Comma')
         if error_code == self.KEYWORD_EXPECTED:
             return ('Error: Expected a Keyword')
         if error_code == self.NUMBER_EXPECTED:
