@@ -104,6 +104,7 @@ class GuiLinux(wx.Frame):
         self.font_buttons = wx.Font(
             14, wx.FONTFAMILY_DEFAULT,    # font to be used for all buttons
             wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        self.retracted_sidebar = False
 
         # Booleans used to stop other buttons from being
         # executed during certain processes
@@ -128,6 +129,7 @@ class GuiLinux(wx.Frame):
         fileMenu.Append(wx.ID_ANY, "&Load Circuit")
         menuBar.Append(fileMenu, "&Menu")
         self.SetMenuBar(menuBar)
+        self.SetMinSize((900, 766))
         self.Maximize()
 
         # store Ids as instance variables for method access
@@ -339,6 +341,9 @@ class GuiLinux(wx.Frame):
         self.GetSizer().Layout()  # Ensure splitter adjusts to the frame size
         size = self.GetSize()
 
+        if self.retracted_sidebar == False:
+            self.main_splitter.SetSashPosition(size[0]-15)
+            self.main_splitter.SetSashPosition(size[0]-400)
         event.Skip()
 
     def on_menu(self, event):
@@ -639,17 +644,20 @@ class GuiLinux(wx.Frame):
         current_position = window.GetSashPosition()
 
         min_sash_pos = current_width - 400  # set displayed position of sidebar
-        max_sash_pos = current_width - 20   # set retracted position of sidebar
+        max_sash_pos = current_width - 15   # set retracted position of sidebar
 
         # sidebar set back to displayed position if
         # sash dragged out any further than displayed position
-        if current_position < min_sash_pos:
+        if current_position < min_sash_pos or current_position<current_width-30 and self.retracted_sidebar==True:
             window.SetSashPosition(min_sash_pos)
+            self.retracted_sidebar = False
 
         # sidebar is set to retracted position if sash is
         # dragged to the right of displayed position
-        if current_position > min_sash_pos or current_position == 2:
+        elif current_position > min_sash_pos:
             window.SetSashPosition(max_sash_pos)
+            self.retracted_sidebar = True
+        
 
     def on_sash_position_change_canvas(self, event):
         """Function that is redundant in nature but is bound to the sash
