@@ -2,7 +2,7 @@ SWITCH 1 CLK1;
 SWITCH 0 SW1, 1 SW2;
 NAND 2 G1;
 OR 2 G2, 2 G3;          # This is a comment
-NOR 3 G4;
+NOR 3 G2;
 XOR G5;
 MONITOR CLK1, G2, G5;
 SIGGEN 100 SIGEN1;

@@ -86,13 +86,13 @@ def main(arg_list):
     [path] = arguments
     scanner = Scanner(path, names)
     parser = Parser(names, devices, network, monitors, scanner)
-    if parser.parse_network():
-        # Initialise an instance of the gui.Gui() class
-        app = wx.App()
-        gui = GuiLinux("Logic Simulator", names, devices, network,
-                       monitors)
-        gui.Show(True)
-        app.MainLoop()
+    parser.parse_network()
+    # Initialise an instance of the gui.Gui() class
+    app = wx.App()
+    gui = GuiLinux("Logic Simulator", names, devices, network,
+                    monitors)
+    gui.Show(True)
+    app.MainLoop()
     sys.exit()
 
 
