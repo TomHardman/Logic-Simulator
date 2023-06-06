@@ -347,4 +347,4 @@ def test_oscillating_network(new_network):
     # Connect the NOR gate to itself
     network.make_connection(NOR1, None, NOR1, I1)
 
-    assert not network.execute_network()
+    assert network.execute_network() == network.OSCILLATING
