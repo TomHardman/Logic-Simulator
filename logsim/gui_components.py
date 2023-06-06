@@ -216,10 +216,13 @@ class DeviceMenu(wx.Dialog):
         self.devices_dict = {'CLOCK': self.devices.CLOCK,
                              'NAND': self.devices.NAND,
                              'SWITCH': self.devices.SWITCH,
-                             'AND': self.devices.AND, 'NOR': self.devices.NOR,
+                             'AND': self.devices.AND, 
+                             'NOR': self.devices.NOR,
                              'OR': self.devices.OR,
                              'XOR': self.devices.XOR,
-                             'DTYPE': self.devices.D_TYPE}
+                             'DTYPE': self.devices.D_TYPE,
+                             'RC': self.devices.RC,
+                             'SIGGEN': self.devices.SIGGEN}
 
         overall_sizer = wx.BoxSizer(wx.VERTICAL)  # Create main sizer
         self.SetSizer(overall_sizer)
@@ -237,7 +240,8 @@ class DeviceMenu(wx.Dialog):
         device type"""
 
         choices = ['AND', 'NAND', 'SWITCH', 'OR',  # choices for drop down
-                   'NOR', 'XOR', 'CLOCK', 'DTYPE']
+                   'NOR', 'XOR', 'CLOCK', 'DTYPE',
+                   'SIGGEN', 'RC']
         device_txt = wx.StaticText(
             self.main_panel, wx.ID_ANY, 'Choose Device:')
         device_txt.SetFont(self.font)
@@ -261,7 +265,18 @@ class DeviceMenu(wx.Dialog):
                                        'Enter half period:')
             self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY,
                                            style=wx.SP_ARROW_KEYS, min=1,
-                                           max=20)
+                                           max=1000)
+        elif self.device_chosen == 'RC':
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
+                                       'Specify time til drop off:')
+            self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY,
+                                           style=wx.SP_ARROW_KEYS, min=1,
+                                           max=1000)
+        elif self.device_chosen == 'SIGGEN':
+            choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
+                                       'Enter signal sequence:')
+            self.choose_ctrl = wx.TextCtrl(self.main_panel, wx.ID_ANY, 
+                                           size=(100, 40))
         elif self.device_chosen == 'SWITCH':
             choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
                                        'Enter initial switch state:')
@@ -304,7 +319,8 @@ class DeviceMenu(wx.Dialog):
 
         phrases = {'CLOCK': 'Half Period: ', 'NAND': 'Number of inputs: ',
                    'AND': 'Number of inputs: ', 'NOR': 'Number of inputs: ',
-                   'OR': 'Number of inputs: ', 'SWITCH': 'Initial State: '}
+                   'OR': 'Number of inputs: ', 'SWITCH': 'Initial State: ',
+                   'RC': 'Time til dropoff:', 'SIGGEN':'Signal Sequence:'}
 
         chosen_txt_dev = wx.StaticText(self.main_panel, wx.ID_ANY,
                                        f' Device chosen: {self.device_chosen}')
@@ -384,6 +400,9 @@ class DeviceMenu(wx.Dialog):
         """Handles the event when the confirm button is clicked in the
         choose qualifier stage"""
         self.qualifier = self.choose_ctrl.GetValue()
+        if self.device_chosen == 'SIGGEN' and set([i for i in self.qualifier]) != {'0', '1'}:
+            error_pop_up('SIGGEN signal must be a sequence of 1s and 0s')
+            return
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
         self.panel_sizer.Detach(self.choose_qual_sizer)
         self.choose_name()
