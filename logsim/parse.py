@@ -66,26 +66,33 @@ class Parser:
         while self.symbol.type != self.scanner.EOF:
             self.error_bool = False
 
-            if self.symbol.id == self.scanner.CONNECT_ID:
-                self.connect_keyword()
-            elif self.symbol.id == self.scanner.AND_ID:
-                self.and_keyword()
-            elif self.symbol.id == self.scanner.NAND_ID:
-                self.nand_keyword()
-            elif self.symbol.id == self.scanner.OR_ID:
-                self.or_keyword()
-            elif self.symbol.id == self.scanner.NOR_ID:
-                self.nor_keyword()
-            elif self.symbol.id == self.scanner.SWITCH_ID:
-                self.switch_keyword()
-            elif self.symbol.id == self.scanner.XOR_ID:
-                self.xor_keyword()
-            elif self.symbol.id == self.scanner.DTYPE_ID:
-                self.dtype_keyword()
-            elif self.symbol.id == self.scanner.MONITOR_ID:
-                self.monitor_keyword()
-            elif self.symbol.id == self.scanner.CLOCK_ID:
-                self.clock_keyword()
+            # if self.symbol.id == self.scanner.CONNECT_ID:
+            #     self.connect_keyword()
+            # elif self.symbol.id == self.scanner.AND_ID:
+            #     self.and_keyword()
+            # elif self.symbol.id == self.scanner.NAND_ID:
+            #     self.nand_keyword()
+            # elif self.symbol.id == self.scanner.OR_ID:
+            #     self.or_keyword()
+            # elif self.symbol.id == self.scanner.NOR_ID:
+            #     self.nor_keyword()
+            # elif self.symbol.id == self.scanner.SWITCH_ID:
+            #     self.switch_keyword()
+            # elif self.symbol.id == self.scanner.XOR_ID:
+            #     self.xor_keyword()
+            # elif self.symbol.id == self.scanner.DTYPE_ID:
+            #     self.dtype_keyword()
+            # elif self.symbol.id == self.scanner.MONITOR_ID:
+            #     self.monitor_keyword()
+            # elif self.symbol.id == self.scanner.CLOCK_ID:
+            #     self.clock_keyword()
+            # elif self.symbol.id == self.scanner.RC_ID:
+            #     self.rc_keyword()
+            # elif self.symbol.id == self.scanner.SIGGEN_ID:
+            #     self.siggen_keyword()
+            if self.symbol.type == self.scanner.KEYWORD:
+                keyword_string = self.names.get_name_string(self.symbol.id)
+                eval("self." + keyword_string.lower() + "_keyword()")
             else:
                 self.error(self.KEYWORD_EXPECTED)
 
@@ -175,6 +182,15 @@ class Parser:
         else:
             self.error(self.NUMBER_EXPECTED)
 
+    def number_string(self):
+        """Checks and returns string of number if a symbol is a number"""
+        if (self.symbol.type == self.scanner.NUMBER):
+            number_string = self.symbol.num_string
+            self.symbol = self.scanner.get_symbol()
+            return number_string
+        else:
+            self.error(self.NUMBER_EXPECTED)
+
     def unnamed_device(self):
         """Checks name symbol does not correspond
             to named device and returns id"""
@@ -188,10 +204,13 @@ class Parser:
         else:
             self.error(self.NAME_EXPECTED)
 
-    def number_unnamed(self):
+    def number_unnamed(self, string=False):
         """Check for a number/unnamed device and returns value and ID"""
         device_id = None
-        number = self.number()
+        if string:
+            number = self.number_string()
+        else:
+            number = self.number()
         if not self.error_bool:
             device_id = self.unnamed_device()
         return number, device_id
@@ -414,15 +433,67 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         half_period, device_id = self.number_unnamed()
         if not self.error_bool:
-            self.devices.make_device(
+            error_type = self.devices.make_device(
                 device_id, self.devices.CLOCK, half_period)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
 
         while not self.error_bool and self.symbol.type == self.scanner.COMMA:
             self.symbol = self.scanner.get_symbol()
             half_period, device_id = self.number_unnamed()
             if not self.error_bool:
-                self.devices.make_device(
+                error_type = self.devices.make_device(
                     device_id, self.devices.CLOCK, half_period)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
+        if not self.error_bool:
+            self.semicolon()
+        return True
+
+    def rc_keyword(self):
+        """Checks for the RC keyword and creates an RC device
+            with specified half period"""
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        high_period, device_id = self.number_unnamed()
+        if not self.error_bool:
+            error_type = self.devices.make_device(
+                device_id, self.devices.RC, high_period)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
+            self.symbol = self.scanner.get_symbol()
+            high_period, device_id = self.number_unnamed()
+            if not self.error_bool:
+                error_type = self.devices.make_device(
+                    device_id, self.devices.RC, high_period)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
+        if not self.error_bool:
+            self.semicolon()
+        return True
+
+    def siggen_keyword(self):
+        """Checks for the RC keyword and creates an RC device
+            with specified half period"""
+        self.scanner.temp_queue.append(self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        sequence, device_id = self.number_unnamed(True)
+        if not self.error_bool:
+            error_type = self.devices.make_device(
+                device_id, self.devices.SIGGEN, sequence)
+            if error_type != self.devices.NO_ERROR:
+                self.error(error_type)
+
+        while not self.error_bool and self.symbol.type == self.scanner.COMMA:
+            self.symbol = self.scanner.get_symbol()
+            sequence, device_id = self.number_unnamed()
+            if not self.error_bool:
+                error_type = self.devices.make_device(
+                    device_id, self.devices.SIGGEN, sequence)
+                if error_type != self.devices.NO_ERROR:
+                    self.error(error_type)
         if not self.error_bool:
             self.semicolon()
         return True
@@ -454,7 +525,8 @@ class Parser:
                 idxlist = [index[1]]
             else:
                 idxlist = [i for i in range(index[0], index[1])]
-            print(idxlist)
+            if idxlist:
+                print(f"Character {idxlist[0]} to {idxlist[-1]}")
             underline = ''
             for i, char in enumerate(text):
                 if i in idxlist:
@@ -470,7 +542,7 @@ class Parser:
                 lines = self.scanner.input_file.readlines()
                 line = lines[symbol.linenum]
                 self.scanner.input_file.seek(position)
-                print(symbol.linenum)
+                print(f"Line - {symbol.linenum}")
                 return underline_text(line, symbol.linepos)
         print(highlight_error(self.symbol))
         if error_code == self.NAME_EXPECTED:

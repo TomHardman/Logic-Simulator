@@ -75,10 +75,10 @@ class Scanner:
                                  self.KEYWORD, self.NUMBER,
                                  self.NAME, self.EOF] = range(8)
         self.keywords_list = ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
-                              "AND", "NAND", "OR", "NOR", "DTYPE", "XOR"]
+                              "AND", "NAND", "OR", "NOR", "DTYPE", "XOR", "RC", "SIGGEN"]
         [self.CONNECT_ID, self.SWITCH_ID, self.MONITOR_ID, self.CLOCK_ID,
          self.AND_ID, self.NAND_ID, self.OR_ID, self.NOR_ID,
-            self.DTYPE_ID, self.XOR_ID] = self.names.lookup(self.keywords_list)
+            self.DTYPE_ID, self.XOR_ID, self.RC_ID, self.SIGGEN_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
         self.input_file = self.open_file(path)
         self.current_character = self.input_file.read(1)
@@ -120,6 +120,8 @@ class Scanner:
 
         symbol = Symbol()
         self.skip_spaces()
+        if self.current_character == "#":
+            self.advance_to_new_line()
 
         if self.current_character.isalpha():
             name_string = self.get_name()
@@ -130,7 +132,7 @@ class Scanner:
             [symbol.id] = self.names.lookup([name_string])
 
         elif self.current_character.isdigit():
-            symbol.id = self.get_number()
+            [symbol.id, symbol.num_string] = self.get_number()
             symbol.type = self.NUMBER
             self.advance()
 
@@ -202,9 +204,19 @@ class Scanner:
             self.current_character = self.input_file.read(1)
             self.countcarry += 1
 
-        return int(num_string)
+        return [int(num_string), num_string]
 
     def advance(self):
         """Skips by 1 charcter"""
         self.current_character = self.input_file.read(1)
         self.poscount += 1
+
+    def advance_to_new_line(self):
+        self.countcarry = 0
+        while self.current_character != "\n" and self.current_character != "":
+            self.poscount += 1
+            self.current_character = self.input_file.read(1)
+        if self.current_character == '\n':
+            self.linecount += 1
+            self.poscount = 0
+            self.current_character = self.input_file.read(1)

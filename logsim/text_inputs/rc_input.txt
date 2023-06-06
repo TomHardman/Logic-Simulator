@@ -1,0 +1,5 @@
+RC 4 RC1;
+SIGGEN 110010 SIGGEN1; # This is a comment
+AND 2 AND1;
+CONNECT RC1 > AND1.I1, SIGGEN1 > AND1.I2;
+MONITOR SIGGEN1; # Comment at the end of file
