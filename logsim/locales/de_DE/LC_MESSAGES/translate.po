@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-06 17:10+0100\n"
-"PO-Revision-Date: 2023-06-06 18:49+0100\n"
+"PO-Revision-Date: 2023-06-06 19:16+0100\n"
 "Last-Translator: th624 <th624@cam.ac.uk>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: German\n"
@@ -270,4 +270,7 @@ msgstr "Das SIGGEN-Signal muss eine Sequenz von 1en und 0en sein"
 #: gui_components.py:420
 msgid "Please enter a valid name"
 msgstr "Bitte geben Sie einen gültigen Namen ein"
+
+msgid "Error"
+msgstr "Fehler"
 

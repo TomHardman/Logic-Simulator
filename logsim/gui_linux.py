@@ -120,7 +120,7 @@ class GuiLinux(wx.Frame):
         menuBar = wx.MenuBar()
 
         # set up locale for language options
-        self.locale = wx.Locale(wx.LANGUAGE_GERMAN)
+        self.locale = wx.Locale(wx.LANGUAGE_CHINESE_SIMPLIFIED)
         builtins.__dict__['_'] = wx.GetTranslation
         #print(self.locale.GetCanonicalName())
         self.locale.AddCatalogLookupPathPrefix('locales')
