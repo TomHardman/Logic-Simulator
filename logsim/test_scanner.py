@@ -10,23 +10,38 @@ from scanner import Scanner
 def new_scanner():
     """Return a Scanner with input -> scan_test_input.txt"""
     names = Names()
-    newscanner = Scanner('scan_test_input.txt', names)
-    return newscanner
+    text = 'NAND G1;\nSWITCH 0 SW1;\nSWITCH 0 SW2;\nCONNECT SW1 > G1.I1;\nCONNECT SW2 > G1.I2;'
 
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+        """Write the string content to the temporary file"""
+        temp_file.write(text)
+        """Get the path of the temporary file"""
+        path = temp_file.name
 
-@pytest.fixture
-def new_scanner2():
-    """Return a Scanner with input -> scan_test_input2.txt"""
-    names = Names()
-    newscanner = Scanner('scan_test_input2.txt', names)
-    return newscanner
-
+    scanner = Scanner(path, names)
+    return scanner
 
 @pytest.fixture
 def scan_invalidchar():
     """Return a Scanner with input given by the tempfile below"""
     names = Names()
     text = 'NAND G!;\nSWITCH 0 SW@\nCONNECT SW1 > G1.I1;'
+
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+        """Write the string content to the temporary file"""
+        temp_file.write(text)
+        """Get the path of the temporary file"""
+        path = temp_file.name
+
+    scanner = Scanner(path, names)
+    return scanner
+
+@pytest.fixture
+def scan_comment():
+    """Return a Scanner with input given by the tempfile below"""
+    names = Names()
+    text = """NAND G1;\nSWITCH 0 SW1;\nSWITCH 0 SW2;\nCONNECT SW1 > G1.I1;
+            \nCONNECT SW2 > G1.I2;\n#AND G2, G3, G1;"""
 
     with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
         """Write the string content to the temporary file"""
@@ -47,9 +62,10 @@ def test_new_scanner(new_scanner):
     assert type(new_scanner.symbol_type_list) == range
     assert all(isinstance(keyword, str)
                for keyword in new_scanner.keywords_list)
-    assert new_scanner.keywords_list == ["CONNECT", "SWITCH", "MONITOR",
-                                         "CLOCK", "AND", "NAND", "OR", "NOR",
-                                         "DTYPE", "XOR"]
+    assert new_scanner.names.name_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
+                                            "AND", "NAND", "OR", "NOR", "DTYPE", "XOR", 
+                                            "RC", "SIGGEN", "G1", "SW1", "SW2",
+                                           "I1", "I2"]
     assert len(new_scanner.symbol_type_list) == 8
     assert new_scanner.current_character == ''
 
@@ -64,10 +80,10 @@ def test_get_position(new_scanner):
             arrows_list.append([sym.linenum, sym.linepos])
     new_scanner.input_file.close()
 
-    assert new_scanner.names.name_list == ["CONNECT", "SWITCH", "MONITOR",
-                                           "CLOCK", "AND", "NAND", "OR", "NOR",
-                                           "DTYPE", "XOR", 'G1', 'SW1', 'SW2',
-                                           'I1', 'I2']
+    assert new_scanner.names.name_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
+                                            "AND", "NAND", "OR", "NOR", "DTYPE", "XOR", 
+                                            "RC", "SIGGEN", "G1", "SW1", "SW2",
+                                           "I1", "I2"]
     assert arrows_list == [[3, [13, 13]], [4, [13, 13]]]
 
 
@@ -110,9 +126,25 @@ def test_invalidchar(scan_invalidchar):
     assert type(scan_invalidchar.symbol_type_list) == range
     assert all(isinstance(keyword, str)
                for keyword in scan_invalidchar.keywords_list)
-    assert scan_invalidchar.keywords_list == ["CONNECT", "SWITCH",
-                                              "MONITOR", "CLOCK",
-                                              "AND", "NAND", "OR", "NOR",
-                                              "DTYPE", "XOR"]
+    assert scan_invalidchar.names.name_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
+                                            "AND", "NAND", "OR", "NOR", "DTYPE", "XOR", 
+                                            "RC", "SIGGEN", "G", "SW", "SW1", "G1", "I1"]
     assert len(scan_invalidchar.symbol_type_list) == 8
     assert scan_invalidchar.current_character == ''
+
+
+def test_comment(scan_comment):
+    """Test scanner gives correct output"""
+    sym = scan_comment.get_symbol()
+    while sym.type != scan_comment.EOF:
+        sym = scan_comment.get_symbol()
+
+    assert type(scan_comment.symbol_type_list) == range
+    assert all(isinstance(keyword, str)
+            for keyword in scan_comment.keywords_list)
+    assert scan_comment.names.name_list == ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
+                                            "AND", "NAND", "OR", "NOR", "DTYPE", "XOR", 
+                                            "RC", "SIGGEN", "G1", "SW1", "SW2",
+                                        "I1", "I2"]
+    assert len(scan_comment.symbol_type_list) == 8
+    assert scan_comment.current_character == ''
