@@ -50,7 +50,7 @@
             "request": "launch",
             "program": "logsim/logsim.py",
             "args": [
-                "logsim/text_inputs/clock_inp.txt"
+                "logsim/definition_file1.txt"
             ]
         }
     ]
