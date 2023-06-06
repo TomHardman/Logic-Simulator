@@ -13,7 +13,6 @@ Graphical user interface: logsim.py <file path>
 import getopt
 import sys
 import tempfile
-
 import wx
 
 from names import Names

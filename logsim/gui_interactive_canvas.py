@@ -24,10 +24,6 @@ from OpenGL import GL, GLUT
 from wx.lib.agw.genericmessagedialog import GenericMessageDialog as GMD
 
 
-def overline(text):
-    return u'{}\u0304'.format((text))
-
-
 def draw_circle(r, x, y, color):
     """Renders a circle of radius r at (x,y)"""
     num_segments = 100
@@ -860,21 +856,20 @@ class RC(Device_GL):
         self.show_text = True
 
     def render(self, dark_mode):
-        """Animates the RC device"""
+        """Animates the clock"""
         if dark_mode:
             GL.glColor3f(0.03, 0.172, 0.422)
-            draw_circle(self.half_height, self.x - self.width /
-                        2, self.y, (0.03, 0.172, 0.422))
+            draw_circle(self.half_height, self.x - self.width/2, self.y, (0.03, 0.172, 0.422))
         else:
             GL.glColor3f(0.212, 0.271, 0.310)
-            draw_circle(self.half_height, self.x - self.width /
-                        2, self.y, (0.212, 0.271, 0.310))
+            draw_circle(self.half_height, self.x - self.width/2, self.y, (0.212, 0.271, 0.310))
         GL.glBegin(GL.GL_POLYGON)
         GL.glVertex2f(self.x - self.width/2, self.y + self.half_height)
         GL.glVertex2f(self.x + self.width/2, self.y + self.half_height)
         GL.glVertex2f(self.x + self.width/2, self.y - self.half_height)
         GL.glVertex2f(self.x - self.width/2, self.y - self.half_height)
         GL.glEnd()
+
 
         if self.device.outputs[None]:
             if dark_mode:
@@ -896,21 +891,17 @@ class RC(Device_GL):
 
         GL.glVertex2f(self.x - self.width/2 + 4 - self.half_height/2, self.y)
         GL.glVertex2f(self.x - self.width/10 - self.half_height/2, self.y)
-        GL.glVertex2f(self.x - self.width/10 - self.half_height /
-                      2, self.y + self.half_height*(2/3))
-        GL.glVertex2f(self.x - self.width/10 - self.half_height /
-                      2, self.y - self.half_height*(2/3))
+        GL.glVertex2f(self.x - self.width/10 - self.half_height/2, self.y + self.half_height*(2/3))
+        GL.glVertex2f(self.x - self.width/10 - self.half_height/2, self.y - self.half_height*(2/3))
 
         GL.glEnd()
 
         GL.glBegin(GL.GL_LINES)
-
+    
         GL.glVertex2f(self.x + self.width/2 - 4 - self.half_height/2, self.y)
         GL.glVertex2f(self.x + self.width/10 - self.half_height/2, self.y)
-        GL.glVertex2f(self.x + self.width/10 - self.half_height /
-                      2, self.y + self.half_height*(2/3))
-        GL.glVertex2f(self.x + self.width/10 - self.half_height /
-                      2, self.y - self.half_height*(2/3))
+        GL.glVertex2f(self.x + self.width/10 - self.half_height/2, self.y + self.half_height*(2/3))
+        GL.glVertex2f(self.x + self.width/10 - self.half_height/2, self.y - self.half_height*(2/3))
 
         GL.glEnd()
 
@@ -922,7 +913,7 @@ class RC(Device_GL):
         elif self.device.outputs[None]:
             color = (0.617, 0, 0)
         else:
-            color = (0, 0, 0)
+            color = (0,0,0)
         draw_circle(self.port_radius, self.x +
                     self.width/2, self.y, color)
         if self.show_text:
@@ -960,7 +951,6 @@ class RC(Device_GL):
             raise ValueError(("Port not valid"))
 
         return [x, y]
-
 
 class Clock(Device_GL):
     """Creates an Clock for animation"""
@@ -1003,7 +993,7 @@ class Clock(Device_GL):
                 GL.glColor3f(0.0, 0.0, 0.0)
                 color = (0.0, 0.0, 0.0)
         GL.glBegin(GL.GL_TRIANGLE_STRIP)
-
+        
         GL.glVertex2f(self.x - self.width/4, self.y)
         GL.glVertex2f(self.x - self.width/4 + self.thickness, self.y)
 
@@ -1025,7 +1015,7 @@ class Clock(Device_GL):
 
         GL.glVertex2f(self.x - self.thickness + self.width/4, self.y)
         GL.glVertex2f(self.x + self.width/4, self.y)
-
+        
         GL.glEnd()
 
         draw_circle(self.thickness/2, self.x - self.width /
@@ -1040,7 +1030,7 @@ class Clock(Device_GL):
         elif self.device.outputs[None]:
             color = (0.617, 0, 0)
         else:
-            color = (0, 0, 0)
+            color = (0,0,0)
         draw_circle(self.port_radius, self.x +
                     self.width/2, self.y, color)
         if self.show_text:
@@ -1078,7 +1068,6 @@ class Clock(Device_GL):
             raise ValueError(("Port not valid"))
 
         return [x, y]
-
 
 class Sig_gen(Device_GL):
     """Creates an SIGGEN for animation"""
@@ -1104,7 +1093,7 @@ class Sig_gen(Device_GL):
         GL.glVertex2f(self.x + self.width/2, self.y + self.half_height)
         GL.glVertex2f(self.x + self.width/2, self.y - self.half_height)
         GL.glVertex2f(self.x - self.width/2, self.y - self.half_height)
-        GL.glVertex2f(self.x - self.width/2 - 8, self.y)
+        GL.glVertex2f(self.x -self.width/2 - 8, self.y)
         GL.glEnd()
 
         if self.device.outputs[None]:
@@ -1123,14 +1112,14 @@ class Sig_gen(Device_GL):
                 color = (0.0, 0.0, 0.0)
         GL.glLineWidth(self.thickness)
         GL.glBegin(GL.GL_LINES)
-
+        
         GL.glVertex2f(self.x - self.width/4 - 4, self.y)
         GL.glVertex2f(self.x - self.width/4 - 4, self.y + self.half_height/2)
 
         GL.glVertex2f(self.x - self.width/4 - 4, self.y + self.half_height/2)
-        GL.glVertex2f(self.x - self.width/8, self.y + self.half_height/2)
+        GL.glVertex2f(self.x - self.width/8 , self.y + self.half_height/2)
 
-        GL.glVertex2f(self.x - self.width/8, self.y + self.half_height/2)
+        GL.glVertex2f(self.x - self.width/8 , self.y + self.half_height/2)
         GL.glVertex2f(self.x - self.width/8, self.y - self.half_height/2)
 
         GL.glVertex2f(self.x - self.width/8, self.y - self.half_height/2)
@@ -1138,6 +1127,7 @@ class Sig_gen(Device_GL):
 
         GL.glVertex2f(self.x + self.width/4, self.y - self.half_height/2)
         GL.glVertex2f(self.x + self.width/4, self.y)
+        
 
         GL.glEnd()
 
@@ -1146,8 +1136,9 @@ class Sig_gen(Device_GL):
                    (self.x - self.width/8, self.y - self.half_height/2),
                    (self.x + self.width/4, self.y - self.half_height/2)]
 
-        for (x, y) in corners:
+        for (x,y) in corners:
             draw_circle(self.thickness/4, x, y, color)
+
 
         if dark_mode:
             if self.device.outputs[None]:
@@ -1157,7 +1148,7 @@ class Sig_gen(Device_GL):
         elif self.device.outputs[None]:
             color = (0.617, 0, 0)
         else:
-            color = (0, 0, 0)
+            color = (0,0,0)
         draw_circle(self.port_radius, self.x +
                     self.width/2, self.y, color)
         if self.show_text:
@@ -1195,6 +1186,8 @@ class Sig_gen(Device_GL):
             raise ValueError(("Port not valid"))
 
         return [x, y]
+
+
 
 
 class Switch(Device_GL):
@@ -1383,8 +1376,6 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         xor_gate_ids = devices.find_devices(devices.XOR)
         clock_ids = devices.find_devices(devices.CLOCK)
         dtype_ids = devices.find_devices(devices.D_TYPE)
-        rc_ids = devices.find_devices(devices.RC)
-        siggen_ids = devices.find_devices(devices.SIGGEN)
         x = 100
         y = 100
 
@@ -1394,20 +1385,6 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             y += 200
             self.objects.append(clock)
             self.devices_GL_list.append(clock)
-
-        for id in rc_ids:
-            device = devices.get_device(id)
-            rc = RC(x, y, device, names)
-            y += 200
-            self.objects.append(rc)
-            self.devices_GL_list.append(rc)
-
-        for id in siggen_ids:
-            device = devices.get_device(id)
-            rc = Sig_gen(x, y, device, names)
-            y += 200
-            self.objects.append(rc)
-            self.devices_GL_list.append(rc)
 
         for id in switch_ids:
             device = devices.get_device(id)
@@ -1493,7 +1470,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.monitors_GL.append(monitor)
             self.objects.append(monitor)
 
-    def render(self):
+    def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
         if not self.init:
@@ -1529,7 +1506,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         size = self.GetClientSize()
         text = "".join(["Canvas redrawn on paint event, size is ",
                         str(size.width), ", ", str(size.height)])
-        self.render()
+        self.render(text)
 
     def on_size(self, event):
         """Handle the canvas resize event."""
@@ -1539,6 +1516,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
 
     def on_mouse(self, event):
         """Handle mouse events."""
+        text = ""
         # Calculate object coordinates of the mouse position
         size = self.GetClientSize()
         ox = (event.GetX() - self.pan_x) / self.zoom
@@ -1552,6 +1530,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         if event.ButtonDown():
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
+            text = "".join(["Mouse button pressed at: ", str(event.GetX()),
+                            ", ", str(event.GetY())])
             # Checks for objects clicked
             for ob in self.devices_GL_list:
                 if ob.is_clicked(ox, oy):
@@ -1588,12 +1568,16 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                             self.raise_error("Choose a valid monitor point")
         # Sets all devices to not clicked
         if event.ButtonUp():
+            text = "".join(["Mouse button released at: ", str(event.GetX()),
+                            ", ", str(event.GetY())])
             if self.object_clicked:
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
                     ob.clicked = False
         # Sets all devices to not clicked
         if event.Leaving():
+            text = "".join(["Mouse left canvas at: ", str(event.GetX()),
+                            ", ", str(event.GetY())])
             if self.object_clicked:
                 self.object_clicked = False
                 for ob in self.devices_GL_list:
@@ -1611,6 +1595,9 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
             self.init = False
+            text = "".join(["Mouse dragged to: ", str(event.GetX()),
+                            ", ", str(event.GetY()), ". Pan is now: ",
+                            str(self.pan_x), ", ", str(self.pan_y)])
         if event.GetWheelRotation() < 0 and self.zoom > 0.5:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -1618,6 +1605,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.pan_y -= (self.zoom - old_zoom) * oy
             self.init = False
+            text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
+                            str(self.zoom)])
         if event.GetWheelRotation() > 0 and self.zoom < 2:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -1625,7 +1614,12 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.pan_y -= (self.zoom - old_zoom) * oy
             self.init = False
-        self.Refresh()  # triggers the paint event
+            text = "".join(["Positive mouse wheel rotation. Zoom is now: ",
+                            str(self.zoom)])
+        if text:
+            self.render(text)
+        else:
+            self.Refresh()  # triggers the paint event
 
     def check_connection_made(self, ox, oy):
         """Handles click events when in connection mode to
@@ -1762,9 +1756,9 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 device_GL = D_type(400, 100, device, self.names)
             elif device_type == self.devices.CLOCK:
                 device_GL = Clock(400, 100, device, self.names)
-            elif device_type == self.devices.SIGGEN:
+            elif device_type == self.devices.CLOCK:
                 device_GL = Sig_gen(400, 100, device, self.names)
-            elif device_type == self.devices.RC:
+            elif device_type == self.devices.CLOCK:
                 device_GL = RC(400, 100, device, self.names)
             self.objects.append(device_GL)
             self.devices_GL_list.append(device_GL)
@@ -1797,7 +1791,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 switch_name = self.names.get_name_string(switch_id)
                 device = self.devices.get_device(switch_id)
                 switch_state = device.outputs[None]
-                file_string += str(switch_state) + " " + switch_name
+                file_string +=  str(switch_state) + " " + switch_name
             file_string += ";\n"
 
         clock_ids = self.devices.find_devices(self.devices.CLOCK)
@@ -1808,7 +1802,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                     file_string += ", "
                 clock_name = self.names.get_name_string(clock_id)
                 device = self.devices.get_device(clock_id)
-                file_string += str(device.clock_half_period) + " " + clock_name
+                file_string +=  str(device.clock_half_period) + " " + clock_name
             file_string += ";\n"
 
         and_ids = self.devices.find_devices(self.devices.AND)
@@ -1820,7 +1814,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 and_name = self.names.get_name_string(and_id)
                 device = self.devices.get_device(and_id)
                 inputs = len(device.inputs.keys())
-                file_string += str(inputs) + " " + and_name
+                file_string +=  str(inputs) + " " + and_name
             file_string += ";\n"
 
         nand_ids = self.devices.find_devices(self.devices.NAND)
@@ -1832,7 +1826,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 nand_name = self.names.get_name_string(nand_id)
                 device = self.devices.get_device(nand_id)
                 inputs = len(device.inputs.keys())
-                file_string += str(inputs) + " " + nand_name
+                file_string +=  str(inputs) + " " + nand_name
             file_string += ";\n"
 
         or_ids = self.devices.find_devices(self.devices.OR)
@@ -1844,9 +1838,9 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 or_name = self.names.get_name_string(or_id)
                 device = self.devices.get_device(or_id)
                 inputs = len(device.inputs.keys())
-                file_string += str(inputs) + " " + or_name
+                file_string +=  str(inputs) + " " + or_name
             file_string += ";\n"
-
+        
         nor_ids = self.devices.find_devices(self.devices.NOR)
         if nor_ids:
             file_string += "NOR "
@@ -1856,7 +1850,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 nor_name = self.names.get_name_string(nor_id)
                 device = self.devices.get_device(nor_id)
                 inputs = len(device.inputs.keys())
-                file_string += str(inputs) + " " + nor_name
+                file_string +=  str(inputs) + " " + nor_name
             file_string += ";\n"
 
         xor_ids = self.devices.find_devices(self.devices.XOR)
@@ -1869,7 +1863,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 device = self.devices.get_device(xor_id)
                 file_string += xor_name
             file_string += ";\n"
-
+        
         dtype_ids = self.devices.find_devices(self.devices.D_TYPE)
         if dtype_ids:
             file_string += "DTYPE "
@@ -1880,32 +1874,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 device = self.devices.get_device(dtype_id)
                 file_string += dtype_name
             file_string += ";\n"
-
-        rc_ids = self.devices.find_devices(self.devices.RC)
-        if rc_ids:
-            file_string += "RC "
-            for i, rc_id in enumerate(rc_ids):
-                if i:
-                    file_string += ", "
-                rc_name = self.names.get_name_string(rc_id)
-                device = self.devices.get_device(rc_id)
-                file_string += str(device.high_period) + " " + rc_name
-            file_string += ";\n"
-
-        siggen_ids = self.devices.find_devices(self.devices.SIGGEN)
-        if siggen_ids:
-            file_string += "SIGGEN "
-            for i, siggen_id in enumerate(siggen_ids):
-                if i:
-                    file_string += ", "
-                rc_name = self.names.get_name_string(siggen_id)
-                device = self.devices.get_device(siggen_id)
-                string_map = {self.devices.HIGH: "1", self.devices.LOW: "0"}
-                sequence_string = "".join([string_map[j]
-                                          for j in device.sequence])
-                file_string += sequence_string + " " + rc_name
-            file_string += ";\n"
-
+        
         if bool(self.monitors.monitors_dictionary):
             file_string += "MONITOR "
             i = 0
@@ -1915,16 +1884,13 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 file_string += self.get_port_string(device_id, port_id)
                 i += 1
             file_string += ";\n"
-
+        
         if self.connections:
             file_string += "CONNECT "
             for i, connection in enumerate(self.connections):
                 if i:
                     file_string += ", "
-                file_string += self.get_port_string(connection.input_device_GL.device.device_id, connection.input_port_id) + \
-                    " > " + \
-                    self.get_port_string(
-                        connection.output_device_GL.device.device_id, connection.output_port_id)
+                file_string += self.get_port_string(connection.input_device_GL.device.device_id, connection.input_port_id) + " > " + self.get_port_string(connection.output_device_GL.device.device_id, connection.output_port_id)
             file_string += ";\n"
         return file_string
 
