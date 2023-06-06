@@ -932,7 +932,7 @@ class RC(Device_GL):
 
     def is_clicked(self, mouse_x, mouse_y):
         """Checks if device is clicked"""
-        x_low = self.x - self.width/2
+        x_low = self.x - self.width- self.port_radius
         x_high = self.x + self.width
         if (x_low < mouse_x < x_high and
             self.y - self.half_height < mouse_y <
@@ -1167,7 +1167,7 @@ class Sig_gen(Device_GL):
 
     def is_clicked(self, mouse_x, mouse_y):
         """Checks if device is clicked"""
-        x_low = self.x - self.width/2
+        x_low = self.x - self.width/2 - 8
         x_high = self.x + self.width
         if (x_low < mouse_x < x_high and
             self.y - self.half_height < mouse_y <

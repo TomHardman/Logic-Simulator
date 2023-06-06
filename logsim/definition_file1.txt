@@ -1,4 +1,4 @@
-CLOCK 3 CLK1;
+SWITCH 1 CLK1;
 SWITCH 0 SW1, 1 SW2;
 NAND 2 G1;
 OR 2 G2, 2 G3;          # This is a comment

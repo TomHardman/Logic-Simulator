@@ -50,7 +50,7 @@
             "request": "launch",
             "program": "logsim/logsim.py",
             "args": [
-                "logsim/definition_file2.txt"
+                "logsim/definition_file1.txt"
             ]
         }
     ]
