@@ -338,10 +338,7 @@ class GuiLinux(wx.Frame):
         """Handle resize events"""
         self.GetSizer().Layout()  # Ensure splitter adjusts to the frame size
         size = self.GetSize()
-        min_height = 766
 
-        if size[1] < min_height:
-            self.SetSize(size[0], min_height)
         event.Skip()
 
     def on_menu(self, event):
