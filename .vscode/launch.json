@@ -48,9 +48,9 @@
             "name": "Run Logsim",
             "type": "python",
             "request": "launch",
-            "program": "logsim\\logsim.py",
+            "program": "logsim/logsim.py",
             "args": [
-                "logsim\\text_inputs\\rc_input.txt"
+                "logsim/text_inputs/rc_input.txt"
             ]
         }
     ]

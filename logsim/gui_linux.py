@@ -337,6 +337,11 @@ class GuiLinux(wx.Frame):
     def on_size(self, event):
         """Handle resize events"""
         self.GetSizer().Layout()  # Ensure splitter adjusts to the frame size
+        size = self.GetSize()
+        min_height = 766
+
+        if size[1] < min_height:
+            self.SetSize(size[0], min_height)
         event.Skip()
 
     def on_menu(self, event):
@@ -377,7 +382,7 @@ class GuiLinux(wx.Frame):
                 file_path = dialog.GetPath()
                 _, file_extension = os.path.splitext(file_path)
                 if file_extension.lower() != ".txt":
-                    error_pop_up('File selected is not a txt')
+                    error_pop_up('Circuit file must be .txt')
                     return
                 text_file = open(file_path)
 
@@ -507,6 +512,7 @@ class GuiLinux(wx.Frame):
                 cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
                 cont_button.SetFont(self.font_buttons)
                 cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
+                self.cont_button = cont_button  # to allow deletion of button
 
                 if self.dark_mode:
                     cont_button.SetForegroundColour(wx.Colour(100, 80, 100))
@@ -652,7 +658,7 @@ class GuiLinux(wx.Frame):
         """Function that is redundant in nature but is bound to the sash
         position change event for the canvas UI window in order to avoid
         interference between the sash position change events for the two
-         separate splitter windows"""
+        separate splitter windows"""
         pass
 
     def on_cycle_spin(self, event):
@@ -795,6 +801,11 @@ class GuiLinux(wx.Frame):
             self.connection_constraint = False
 
     def load_circuit(self, names, devices, network, monitors):
+        '''Function that reconfigures the GUI canvases and instance variables
+        when a new circuit is successfully loaded from the file menu'''
+        if not self.first_run:
+            self.cont_button.Destroy()
+
         self.devices = devices
         self.names = names
         self.monitors = monitors
