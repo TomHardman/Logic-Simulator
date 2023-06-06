@@ -243,7 +243,7 @@ class DeviceMenu(wx.Dialog):
                    'NOR', 'XOR', 'CLOCK', 'DTYPE',
                    'SIGGEN', 'RC']
         device_txt = wx.StaticText(
-            self.main_panel, wx.ID_ANY, 'Choose Device:')
+            self.main_panel, wx.ID_ANY, _('Choose Device:'))
         device_txt.SetFont(self.font)
         drop_down = wx.Choice(self.main_panel, wx.ID_ANY, choices=choices)
         drop_down.Bind(wx.EVT_CHOICE, self.on_drop_down)
@@ -262,39 +262,39 @@ class DeviceMenu(wx.Dialog):
         or DTYPE"""
         if self.device_chosen == 'CLOCK':
             choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                       'Enter half period:')
+                                       _('Enter half period:'))
             self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY,
                                            style=wx.SP_ARROW_KEYS, min=1,
                                            max=1000)
         elif self.device_chosen == 'RC':
             choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                       'Specify time til drop off:')
+                                       _('Enter time til drop off:'))
             self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY,
                                            style=wx.SP_ARROW_KEYS, min=1,
                                            max=1000)
         elif self.device_chosen == 'SIGGEN':
             choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                       'Enter signal sequence:')
+                                       _('Enter signal sequence:'))
             self.choose_ctrl = wx.TextCtrl(self.main_panel, wx.ID_ANY, 
                                            size=(100, 40))
         elif self.device_chosen == 'SWITCH':
             choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                       'Enter initial switch state:')
+                                       _('Enter initial switch state:'))
             self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY,
                                            style=wx.SP_ARROW_KEYS, min=0,
                                            max=1)
         else:
             choose_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                       'Enter number of inputs:')
+                                       _('Enter number of inputs:'))
             self.choose_ctrl = wx.SpinCtrl(self.main_panel, wx.ID_ANY,
                                            style=wx.SP_ARROW_KEYS, min=2,
                                            max=16)
-
+        
         chosen_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                   f' Device chosen: {self.device_chosen}')
+                                   f"{_('Device chosen')}: {self.device_chosen}")
         chosen_txt.SetFont(self.font)
-        confirm_button_qual = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
-        back_button_qual = wx.Button(self.main_panel, wx.ID_ANY, "Back")
+        confirm_button_qual = wx.Button(self.main_panel, wx.ID_ANY, _("Confirm"))
+        back_button_qual = wx.Button(self.main_panel, wx.ID_ANY, _("Back"))
         confirm_button_qual.Bind(wx.EVT_BUTTON, self.on_confirm_qual)
         back_button_qual.Bind(wx.EVT_BUTTON, self.on_back_qual)
 
@@ -317,13 +317,13 @@ class DeviceMenu(wx.Dialog):
         """Function that creates the pop up window for entering
         the device name"""
 
-        phrases = {'CLOCK': 'Half Period: ', 'NAND': 'Number of inputs: ',
-                   'AND': 'Number of inputs: ', 'NOR': 'Number of inputs: ',
-                   'OR': 'Number of inputs: ', 'SWITCH': 'Initial State: ',
-                   'RC': 'Time til dropoff:', 'SIGGEN':'Signal Sequence:'}
+        phrases = {'CLOCK': _('Half Period: '), 'NAND': _('Number of inputs: '),
+                   'AND': _('Number of inputs: '), 'NOR': _('Number of inputs: '),
+                   'OR': _('Number of inputs: '), 'SWITCH': _('Initial State: '),
+                   'RC': _('Time til dropoff:'), 'SIGGEN':_('Signal Sequence: ')}
 
         chosen_txt_dev = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                       f' Device chosen: {self.device_chosen}')
+                                       f"{_('Device chosen')}: {self.device_chosen}")
         chosen_txt_dev.SetFont(self.font)
 
         # add text to state chosen qualifier if relevant
@@ -334,10 +334,10 @@ class DeviceMenu(wx.Dialog):
             chosen_txt_qual.SetFont(self.font)
 
         name_prompt = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                    'Enter device name:')
+                                    _('Enter device name:'))
         name_input = wx.TextCtrl(self.main_panel, wx.ID_ANY, size=(100, 40))
-        confirm_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Confirm")
-        back_button_name = wx.Button(self.main_panel, wx.ID_ANY, "Back")
+        confirm_button_name = wx.Button(self.main_panel, wx.ID_ANY, _("Confirm"))
+        back_button_name = wx.Button(self.main_panel, wx.ID_ANY, _("Back"))
         confirm_button_name.Bind(wx.EVT_BUTTON, self.on_confirm_name)
         back_button_name.Bind(wx.EVT_BUTTON, self.on_back_name)
         name_input.Bind(wx.EVT_TEXT, self.on_name_entry)
@@ -376,7 +376,7 @@ class DeviceMenu(wx.Dialog):
 
         if self.first_selection and self.device_chosen:
             confirm_button_dev = wx.Button(self.main_panel, wx.ID_ANY,
-                                           "Confirm")
+                                           _("Confirm"))
             self.choose_dev_sizer.Add(confirm_button_dev, 1,
                                       wx.ALL | wx.ALIGN_LEFT, 5)
             confirm_button_dev.Bind(wx.EVT_BUTTON, self.on_confirm_dev)
@@ -403,7 +403,7 @@ class DeviceMenu(wx.Dialog):
         if self.device_chosen == 'SIGGEN':
             seq_set = set([i for i in self.qualifier])
             if seq_set != {'1', '0'} and seq_set != {'1'} and seq_set != {'0'}:
-                error_pop_up('SIGGEN signal must be a sequence of 1s and 0s')
+                error_pop_up(_('SIGGEN signal must be a sequence of 1s and 0s'))
                 return
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
         self.panel_sizer.Detach(self.choose_qual_sizer)
@@ -419,7 +419,7 @@ class DeviceMenu(wx.Dialog):
                 self.EndModal(wx.ID_OK)
 
         else:
-            error_pop_up('Please enter a valid name')
+            error_pop_up(_('Please enter a valid name'))
 
     def on_back_qual(self, event):
         """Handles the event when the back button is clicked in the

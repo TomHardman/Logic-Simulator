@@ -7,6 +7,7 @@ from parse import Parser
 
 import wx
 import os
+import builtins
 
 from gui_plotting_canvas import TraceCanvas
 from gui_interactive_canvas import InteractiveCanvas
@@ -118,17 +119,22 @@ class GuiLinux(wx.Frame):
         themeMenu = wx.Menu()
         menuBar = wx.MenuBar()
 
-        # sub-menu for choosing colour theme
-        themeMenu.Append(wx.ID_ANY, "Light")
-        themeMenu.Append(wx.ID_ANY, "Dark")
-        # store Ids as instance variables for method access
+        # set up locale for language options
+        self.locale = wx.Locale(wx.LANGUAGE_CHINESE_SIMPLIFIED)
+        self.locale.AddCatalog('translate')
+        builtins.__dict__['_'] = wx.GetTranslation
+        print(self.locale.GetCanonicalName())
 
-        fileMenu.Append(wx.ID_EXIT, "&Exit")
+        # sub-menu for choosing colour theme
+        themeMenu.Append(wx.ID_ANY, _("Light"))
+        themeMenu.Append(wx.ID_ANY, _("Dark"))
+
+        fileMenu.Append(wx.ID_EXIT, _("&Exit"))
         fileMenu.Append(wx.ID_ABOUT, "&About")
-        fileMenu.AppendSubMenu(themeMenu, "&Theme")
-        fileMenu.Append(wx.ID_ANY, "&Save Circuit")
-        fileMenu.Append(wx.ID_ANY, "&Load Circuit")
-        menuBar.Append(fileMenu, "&Menu")
+        fileMenu.AppendSubMenu(themeMenu, _("&Theme"))
+        fileMenu.Append(wx.ID_ANY, _("&Save Circuit"))
+        fileMenu.Append(wx.ID_ANY, _("&Load Circuit"))
+        menuBar.Append(fileMenu, _("&Menu"))
         self.SetMenuBar(menuBar)
         self.SetMinSize((900, 766))
         self.Maximize()
@@ -203,7 +209,7 @@ class GuiLinux(wx.Frame):
         panel_monitors.SetSizer(monitor_sizer)
 
         # Widgets and sizers for control panel
-        cycle_text = wx.StaticText(panel_control, wx.ID_ANY, "Cycles:")
+        cycle_text = wx.StaticText(panel_control, wx.ID_ANY, _("Cycles:"))
         cycle_text.SetFont(self.font_buttons)
 
         cycle_spin = wx.SpinCtrl(panel_control, wx.ID_ANY, str(self.cycles))
@@ -211,7 +217,7 @@ class GuiLinux(wx.Frame):
                           wx.FONTWEIGHT_LIGHT)
         cycle_spin.SetFont(font_cs)
 
-        run_button = wx.Button(panel_control, wx.ID_ANY, label="Run")
+        run_button = wx.Button(panel_control, wx.ID_ANY, label=_("Run"))
         run_button.SetFont(self.font_buttons)
 
         cycles_comp_text = wx.StaticText(
@@ -220,8 +226,9 @@ class GuiLinux(wx.Frame):
         cycles_comp_text.SetFont(self.font_buttons)
 
         animate_button = wx.Button(panel_control, wx.ID_ANY,
-                                   "Animate", size=(120, 40))
+                                   _("Animate"), size=(120, 40))
         animate_button.SetFont(self.font_buttons)
+        self.animate_button = animate_button
         self.timer = wx.Timer(self)  # timer object to be used for animation
 
         # set up four horizontal sizers to be stacked vertically
@@ -257,15 +264,15 @@ class GuiLinux(wx.Frame):
 
         # Widgets and sizers for monitor panel
         monitor_title = wx.StaticText(panel_monitors, wx.ID_ANY,
-                                      "Monitor Configuration:")
+                                      _("Monitor Configuration:"))
         monitor_title.SetFont(self.font_buttons)
         title_sizer = wx.BoxSizer(wx.HORIZONTAL)
         title_sizer.Add(monitor_title, 1, wx.ALL, 10)
 
         add_zap_button = wx.Button(panel_monitors, wx.ID_ANY,
-                                   "Add/Zap\nMonitors")
+                                   _("Add/Zap\nMonitors"))
         colour_button = wx.Button(panel_monitors, wx.ID_ANY,
-                                  "Change\nTrace Colours")
+                                  _("Change\nTrace Colours"))
         add_zap_button.SetFont(self.font_buttons)
         colour_button.SetFont(self.font_buttons)
 
@@ -283,15 +290,15 @@ class GuiLinux(wx.Frame):
 
         # Widgets and sizers for device panel
         device_title = wx.StaticText(panel_devices, wx.ID_ANY,
-                                     "Device Configuration:")
+                                     _("Device Configuration:"))
         device_title.SetFont(self.font_buttons)
         device_sizer.Add(device_title, 1, wx.ALL, 10)
 
-        add_button_d = wx.Button(panel_devices, wx.ID_ANY, "Add\nDevice")
+        add_button_d = wx.Button(panel_devices, wx.ID_ANY, _("Add\nDevice"))
         add_button_d.SetFont(self.font_buttons)
         add_button_d.SetInitialSize(wx.Size(150, 60))
 
-        add_button_c = wx.Button(panel_devices, wx.ID_ANY, "Add\nConnections")
+        add_button_c = wx.Button(panel_devices, wx.ID_ANY, _("Add\nConnections"))
         add_button_c.SetFont(self.font_buttons)
         add_button_c.SetInitialSize(wx.Size(150, 60))
 
@@ -352,15 +359,15 @@ class GuiLinux(wx.Frame):
         if Id == wx.ID_ABOUT:
             # Display pop up giving information about Logsim
             icon = wx.Bitmap("doge.png", wx.BITMAP_TYPE_PNG)
-            mb = CustomDialog(None, "Logic Simulator "
-                              "\nCreated by bd432, al2008, th624\n2023",
-                              "About Logsim", icon)
+            mb = CustomDialog(
+                None, _("Logic Simulator \nCreated by bd432, al2008, th624\n2023"),
+                _("About Logsim"), icon)
             mb.ShowModal()
             mb.Destroy()
 
         if Id == self.save_id:
             circuit_string = self.circuit_canvas.create_file_string()
-            dialog = wx.FileDialog(self, message="Choose a file location",
+            dialog = wx.FileDialog(self, message=_("Choose a file location"),
                     style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
             
             if dialog.ShowModal() == wx.ID_OK:
@@ -373,14 +380,14 @@ class GuiLinux(wx.Frame):
 
         if Id == self.load_id:
             circuit_string = self.circuit_canvas.create_file_string()
-            dialog = wx.FileDialog(self, message="Choose a file to load",
+            dialog = wx.FileDialog(self, message=_("Choose a file to load"),
                     style=wx.FD_OPEN)
             
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
                 _, file_extension = os.path.splitext(file_path)
                 if file_extension.lower() != ".txt":
-                    error_pop_up('Circuit file must be .txt')
+                    error_pop_up(_('Circuit file must be .txt'))
                     return
                 text_file = open(file_path)
 
@@ -394,7 +401,7 @@ class GuiLinux(wx.Frame):
                 if parser.parse_network():
                     self.load_circuit(names, devices, network, monitors)
                 else:
-                    error_pop_up('Circuit could not be loaded from file')
+                    error_pop_up(_('Circuit could not be loaded from file'))
             
             dialog.Destroy()
         
@@ -466,16 +473,16 @@ class GuiLinux(wx.Frame):
         - on all runs it runs the simulation from scratch for the
         specified number of cycles"""
         if self.connection_constraint:
-            error_pop_up('Finish adding connections '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding connections'
+                         'before trying to execute another action'))
             return
         if self.monitor_constraint:
-            error_pop_up('Finish adding/zapping monitors '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding/zapping monitors '
+                         'before trying to execute another action'))
             return
         if self.animation_constraint:
-            error_pop_up('End animation before '
-                         'trying to execute another action')
+            error_pop_up(_('End animation before '
+                         'trying to execute another action'))
             return
 
         # if the number of cycles provided is valid
@@ -493,12 +500,12 @@ class GuiLinux(wx.Frame):
                 # show error messages if run fails
                 elif self.network.execute_network() == \
                         self.network.OSCILLATING:
-                    error_pop_up('Run failed to execute - network oscillating')
+                    error_pop_up(_('Run failed to execute - network oscillating'))
                     return
                 elif self.network.execute_network() == \
                         self.network.INPUTS_NOT_CONNECTED:
-                    error_pop_up('Run failed to execute - make sure all '
-                                 'devices are connected')
+                    error_pop_up(_('Run failed to execute - make sure all '
+                                 'devices are connected'))
                     return
 
             # adds continue button to GUI after first run has been executed
@@ -507,7 +514,7 @@ class GuiLinux(wx.Frame):
                 run_sizer = self.run_sizer
                 panel_control = self.panel_control
 
-                cont_button = wx.Button(panel_control, wx.ID_ANY, "Continue")
+                cont_button = wx.Button(panel_control, wx.ID_ANY, _("Continue"))
                 cont_button.SetFont(self.font_buttons)
                 cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
                 self.cont_button = cont_button  # to allow deletion of button
@@ -519,34 +526,34 @@ class GuiLinux(wx.Frame):
                 panel_control.Layout()
 
             self.cycles_comp_text.SetLabel(
-                f"Cycles Completed: {self.cycles_completed}")
+                f"{_('Cycles Completed')}: {self.cycles_completed}")
             self.trace_canvas.pan_x = 0  # autopan back to beginning of plot
             self.trace_canvas.init = False
             self.trace_canvas.Refresh()  # call plotting event for canvases
             self.circuit_canvas.Refresh()
 
         else:  # show error dialogue box if given cycle no. is not valid
-            error_pop_up('Please select valid '
-                         'number of cycles greater than zero')
+            error_pop_up(_('Please select valid '
+                         'number of cycles greater than zero'))
 
     def on_animate(self, event):
         """Handles the event where the animate button is pressed -
         begins animation of plotting and circuit display until button,
         which will now display stop, is pressed again"""
         if self.connection_constraint:
-            error_pop_up('Finish adding connections '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding connections '
+                         'before trying to execute another action'))
             return
         if self.monitor_constraint:
-            error_pop_up('Finish adding/zapping monitors '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding/zapping monitors '
+                         'before trying to execute another action'))
             return
 
         Id = event.GetId()
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
 
-        if lab == 'Animate':
+        if lab == _('Animate'):
             # perform cold startup if simulating from scratch
             if self.cycles_completed == 0:
                 self.monitors.reset_monitors()
@@ -562,8 +569,8 @@ class GuiLinux(wx.Frame):
                 self.trace_canvas.Refresh()
                 self.circuit_canvas.Refresh()
                 self.cycles_comp_text.SetLabel(
-                    f"Cycles Completed: {self.cycles_completed}")
-                button.SetLabel('Stop')
+                    f"{_('Cycles Completed')}: {self.cycles_completed}")
+                button.SetLabel(_('Stop'))
                 self.animation_constraint = True
                 # create timer object that calls on_tick every 500ms
                 self.timer.Start(500)
@@ -575,7 +582,7 @@ class GuiLinux(wx.Frame):
                     panel_control = self.panel_control
 
                     cont_button = wx.Button(panel_control, wx.ID_ANY,
-                                            "Continue")
+                                            _("Continue"))
                     cont_button.SetFont(self.font_buttons)
                     cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
                     self.cont_button = cont_button
@@ -590,15 +597,15 @@ class GuiLinux(wx.Frame):
 
             # show error messages if run fails
             elif error_code == self.network.OSCILLATING:
-                error_pop_up('Run failed to execute - network oscillating')
+                error_pop_up(_('Run failed to execute - network oscillating'))
                 return
             elif error_code == self.network.INPUTS_NOT_CONNECTED:
-                error_pop_up('Run failed to execute - make sure all '
-                             'devices are connected')
+                error_pop_up(_('Run failed to execute - make sure all '
+                             'devices are connected'))
                 return
 
-        elif lab == 'Stop':
-            button.SetLabel('Animate')
+        elif lab == _('Stop'):
+            button.SetLabel(_('Animate'))
             self.animation_constraint = False
             self.timer.Stop()
 
@@ -617,15 +624,21 @@ class GuiLinux(wx.Frame):
             self.trace_canvas.Refresh()
             self.circuit_canvas.Refresh()
             self.cycles_comp_text.SetLabel(
-                f"Cycles Completed: {self.cycles_completed}")
+                f"{_('Cycles Completed')}: {self.cycles_completed}")
 
         # show error messages if run fails
         elif error_code == self.network.OSCILLATING:
-            error_pop_up('Run failed to execute - network oscillating')
+            error_pop_up(_('Run failed to execute - network oscillating'))
+            self.animate_button.SetLabel(_('Animate'))
+            self.animation_constraint = False
+            self.timer.Stop()
             return
         elif error_code == self.network.INPUTS_NOT_CONNECTED:
-            error_pop_up('Run failed to execute - make sure all '
-                         'devices are connected')
+            error_pop_up(_('Run failed to execute - make sure all '
+                         'devices are connected'))
+            self.animate_button.SetLabel(_('Animate'))
+            self.animation_constraint = False
+            self.timer.Stop()
             return
 
     def on_sash_position_change_side(self, event):
@@ -677,16 +690,16 @@ class GuiLinux(wx.Frame):
     def on_continue_button(self, event):
         """Handle the event when the user presses the continue button"""
         if self.connection_constraint:
-            error_pop_up('Finish adding connections '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding connections '
+                         'before trying to execute another action'))
             return
         if self.monitor_constraint:
-            error_pop_up('Finish adding/zapping monitors '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding/zapping monitors '
+                         'before trying to execute another action'))
             return
         if self.animation_constraint:
-            error_pop_up('End animation before '
-                         'trying to execute another action')
+            error_pop_up(_('End animation before '
+                         'trying to execute another action'))
             return
 
         if self.cycles > 0:  # if the number of cycles provided is valid
@@ -702,22 +715,22 @@ class GuiLinux(wx.Frame):
                     self.trace_canvas.Refresh()
                     self.circuit_canvas.Refresh()
                     self.cycles_comp_text.SetLabel(
-                        f"Cycles Completed: {self.cycles_completed}")
+                        f"{_('Cycles Completed')}: {self.cycles_completed}")
 
                 # show error messages if run fails
                 elif error_code == \
                         self.network.OSCILLATING:
-                    error_pop_up('Run failed to execute - network oscillating')
+                    error_pop_up(_('Run failed to execute - network oscillating'))
                     return
                 elif error_code == \
                         self.network.INPUTS_NOT_CONNECTED:
-                    error_pop_up('Run failed to execute - make sure all '
-                                 'devices are connected')
+                    error_pop_up(_('Run failed to execute - make sure all '
+                                 'devices are connected'))
                     return
 
         else:  # show error dialogue box if cycle no. is not valid
-            error_pop_up('Please select valid '
-                         'number of cycles greater than zero')
+            error_pop_up(_('Please select valid '
+                         'number of cycles greater than zero'))
 
     def on_add_zap_button(self, event):
         """Handle the event when the user presses the add monitor
@@ -725,27 +738,27 @@ class GuiLinux(wx.Frame):
         canvas until the button, which will read 'Stop' after being
         pressed initially, is pressed again."""
         if self.connection_constraint:
-            error_pop_up('Finish adding connections '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding connections '
+                         'before trying to execute another action'))
             return
         if self.animation_constraint:
-            error_pop_up('End animation before '
-                         'trying to execute another action')
+            error_pop_up(_('End animation before '
+                         'trying to execute another action'))
             return
 
         Id = event.GetId()
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
 
-        if lab == 'Add/Zap\nMonitors':
-            button.SetLabel('Stop')
+        if lab == _('Add/Zap\nMonitors'):
+            button.SetLabel(_('Stop'))
             # allow monitors to be added/zapped  by clicking ports on
             # the circuit canvas
             self.circuit_canvas.choose_monitor = True
             self.monitor_constraint = True
 
-        elif lab == 'Stop':
-            button.SetLabel('Add/Zap\nMonitors')
+        elif lab == _('Stop'):
+            button.SetLabel(_('Add/Zap\nMonitors'))
             # stop monitors being added/zapped
             self.circuit_canvas.choose_monitor = False
             self.monitor_constraint = False
@@ -755,20 +768,20 @@ class GuiLinux(wx.Frame):
         - will generate a device menu pop up that allows the user to
         select the device type, characteristics and name"""
         if self.connection_constraint:
-            error_pop_up('Finish adding connections '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding connections '
+                         'before trying to execute another action'))
             return
         if self.monitor_constraint:
-            error_pop_up('Finish adding/zapping monitors '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding/zapping monitors '
+                         'before trying to execute another action'))
             return
         if self.animation_constraint:
-            error_pop_up('End animation before trying to '
-                         'execute another action')
+            error_pop_up(_('End animation before trying to '
+                         'execute another action'))
             return
 
         # create device menu pop-up
-        dev_menu = DeviceMenu(self, 'Device Menu',
+        dev_menu = DeviceMenu(self, _('Device Menu'),
                               self.devices, self.circuit_canvas)
         dev_menu.ShowModal()
         dev_menu.Destroy()
@@ -779,27 +792,27 @@ class GuiLinux(wx.Frame):
         circuit canvas until the button, which will read 'Stop' after
         being pressed initially, is pressed again."""
         if self.monitor_constraint:
-            error_pop_up('Finish adding/zapping monitors '
-                         'before trying to execute another action')
+            error_pop_up(_('Finish adding/zapping monitors '
+                         'before trying to execute another action'))
             return
         if self.animation_constraint:
-            error_pop_up('End animation before '
-                         'trying to execute another action')
+            error_pop_up(_('End animation before '
+                         'trying to execute another action'))
             return
 
         Id = event.GetId()
         button = self.FindWindowById(Id)
         lab = button.GetLabel()
 
-        if lab == 'Add\nConnections':
-            button.SetLabel('Stop')
+        if lab == _('Add\nConnections'):
+            button.SetLabel(_('Stop'))
             # allow connections to be made on circuit canvas
             self.circuit_canvas.connection_list = [True, None, None]
             self.circuit_canvas.Refresh()
             self.connection_constraint = True
 
-        elif lab == 'Stop':
-            button.SetLabel('Add\nConnections')
+        elif lab == _('Stop'):
+            button.SetLabel(_('Add\nConnections'))
             # stop connections from being made on circuit canvas
             self.circuit_canvas.connection_list = [False, None, None]
             self.circuit_canvas.temp_connection = None
@@ -838,5 +851,24 @@ class GuiLinux(wx.Frame):
         self.trace_canvas.Refresh()
         self.circuit_canvas.Refresh()
         self.SetSize(self.GetSize().GetWidth()-10, self.GetSize().GetHeight()-10)
-        self.cycles_comp_text.SetLabel(f"Cycles Completed: {self.cycles_completed}")
+        self.cycles_comp_text.SetLabel(f'{_("Cycles Completed")}: {self.cycles_completed}')
         self.Maximize()
+
+    def updateLanguage(self, lang):
+        '''Update the language to the requested one'''
+        # if an unsupported language is requested default to English
+        if lang in self.supLang:
+            selLang = self.supLang[lang]
+        else:
+            selLang = wx.LANGUAGE_ENGLISH
+
+        if self.locale:
+            assert sys.getrefcount(self.locale) <= 2
+            del self.locale
+
+        # create a locale object for this language
+        self.locale = wx.Locale(selLang)
+        if self.locale.IsOk():
+            self.locale.AddCatalog(appC.langDomain)
+        else:
+            self.locale = None
