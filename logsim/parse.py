@@ -523,7 +523,7 @@ class Parser:
         if error_code == self.NAME_EXPECTED:
             return ('Error: Expected a Name')
         if error_code == self.SEMICOLON_EXPECTED:
-            return ('Error: Expected a Semicolon')
+            return ('Error: Expected a Semicolon or Comma')
         if error_code == self.KEYWORD_EXPECTED:
             return ('Error: Expected a Keyword')
         if error_code == self.NUMBER_EXPECTED:
