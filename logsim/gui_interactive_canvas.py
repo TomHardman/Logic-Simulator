@@ -1762,9 +1762,9 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
                 device_GL = D_type(400, 100, device, self.names)
             elif device_type == self.devices.CLOCK:
                 device_GL = Clock(400, 100, device, self.names)
-            elif device_type == self.devices.CLOCK:
+            elif device_type == self.devices.SIGGEN:
                 device_GL = Sig_gen(400, 100, device, self.names)
-            elif device_type == self.devices.CLOCK:
+            elif device_type == self.devices.RC:
                 device_GL = RC(400, 100, device, self.names)
             self.objects.append(device_GL)
             self.devices_GL_list.append(device_GL)
