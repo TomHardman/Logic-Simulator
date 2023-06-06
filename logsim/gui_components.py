@@ -400,9 +400,11 @@ class DeviceMenu(wx.Dialog):
         """Handles the event when the confirm button is clicked in the
         choose qualifier stage"""
         self.qualifier = self.choose_ctrl.GetValue()
-        if self.device_chosen == 'SIGGEN' and set([i for i in self.qualifier]) != {'0', '1'}:
-            error_pop_up('SIGGEN signal must be a sequence of 1s and 0s')
-            return
+        if self.device_chosen == 'SIGGEN':
+            seq_set = set([i for i in self.qualifier])
+            if seq_set != {'1', '0'} and seq_set != {'1'} and seq_set != {'0'}:
+                error_pop_up('SIGGEN signal must be a sequence of 1s and 0s')
+                return
         self.destroy_widgets_in_sizer(self.choose_qual_sizer)
         self.panel_sizer.Detach(self.choose_qual_sizer)
         self.choose_name()
