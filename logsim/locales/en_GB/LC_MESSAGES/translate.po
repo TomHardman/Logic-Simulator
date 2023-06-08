@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-06 17:10+0100\n"
-"PO-Revision-Date: 2023-06-08 16:04+0100\n"
+"PO-Revision-Date: 2023-06-08 17:19+0100\n"
 "Last-Translator: th624 <th624@cam.ac.uk>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -18,54 +18,54 @@ msgstr ""
 
 #: gui_linux.py:129
 msgid "Light"
-msgstr "亮"
+msgstr "Light"
 
 msgid "About"
-msgstr "关于"
+msgstr "About"
 
 #: gui_linux.py:130
 msgid "Dark"
-msgstr "暗"
+msgstr "Dark"
 
 #: gui_linux.py:132
 msgid "&Exit"
-msgstr "&退出"
+msgstr "&Exit"
 
 #: gui_linux.py:134
 msgid "&Theme"
-msgstr "&主题"
+msgstr "&Theme"
 
 #: gui_linux.py:135
 msgid "&Save Circuit"
-msgstr "&保存电路"
+msgstr "&Save Circuit"
 
 #: gui_linux.py:136
 msgid "&Load Circuit"
-msgstr "&加载电路"
+msgstr "&Load Circuit"
 
 msgid "English"
-msgstr "英语 (EN)"
+msgstr "English"
 
 msgid "Chinese-Simplified (中国人)"
-msgstr "中国人 "
+msgstr "Chinese-Simplified (中国人)"
 
 msgid "German (DE)"
-msgstr "德语 (DE)"
+msgstr "German (DE)"
 
 msgid "&Choose Language"
-msgstr "&选择语言"
+msgstr "&Choose Language"
 
 #: gui_linux.py:137
 msgid "&Menu"
-msgstr "&菜单"
+msgstr "&Menu"
 
 #: gui_linux.py:212
 msgid "Cycles:"
-msgstr "周期:"
+msgstr "Cycles:"
 
 #: gui_linux.py:220
 msgid "Run"
-msgstr "运行"
+msgstr "Run"
 
 #: gui_linux.py:229
 #: gui_linux.py:556
@@ -73,15 +73,15 @@ msgstr "运行"
 #: gui_linux.py:632
 #: gui_linux.py:639
 msgid "Animate"
-msgstr "动画"
+msgstr "Animate"
 
 #: gui_linux.py:229
 msgid "Cycles Completed"
-msgstr "周期完成"
+msgstr "Cycles Completed"
 
 #: gui_linux.py:267
 msgid "Monitor Configuration:"
-msgstr "监视器配置:"
+msgstr "Monitor Configuration:"
 
 #: gui_linux.py:273
 #: gui_linux.py:753
@@ -90,28 +90,28 @@ msgid ""
 "Add/Zap\n"
 "Monitors"
 msgstr ""
-"添加/删除\n"
-"监视器"
+"Add/Zap\n"
+"Monitors"
 
 #: gui_linux.py:275
 msgid ""
 "Change\n"
 "Trace Colours"
 msgstr ""
-"更改\n"
-"追踪颜色"
+"Change\n"
+"Trace Colours"
 
 #: gui_linux.py:293
 msgid "Device Configuration:"
-msgstr "设备配置:"
+msgstr "Device Configuration:"
 
 #: gui_linux.py:297
 msgid ""
 "Add\n"
 "Device"
 msgstr ""
-"添加\n"
-"设备"
+"Add\n"
+"Device"
 
 #: gui_linux.py:301
 #: gui_linux.py:807
@@ -120,8 +120,8 @@ msgid ""
 "Add\n"
 "Connections"
 msgstr ""
-"添加\n"
-"连接"
+"Add\n"
+"Connections"
 
 #: gui_linux.py:363
 msgid ""
@@ -129,33 +129,33 @@ msgid ""
 "Created by bd432, al2008, th624\n"
 "2023"
 msgstr ""
-"逻辑模拟器\n"
-"作者: bd432, al2008, th624\n"
+"Logic Simulator \n"
+"Created by bd432, al2008, th624\n"
 "2023"
 
 #: gui_linux.py:364
 msgid "About Logsim"
-msgstr "关于 Logsim"
+msgstr "About Logsim"
 
 #: gui_linux.py:370
 msgid "Choose a file location"
-msgstr "选择文件位置"
+msgstr "Choose a file location"
 
 #: gui_linux.py:383
 msgid "Choose a file to load"
-msgstr "选择要加载的文件"
+msgstr "Choose a file to load"
 
 #: gui_linux.py:390
 msgid "Circuit file must be .txt"
-msgstr "电路文件必须为 .txt 格式"
+msgstr "Circuit file must be .txt"
 
 #: gui_linux.py:404
 msgid "Circuit could not be loaded from file"
-msgstr "无法从文件加载电路"
+msgstr "Circuit could not be loaded from file"
 
 #: gui_linux.py:476
 msgid "Finish adding connections before trying to execute another action"
-msgstr "在尝试执行其他操作之前，请完成添加连接"
+msgstr "Finish adding connections before trying to execute another action"
 
 #: gui_linux.py:480
 #: gui_linux.py:548
@@ -163,7 +163,7 @@ msgstr "在尝试执行其他操作之前，请完成添加连接"
 #: gui_linux.py:775
 #: gui_linux.py:795
 msgid "Finish adding/zapping monitors before trying to execute another action"
-msgstr "在尝试执行其他操作之前，请完成添加/删除监视器"
+msgstr "Finish adding/zapping monitors before trying to execute another action"
 
 #: gui_linux.py:484
 #: gui_linux.py:701
@@ -171,31 +171,31 @@ msgstr "在尝试执行其他操作之前，请完成添加/删除监视器"
 #: gui_linux.py:779
 #: gui_linux.py:799
 msgid "End animation before trying to execute another action"
-msgstr "在尝试执行其他操作之前，请结束动画"
+msgstr "End animation before trying to execute another action"
 
 #: gui_linux.py:503
 #: gui_linux.py:600
 #: gui_linux.py:631
 #: gui_linux.py:723
 msgid "Run failed to execute - network oscillating"
-msgstr "运行失败 - 网络振荡"
+msgstr "Run failed to execute - network oscillating"
 
 #: gui_linux.py:507
 #: gui_linux.py:603
 #: gui_linux.py:637
 #: gui_linux.py:727
 msgid "Run failed to execute - make sure all devices are connected"
-msgstr "运行失败 - 请确保所有设备都已连接"
+msgstr "Run failed to execute - make sure all devices are connected"
 
 #: gui_linux.py:517
 #: gui_linux.py:585
 msgid "Continue"
-msgstr "继续"
+msgstr "Continue"
 
 #: gui_linux.py:536
 #: gui_linux.py:732
 msgid "Please select valid number of cycles greater than zero"
-msgstr "请选择大于零的有效周期数"
+msgstr "Please select valid number of cycles greater than zero"
 
 #: gui_linux.py:573
 #: gui_linux.py:607
@@ -204,90 +204,90 @@ msgstr "请选择大于零的有效周期数"
 #: gui_linux.py:808
 #: gui_linux.py:814
 msgid "Stop"
-msgstr "停止"
+msgstr "Stop"
 
 #: gui_linux.py:784
 msgid "Device Menu"
-msgstr "设备菜单"
+msgstr "Device Menu"
 
 #: gui_components.py:246
 msgid "Choose Device:"
-msgstr "选择设备:"
+msgstr "Choose Device:"
 
 #: gui_components.py:265
 msgid "Enter half period:"
-msgstr "输入半周期:"
+msgstr "Enter half period:"
 
 #: gui_components.py:271
 msgid "Enter time til drop off:"
-msgstr "输入到断开的时间:"
+msgstr "Enter time til drop off:"
 
 #: gui_components.py:277
 msgid "Enter signal sequence:"
-msgstr "输入信号序列:"
+msgstr "Enter signal sequence:"
 
 #: gui_components.py:282
 msgid "Enter initial switch state:"
-msgstr "输入初始开关状态:"
+msgstr "Enter initial switch state:"
 
 #: gui_components.py:288
 msgid "Enter number of inputs:"
-msgstr "输入输入数量:"
+msgstr "Enter number of inputs:"
 
 #: gui_components.py:294
 #: gui_components.py:337
 #: gui_components.py:377
 msgid "Confirm"
-msgstr "确认"
+msgstr "Confirm"
 
 #: gui_components.py:294
 msgid "Device chosen"
-msgstr "设备已选择"
+msgstr "Device chosen"
 
 #: gui_components.py:295
 #: gui_components.py:338
 msgid "Back"
-msgstr "返回"
+msgstr "Back"
 
 #: gui_components.py:318
 msgid "Half Period: "
-msgstr "半周期: "
+msgstr "Half Period: "
 
 #: gui_components.py:318
 #: gui_components.py:319
 #: gui_components.py:320
 msgid "Number of inputs: "
-msgstr "输入数量: "
+msgstr "Number of inputs: "
 
 #: gui_components.py:320
 msgid "Initial State: "
-msgstr "初始状态: "
+msgstr "Initial State: "
 
 #: gui_components.py:321
 msgid "Time til dropoff:"
-msgstr "断开时间:"
+msgstr "Time til dropoff:"
 
 #: gui_components.py:321
 msgid "Signal Sequence: "
-msgstr "信号序列: "
+msgstr "Signal Sequence: "
 
 #: gui_components.py:335
 msgid "Enter device name:"
-msgstr "输入设备名称:"
+msgstr "Enter device name:"
 
 #: gui_components.py:404
 msgid "SIGGEN signal must be a sequence of 1s and 0s"
-msgstr "SIGGEN 信号必须是一系列的 1 和 0"
+msgstr "SIGGEN signal must be a sequence of 1s and 0s"
 
 #: gui_components.py:420
 msgid "Please enter a valid name"
-msgstr "请输入有效的名称"
+msgstr "Please enter a valid name"
 
 msgid "Error"
-msgstr "错误"
+msgstr "Error"
 
 msgid "Warning"
-msgstr "警告"
+msgstr "Warning"
 
 msgid ""
 "Changing language will reset the circuit \n"
@@ -295,6 +295,8 @@ msgid ""
 "reset to their default positions. Are you sure you want to \n"
 "continue?"
 msgstr ""
-"更改语言将重置电路画布和任何已重新定位的设备都将重置为默认位置。\n"
-"你确定你要继续吗？"
+"Changing language will reset the circuit \n"
+"canvas and any devices that have been repositioned will be \n"
+"reset to their default positions. Are you sure you want to \n"
+"continue?"
 

@@ -12,7 +12,7 @@ import builtins
 from gui_plotting_canvas import TraceCanvas
 from gui_interactive_canvas import InteractiveCanvas
 from gui_components import error_pop_up, DeviceMenu, RoundedScrollWindow, \
-    CustomDialog
+    CustomDialog, WarningDialog
 
 class GuiLinux(wx.Frame):
     """
@@ -92,7 +92,6 @@ class GuiLinux(wx.Frame):
                  dark_mode=False, lang=wx.LANGUAGE_DEFAULT, cyc_comp=0):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
-        print(dark_mode)
         # Initialise instance variables
         self.devices = devices
         self.names = names
@@ -107,7 +106,6 @@ class GuiLinux(wx.Frame):
             wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         self.retracted_sidebar = False
         self.resizing = False
-        print(self.dark_mode)
 
         # Booleans used to stop other events being triggered
         # during certain processes
@@ -120,12 +118,12 @@ class GuiLinux(wx.Frame):
         themeMenu = wx.Menu()
         langMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        print(self.dark_mode)
-
+        
+    
         # set up locale for language options
         self.locale = wx.Locale(lang)
         builtins.__dict__['_'] = wx.GetTranslation
-        self.locale.AddCatalogLookupPathPrefix('locales')
+        self.locale.AddCatalogLookupPathPrefix('logsim/locales')
         self.locale.AddCatalog('translate')
 
         # sub-menu for choosing colour theme
@@ -134,7 +132,7 @@ class GuiLinux(wx.Frame):
 
         # sub-menu for choosing language
         langMenu.Append(wx.ID_ANY, _("Chinese-Simplified (中国人)"))
-        langMenu.Append(wx.ID_ANY, _("English (EN)"))
+        langMenu.Append(wx.ID_ANY, _("English"))
         langMenu.Append(wx.ID_ANY, _("German (DE)"))
 
         fileMenu.Append(wx.ID_EXIT, _("&Exit"))
@@ -147,7 +145,6 @@ class GuiLinux(wx.Frame):
         self.SetMenuBar(menuBar)
         self.SetMinSize((900, 766))
         self.Maximize()
-        print(self.dark_mode)
 
         # store Ids as instance variables for method access
         self.light_id = themeMenu.FindItemByPosition(0).GetId()
@@ -351,9 +348,7 @@ class GuiLinux(wx.Frame):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MENU, self.on_menu)
 
-        print(self.dark_mode)
         if self.dark_mode:
-            print('yeah')
             self.set_dark_mode()
 
         self.Layout()
@@ -364,7 +359,6 @@ class GuiLinux(wx.Frame):
         """Handle resize events"""
         self.GetSizer().Layout()  # Ensure splitter adjusts to the frame size
         size = self.GetSize()
-        self.resizing = True
 
         event.Skip()
 
@@ -461,16 +455,26 @@ class GuiLinux(wx.Frame):
             self.Refresh()
 
         if Id == self.german_id or Id == self.eng_id or Id == self.chinese_id:
+            dlg = WarningDialog(
+                None, 
+                wx.GetTranslation('Changing language will reset the circuit \n' 
+                'canvas and any devices that have been repositioned will be \n' 
+                'reset to their default positions. Are you sure you want to \n'
+                'continue?'), 
+                wx.GetTranslation('Warning'))
+            if dlg.ShowModal():
+                dlg.Destroy()
+            else:
+                dlg.Destroy()
+                return
+
             if Id == self.german_id:
-                print('lang')
                 lang = wx.LANGUAGE_GERMAN
             elif Id == self.eng_id:
                 lang = wx.LANGUAGE_ENGLISH_UK
             elif Id == self.chinese_id:
                 lang = wx.LANGUAGE_CHINESE_SIMPLIFIED
 
-            print(self.dark_mode)
-            print('lang2')
             dm = self.dark_mode
             gui_new = GuiLinux(
                 "Logic Simulator", self.names, self.devices, self.network,
@@ -688,10 +692,6 @@ class GuiLinux(wx.Frame):
         elif current_position > min_sash_pos:
             window.SetSashPosition(max_sash_pos)
             self.retracted_sidebar = True
-
-        if self.resizing:
-            window.SetSashPosition(max_sash_pos)
-            self.resizing = False
 
     def on_sash_position_change_canvas(self, event):
         """Function that is redundant in nature but is bound to the sash

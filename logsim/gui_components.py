@@ -25,6 +25,18 @@ def error_pop_up(string, style=wx.OK | wx.ICON_ERROR | 0x40):
     dlg.Destroy()
 
 
+class WarningDialog(wx.GenericMessageDialog):
+    def __init__(self, parent, message, caption):
+        super().__init__(parent, message, caption, style=wx.YES_NO | 
+         wx.ICON_WARNING)
+
+    def ShowModal(self):
+        clicked = super().ShowModal()
+        if clicked == wx.ID_YES:
+            return True
+        elif clicked == wx.ID_NO:
+            return False
+
 class CustomDialog(wx.Dialog):
     """Class that inherits  from the wx.Dialog class but creates a pop
     up box that supports the setting of custom bitmap icons
