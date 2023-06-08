@@ -14,7 +14,6 @@ from gui_interactive_canvas import InteractiveCanvas
 from gui_components import error_pop_up, DeviceMenu, RoundedScrollWindow, \
     CustomDialog
 
-
 class GuiLinux(wx.Frame):
     """
     Class that contains the framework for the Gui
@@ -89,24 +88,26 @@ class GuiLinux(wx.Frame):
 
     """
 
-    def __init__(self, title, names, devices, network, monitors):
+    def __init__(self, title, names, devices, network, monitors,
+                 dark_mode=False, lang=wx.LANGUAGE_DEFAULT, cyc_comp=0):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
-
+        print(dark_mode)
         # Initialise instance variables
         self.devices = devices
         self.names = names
         self.monitors = monitors
         self.network = network
-        self.dark_mode = False
+        self.dark_mode = dark_mode
         self.first_run = True
         self.cycles = 10
-        self.cycles_completed = 0
+        self.cycles_completed = cyc_comp
         self.font_buttons = wx.Font(
             14, wx.FONTFAMILY_DEFAULT,    # font to be used for all buttons
             wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         self.retracted_sidebar = False
         self.resizing = False
+        print(self.dark_mode)
 
         # Booleans used to stop other events being triggered
         # during certain processes
@@ -117,12 +118,13 @@ class GuiLinux(wx.Frame):
         # Configure the file menu
         fileMenu = wx.Menu()
         themeMenu = wx.Menu()
+        langMenu = wx.Menu()
         menuBar = wx.MenuBar()
+        print(self.dark_mode)
 
         # set up locale for language options
-        self.locale = wx.Locale(wx.LANGUAGE_CHINESE_SIMPLIFIED)
+        self.locale = wx.Locale(lang)
         builtins.__dict__['_'] = wx.GetTranslation
-        #print(self.locale.GetCanonicalName())
         self.locale.AddCatalogLookupPathPrefix('locales')
         self.locale.AddCatalog('translate')
 
@@ -130,21 +132,31 @@ class GuiLinux(wx.Frame):
         themeMenu.Append(wx.ID_ANY, _("Light"))
         themeMenu.Append(wx.ID_ANY, _("Dark"))
 
+        # sub-menu for choosing language
+        langMenu.Append(wx.ID_ANY, _("Chinese-Simplified (中国人)"))
+        langMenu.Append(wx.ID_ANY, _("English (EN)"))
+        langMenu.Append(wx.ID_ANY, _("German (DE)"))
+
         fileMenu.Append(wx.ID_EXIT, _("&Exit"))
         fileMenu.Append(wx.ID_ABOUT, _("&About"))
         fileMenu.AppendSubMenu(themeMenu, _("&Theme"))
         fileMenu.Append(wx.ID_ANY, _("&Save Circuit"))
         fileMenu.Append(wx.ID_ANY, _("&Load Circuit"))
+        fileMenu.AppendSubMenu(langMenu, _("&Choose Language"))
         menuBar.Append(fileMenu, _("&Menu"))
         self.SetMenuBar(menuBar)
         self.SetMinSize((900, 766))
         self.Maximize()
+        print(self.dark_mode)
 
         # store Ids as instance variables for method access
         self.light_id = themeMenu.FindItemByPosition(0).GetId()
         self.dark_id = themeMenu.FindItemByPosition(1).GetId()
         self.save_id = fileMenu.FindItemByPosition(3).GetId()
         self.load_id = fileMenu.FindItemByPosition(4).GetId()
+        self.chinese_id = langMenu.FindItemByPosition(0).GetId()
+        self.eng_id = langMenu.FindItemByPosition(1).GetId()
+        self.german_id = langMenu.FindItemByPosition(2).GetId()
 
         # Set up panels to split window into
         # canvas UI window and adjustable sidebar
@@ -325,8 +337,9 @@ class GuiLinux(wx.Frame):
 
         # Add canvas widgets - include as instance variables for method access
         self.trace_canvas = TraceCanvas(self.plotting_ui, devices, monitors)
-        self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self, devices,
-                                                monitors, names, network)
+        self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self,
+                                                    devices, monitors, names,
+                                                    network)
 
         # Add canvases to respective panels
         self.plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
@@ -337,6 +350,11 @@ class GuiLinux(wx.Frame):
         self.SetSizer(main_sizer)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MENU, self.on_menu)
+
+        print(self.dark_mode)
+        if self.dark_mode:
+            print('yeah')
+            self.set_dark_mode()
 
         self.Layout()
         self.Centre()
@@ -361,7 +379,8 @@ class GuiLinux(wx.Frame):
             # Display pop up giving information about Logsim
             icon = wx.Bitmap("doge.png", wx.BITMAP_TYPE_PNG)
             mb = CustomDialog(
-                None, wx.GetTranslation("Logic Simulator \nCreated by bd432, al2008, th624\n2023"),
+                None, wx.GetTranslation("Logic Simulator \nCreated by "
+                                        "bd432, al2008, th624\n2023"),
                 wx.GetTranslation("About Logsim"), icon)
             mb.ShowModal()
             mb.Destroy()
@@ -369,7 +388,7 @@ class GuiLinux(wx.Frame):
         if Id == self.save_id:
             circuit_string = self.circuit_canvas.create_file_string()
             dialog = wx.FileDialog(
-                self, message= wx.GetTranslation("Choose a file location"),
+                self, message=wx.GetTranslation("Choose a file location"),
                 style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
             
             if dialog.ShowModal() == wx.ID_OK:
@@ -380,7 +399,6 @@ class GuiLinux(wx.Frame):
             dialog.Destroy()
             
         if Id == self.load_id:
-            circuit_string = self.circuit_canvas.create_file_string()
             dialog = wx.FileDialog(
                 self, message= wx.GetTranslation("Choose a file to load"),
                 style=wx.FD_OPEN)
@@ -391,7 +409,7 @@ class GuiLinux(wx.Frame):
                 if file_extension.lower() != ".txt":
                     error_pop_up(_('Circuit file must be .txt'))
                     return
-                text_file = open(file_path)
+                #text_file = open(file_path)
 
                 names = Names()
                 devices = Devices(names)
@@ -431,28 +449,8 @@ class GuiLinux(wx.Frame):
                             widget.SetForegroundColour(wx.BLACK)
 
             if Id == self.dark_id:
-                self.circuit_canvas.dark_mode = True
-                self.trace_canvas.dark_mode = True
                 self.dark_mode = True
-                self.sidebar.SetBackgroundColour(wx.Colour(100, 80, 100))
-
-                # iterate through panels in sidebar set bg colour to dark pink
-                # and then iterate through widgets and set to dark mode design
-                for panel in self.sidebar.GetChildren():
-                    panel.SetBackgroundColour(wx.Colour(100, 80, 100))
-                    for widget in panel.GetChildren():
-                        if str(type(widget)).split('.')[-1].split("'")[0] \
-                                == 'StaticText':
-                            widget.\
-                                SetForegroundColour(wx.Colour(179, 179, 179))
-                        if str(type(widget)).split('.')[-1].split("'")[0] \
-                                == 'SpinCtrl':
-                            widget.\
-                                SetForegroundColour(wx.Colour(165, 105, 179))
-                        if str(type(widget)).split('.')[-1].split("'")[0] \
-                                == 'Button':
-                            widget.\
-                                SetForegroundColour(wx.Colour(100, 80, 100))
+                self.set_dark_mode()
 
             # refresh canvases and self to update display
             self.circuit_canvas.init = False
@@ -461,6 +459,24 @@ class GuiLinux(wx.Frame):
             self.trace_canvas.monitor_colours.clear()
             self.trace_canvas.Refresh()
             self.Refresh()
+
+        if Id == self.german_id or Id == self.eng_id or Id == self.chinese_id:
+            if Id == self.german_id:
+                print('lang')
+                lang = wx.LANGUAGE_GERMAN
+            elif Id == self.eng_id:
+                lang = wx.LANGUAGE_ENGLISH_UK
+            elif Id == self.chinese_id:
+                lang = wx.LANGUAGE_CHINESE_SIMPLIFIED
+
+            print(self.dark_mode)
+            print('lang2')
+            dm = self.dark_mode
+            gui_new = GuiLinux(
+                "Logic Simulator", self.names, self.devices, self.network,
+                self.monitors, self.dark_mode, lang, self.cycles_completed)
+            self.Close()
+            gui_new.Show(True)
 
     def on_change_monitor_colours(self, event):
         """Handles the event when the user presses the change trace
@@ -661,7 +677,9 @@ class GuiLinux(wx.Frame):
 
         # sidebar set back to displayed position if sash dragged out any 
         # further than displayed position or dragged to left when retracted
-        if current_position < min_sash_pos or current_position<current_width-20 and self.retracted_sidebar==True:
+        if current_position < min_sash_pos \
+                or current_position < current_width-20 \
+                and self.retracted_sidebar:
             window.SetSashPosition(min_sash_pos)
             self.retracted_sidebar = False
 
@@ -674,7 +692,6 @@ class GuiLinux(wx.Frame):
         if self.resizing:
             window.SetSashPosition(max_sash_pos)
             self.resizing = False
-        
 
     def on_sash_position_change_canvas(self, event):
         """Function that is redundant in nature but is bound to the sash
@@ -723,7 +740,8 @@ class GuiLinux(wx.Frame):
                 # show error messages if run fails
                 elif error_code == \
                         self.network.OSCILLATING:
-                    error_pop_up(_('Run failed to execute - network oscillating'))
+                    error_pop_up(
+                        _('Run failed to execute - network oscillating'))
                     return
                 elif error_code == \
                         self.network.INPUTS_NOT_CONNECTED:
@@ -853,25 +871,31 @@ class GuiLinux(wx.Frame):
         self.Layout()
         self.trace_canvas.Refresh()
         self.circuit_canvas.Refresh()
-        self.SetSize(self.GetSize().GetWidth()-10, self.GetSize().GetHeight()-10)
-        self.cycles_comp_text.SetLabel(f'{_("Cycles Completed")}: {self.cycles_completed}')
+        self.SetSize(self.GetSize().GetWidth()-10,
+                     self.GetSize().GetHeight()-10)
+        self.cycles_comp_text.SetLabel(
+            f'{_("Cycles Completed")}: {self.cycles_completed}')
         self.Maximize()
 
-    def updateLanguage(self, lang):
-        '''Update the language to the requested one'''
-        # if an unsupported language is requested default to English
-        if lang in self.supLang:
-            selLang = self.supLang[lang]
-        else:
-            selLang = wx.LANGUAGE_ENGLISH
+    def set_dark_mode(self):
+        self.circuit_canvas.dark_mode = True
+        self.trace_canvas.dark_mode = True
+        self.sidebar.SetBackgroundColour(wx.Colour(100, 80, 100))
 
-        if self.locale:
-            assert sys.getrefcount(self.locale) <= 2
-            del self.locale
-
-        # create a locale object for this language
-        self.locale = wx.Locale(selLang)
-        if self.locale.IsOk():
-            self.locale.AddCatalog(appC.langDomain)
-        else:
-            self.locale = None
+        # iterate through panels in sidebar set bg colour to dark pink
+        # and then iterate through widgets and set to dark mode design
+        for panel in self.sidebar.GetChildren():
+            panel.SetBackgroundColour(wx.Colour(100, 80, 100))
+            for widget in panel.GetChildren():
+                if str(type(widget)).split('.')[-1].split("'")[0] \
+                        == 'StaticText':
+                    widget. \
+                        SetForegroundColour(wx.Colour(179, 179, 179))
+                if str(type(widget)).split('.')[-1].split("'")[0] \
+                        == 'SpinCtrl':
+                    widget. \
+                        SetForegroundColour(wx.Colour(165, 105, 179))
+                if str(type(widget)).split('.')[-1].split("'")[0] \
+                        == 'Button':
+                    widget. \
+                        SetForegroundColour(wx.Colour(100, 80, 100))
