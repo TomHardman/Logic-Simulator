@@ -123,7 +123,7 @@ class GuiLinux(wx.Frame):
         # set up locale for language options
         self.locale = wx.Locale(lang)
         builtins.__dict__['_'] = wx.GetTranslation
-        self.locale.AddCatalogLookupPathPrefix('logsim/locales')
+        self.locale.AddCatalogLookupPathPrefix('locales')
         self.locale.AddCatalog('translate')
 
         # sub-menu for choosing colour theme
