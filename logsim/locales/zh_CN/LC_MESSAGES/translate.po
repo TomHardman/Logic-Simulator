@@ -43,6 +43,18 @@ msgstr "&保存电路"
 msgid "&Load Circuit"
 msgstr "&加载电路"
 
+msgid: "English"
+msgstr: "英语 (EN)"
+
+msgid: "Chinese-Simplified (中国人)"
+msgstr: "中国人 "
+
+msgid: "German (DE)"
+msgstr: "德语 (DE)"
+
+msgid: "&Choose Language"
+msgstr: "&选择语言"
+
 #: gui_linux.py:137
 msgid "&Menu"
 msgstr "&菜单"

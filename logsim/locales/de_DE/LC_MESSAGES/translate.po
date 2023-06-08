@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-06 17:10+0100\n"
-"PO-Revision-Date: 2023-06-06 19:16+0100\n"
+"PO-Revision-Date: 2023-06-08 15:39+0100\n"
 "Last-Translator: th624 <th624@cam.ac.uk>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: German\n"
@@ -42,6 +42,18 @@ msgstr "&Schaltung speichern"
 #: gui_linux.py:136
 msgid "&Load Circuit"
 msgstr "&Schaltung laden"
+
+msgid: "English"
+msgstr: "Englisch (EN)"
+
+msgid: "Chinese-Simplified (中国人)"
+msgstr: "Vereinfachtes Chinesisch"
+
+msgid: "German (DE)"
+msgstr: "Deutsch"
+
+msgid: "&Choose Language"
+msgstr: "&Sprache wählen"
 
 #: gui_linux.py:137
 msgid "&Menu"
@@ -273,4 +285,18 @@ msgstr "Bitte geben Sie einen gültigen Namen ein"
 
 msgid "Error"
 msgstr "Fehler"
+
+msgid "Warning"
+msgstr "Warnung"
+
+msgid ""
+"Changing language will reset the circuit \n"
+"canvas and any devices that have been repositioned will be \n"
+"reset to their default positions. Are you sure you want to \n"
+"continue?"
+msgstr ""
+"Durch Ändern der Sprache wird die Schaltungsoberfläche \n"
+"zurückgesetzt und Alle Geräte, die neu positioniert \n"
+"wurden, werden auf ihre Position zurückgesetzt Standardpositionen. \n"
+"Bist du dir sicher, dass du weitermachen willst?"
 
