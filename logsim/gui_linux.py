@@ -409,7 +409,8 @@ class GuiLinux(wx.Frame):
                 file_path = dialog.GetPath()
                 _, file_extension = os.path.splitext(file_path)
                 if file_extension.lower() != ".txt":
-                    error_pop_up(_('Circuit file must be .txt'))
+                    error_pop_up(
+                        wx.GetTranslation('Circuit file must be .txt'))
                     return
 
                 names = Names()
@@ -422,7 +423,9 @@ class GuiLinux(wx.Frame):
                 if parser.parse_network():
                     self.load_circuit(names, devices, network, monitors)
                 else:
-                    error_pop_up(_('Circuit could not be loaded from file'))
+                    error_pop_up(
+                        wx.GetTranslation(
+                            'Circuit could not be loaded from file'))
 
             dialog.Destroy()
 

@@ -2,7 +2,7 @@
 This module contains the TraceCanvas class which is used for plotting
 monitor traces in the Gui. The plot_trace and choose_viable_colour
 functions are defined outside the Class but are used by the TraceCanvas
-for plotting
+for plottin
 """
 import wx
 import wx.glcanvas as wxcanvas
