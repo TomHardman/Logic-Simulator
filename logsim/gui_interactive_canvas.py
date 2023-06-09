@@ -1787,7 +1787,8 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         dlg.Destroy()
 
     def create_file_string(self):
-        """Creates a string that represent """
+        """Creates a string that represent the circuit
+           using the EBNF syntax rules"""
         file_string = ""
         switch_ids = self.devices.find_devices(self.devices.SWITCH)
         if switch_ids:
@@ -1922,14 +1923,18 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             for i, connection in enumerate(self.connections):
                 if i:
                     file_string += ", "
-                file_string += self.get_port_string(connection.input_device_GL.device.device_id, connection.input_port_id) + \
+                file_string += self.get_port_string(
+                    connection.input_device_GL.device.device_id,
+                    connection.input_port_id) + \
                     " > " + \
                     self.get_port_string(
-                        connection.output_device_GL.device.device_id, connection.output_port_id)
+                        connection.output_device_GL.
+                    device.device_id, connection.output_port_id)
             file_string += ";\n"
         return file_string
 
     def get_port_string(self, device_id, port_id):
+        """Returns a string the represents a port with the EBNF syntax"""
         port_string = self.names.get_name_string(device_id)
         if port_id is None:
             return port_string
