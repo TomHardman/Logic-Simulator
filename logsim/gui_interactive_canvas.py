@@ -932,7 +932,7 @@ class RC(Device_GL):
 
     def is_clicked(self, mouse_x, mouse_y):
         """Checks if device is clicked"""
-        x_low = self.x - self.width- self.port_radius
+        x_low = self.x - self.width - self.port_radius
         x_high = self.x + self.width
         if (x_low < mouse_x < x_high and
             self.y - self.half_height < mouse_y <
@@ -1787,6 +1787,7 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
         dlg.Destroy()
 
     def create_file_string(self):
+        """Creates a string that represent """
         file_string = ""
         switch_ids = self.devices.find_devices(self.devices.SWITCH)
         if switch_ids:
@@ -1934,4 +1935,3 @@ class InteractiveCanvas(wxcanvas.GLCanvas):
             return port_string
         port_string += "." + self.names.get_name_string(port_id)
         return port_string
-        

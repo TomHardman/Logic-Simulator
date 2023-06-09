@@ -37,6 +37,7 @@ def system_with_test_data():
 
     return [names, devices, network, monitors, scanner, parser]
 
+
 @pytest.fixture
 def system_with_invalid_keywords():
     """Return a System with text input specified below"""
@@ -252,6 +253,7 @@ def system_with_no_connect():
 
     return [names, devices, network, monitors, scanner, parser]
 
+
 @pytest.fixture
 def system_with_siggen_invalid():
     """Return a System with invalid SIGGEN inputs"""
@@ -273,6 +275,7 @@ def system_with_siggen_invalid():
     parser = Parser(names, devices, network, monitors, scanner)
 
     return [names, devices, network, monitors, scanner, parser]
+
 
 @pytest.fixture
 def system_with_RC_invalid():
