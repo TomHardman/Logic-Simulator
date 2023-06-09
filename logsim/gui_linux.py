@@ -26,35 +26,40 @@ class GuiLinux(wx.Frame):
     devices: Devices object to pass the devices to the Gui
     network: Network object to pass the network to the Gui
     monitors: Monitors object to pass the monitors to the Gui
+    dark_mode: Specifies the desired colour theme of the Gui
+    lang: Specifies the chosen language for the Gui
+    cyc_comp: Specifies the cycles already completed when creating
+              a new GUI - this occurs when changing language
 
     Public Methods
     -----------
-    on_size: Handles resize events
+    on_size(self, event): Handles resize events
 
-    on_menu: Handles the event when the user selects a menu item
+    on_menu(self, event):
+        Handles the event when the user selects a menu item
 
-    on_change_monitor_colour:
+    on_change_monitor_colour(self, event):
         Handles the event when the user presses the change trace colours
         button by clearing the dictionary of colours in trace_canvas
         so they are reallocated
 
-    on_run_button:
+    on_run_button(self, event):
         Handles the event when the user presses the run button - on
         first run it causes the continue button to appear in the GUI -
         on all runs it runs the simulation from scratch for the
         specified number of cycles
 
-    on_animate:
+    on_animate(self, event):
         Handles the event where the animate button is pressed begins
         animation of plotting and circuit display until button, which
         will now display stop, is pressed again
 
-    on_tick:
+    on_tick(self, event):
         While animation is occurring, this function is called every time
         there is a tick to animate the logic circuit display and
         plotting of the monitor traces cycle by cycle.
 
-    on_sash_position_change_side:
+    on_sash_position_change_side(self, event):
         Handles the event where the sash position of the window changes
         - this is used to constrain the sidebar to either appear
         displayed to an ideal size or completely retracted.
@@ -62,31 +67,34 @@ class GuiLinux(wx.Frame):
         linux this sidebar is designed to only take these two positions
         and is not fully adjustable
 
-    on_sash_position_change_canvas:
+    on_sash_position_change_canvas(self, event):
         Function that is redundant in nature but is bound to the sash
         position change event for the canvas UI window in order to avoid
         interference between the sash position change events for the two
         separate splitter windows
 
-    on_continue_button: Handles the event when the user presses
-                         the continue button
+    on_continue_button(self, event):
+        Handles the event when the user presses the continue button
 
-    on_add_zap_button:
+    on_add_zap_button(self, event):
         Handle the event when the user presses the add monitor
         button - allows monitors to be added/zapped on the circuit
         canvas until the button, which will read 'Stop' after being
         pressed initially, is pressed again.
 
-    on_add_device_button:
+    on_add_device_button(self, event):
         Handle the event when the user presses the add device button -
         will generate a device menu pop up that allows the user to
         select the device type, characteristics and name
 
-    on_add_connection_button:
+    on_add_connection_button(self, event):
         Handles the event when the user presses the add connection
         button and allows connections to be made between devices on the
         circuit canvas
 
+    set_dark_mode(self):
+        Function that is used to set dark mode if necessary
+        when a new GUI is initialised
     """
 
     def __init__(self, title, names, devices, network, monitors,
@@ -308,8 +316,8 @@ class GuiLinux(wx.Frame):
         add_button_d.SetFont(self.font_buttons)
         add_button_d.SetInitialSize(wx.Size(150, 60))
 
-        add_button_c = wx.Button(
-            panel_devices, wx.ID_ANY, _("Add\nConnections"))
+        add_button_c = wx.Button(panel_devices, wx.ID_ANY,
+                                 _("Add\nConnections"))
         add_button_c.SetFont(self.font_buttons)
         add_button_c.SetInitialSize(wx.Size(160, 60))
 
@@ -335,9 +343,8 @@ class GuiLinux(wx.Frame):
 
         # Add canvas widgets - include as instance variables for method access
         self.trace_canvas = TraceCanvas(self.plotting_ui, devices, monitors)
-        self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self,
-                                                devices, monitors, names,
-                                                network)
+        self.circuit_canvas = InteractiveCanvas(
+            self.circuit_ui, self, devices, monitors, names, network)
 
         # Add canvases to respective panels
         self.plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
@@ -405,7 +412,6 @@ class GuiLinux(wx.Frame):
                     error_pop_up(
                         wx.GetTranslation('Circuit file must be .txt'))
                     return
-                # text_file = open(file_path)
 
                 names = Names()
                 devices = Devices(names)
@@ -461,10 +467,13 @@ class GuiLinux(wx.Frame):
         if Id == self.german_id or Id == self.eng_id or Id == self.chinese_id:
             dlg = WarningDialog(
                 None,
-                wx.GetTranslation('Changing language will reset the circuit \n'
-                                  'canvas and any devices that have been repositioned will be \n'
-                                  'reset to their default positions. Are you sure you want to \n'
-                                  'continue?'),
+                wx.GetTranslation(
+                    'Changing language will reset the circuit \n'
+                    'canvas and any devices that have been repositioned '
+                    'will be \n'
+                    'reset to their default positions. Are you sure '
+                    'you want to \n'
+                    'continue?'),
                 wx.GetTranslation('Warning'))
             if dlg.ShowModal():
                 dlg.Destroy()
@@ -542,8 +551,8 @@ class GuiLinux(wx.Frame):
                 run_sizer = self.run_sizer
                 panel_control = self.panel_control
 
-                cont_button = wx.Button(
-                    panel_control, wx.ID_ANY, _("Continue"))
+                cont_button = wx.Button(panel_control, wx.ID_ANY,
+                                        _("Continue"))
                 cont_button.SetFont(self.font_buttons)
                 cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
                 self.cont_button = cont_button  # to allow deletion of button
@@ -847,11 +856,12 @@ class GuiLinux(wx.Frame):
             self.connection_constraint = False
 
     def load_circuit(self, names, devices, network, monitors):
-        '''Function that reconfigures the GUI canvases and instance variables
-        when a new circuit is successfully loaded from the file menu'''
+        """Function that reconfigures the GUI canvases and instance variables
+        when a new circuit is successfully loaded from the file menu"""
         if not self.first_run:
             self.cont_button.Destroy()
 
+        # redefine instance variables
         self.devices = devices
         self.names = names
         self.monitors = monitors
@@ -865,6 +875,7 @@ class GuiLinux(wx.Frame):
         self.trace_canvas.Destroy()
         self.circuit_canvas.Destroy()
 
+        # reinitialise trace and circuit canvas
         self.trace_canvas = TraceCanvas(self.plotting_ui, devices, monitors)
         self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self, devices,
                                                 monitors, names, network)
@@ -877,13 +888,18 @@ class GuiLinux(wx.Frame):
         self.Layout()
         self.trace_canvas.Refresh()
         self.circuit_canvas.Refresh()
-        self.SetSize(self.GetSize().GetWidth()-10,
-                     self.GetSize().GetHeight()-10)
         self.cycles_comp_text.SetLabel(
             f'{_("Cycles Completed")}: {self.cycles_completed}')
+
+        # a forced resize is necessary to ensure that paint events
+        # are generated properly for the canvases
+        self.SetSize(self.GetSize().GetWidth()-10,
+                     self.GetSize().GetHeight()-10)
         self.Maximize()
 
     def set_dark_mode(self):
+        """Function that is used to set dark mode if necessary
+        when a new GUI is initialised"""
         self.circuit_canvas.dark_mode = True
         self.trace_canvas.dark_mode = True
         self.sidebar.SetBackgroundColour(wx.Colour(100, 80, 100))

@@ -6,6 +6,8 @@ Classes
 ----------
 CustomDialog(parent, message, caption, bitmap)
 
+WarningDialog(parent, message, caption)
+
 RoundedScrollWindow(parent, title, devices, canvas)
 
 DeviceMenu(parent, title, devices, canvas)
@@ -26,6 +28,16 @@ def error_pop_up(string, style=wx.OK | wx.ICON_ERROR | 0x40):
 
 
 class WarningDialog(wx.GenericMessageDialog):
+    """Class that inherits from GenericMessageDialog and is used for
+    creating a warning message dialog that returns false when the
+    no button is clicked
+
+    Parameters
+    ----------
+    parent: the parent window that the dialog box belongs to
+    message: the message to be displayed in the dialog box
+    caption: the caption for the dialog box
+    """
     def __init__(self, parent, message, caption):
         super().__init__(parent, message, caption, style=wx.YES_NO |
                          wx.ICON_WARNING)
@@ -49,7 +61,6 @@ class CustomDialog(wx.Dialog):
     caption: the caption for the dialog box
     bitmap: custom bitmap icon to be displayed in the dialog box
     """
-
     def __init__(self, parent, message, caption, bitmap):
         super().__init__(parent, title=caption)
 
@@ -304,12 +315,14 @@ class DeviceMenu(wx.Dialog):
                                            style=wx.SP_ARROW_KEYS, min=2,
                                            max=16)
 
-        chosen_txt = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                   f"{_('Device chosen')}: {self.device_chosen}")
+        chosen_txt = wx.StaticText(
+            self.main_panel, wx.ID_ANY,
+            f"{_('Device chosen')}: {self.device_chosen}")
         chosen_txt.SetFont(self.font)
-        confirm_button_qual = wx.Button(
-            self.main_panel, wx.ID_ANY, _("Confirm"))
-        back_button_qual = wx.Button(self.main_panel, wx.ID_ANY, _("Back"))
+        confirm_button_qual = wx.Button(self.main_panel, wx.ID_ANY,
+                                        _("Confirm"))
+        back_button_qual = wx.Button(self.main_panel, wx.ID_ANY,
+                                     _("Back"))
         confirm_button_qual.Bind(wx.EVT_BUTTON, self.on_confirm_qual)
         back_button_qual.Bind(wx.EVT_BUTTON, self.on_back_qual)
 
@@ -332,13 +345,15 @@ class DeviceMenu(wx.Dialog):
         """Function that creates the pop up window for entering
         the device name"""
 
-        phrases = {'CLOCK': _('Half Period: '), 'NAND': _('Number of inputs: '),
-                   'AND': _('Number of inputs: '), 'NOR': _('Number of inputs: '),
-                   'OR': _('Number of inputs: '), 'SWITCH': _('Initial State: '),
-                   'RC': _('Time til dropoff:'), 'SIGGEN': _('Signal Sequence: ')}
+        phrases = {
+            'CLOCK': _('Half Period: '), 'NAND': _('Number of inputs: '),
+            'AND': _('Number of inputs: '), 'NOR': _('Number of inputs: '),
+            'OR': _('Number of inputs: '), 'SWITCH': _('Initial State: '),
+            'RC': _('Time til dropoff:'), 'SIGGEN': _('Signal Sequence: ')}
 
-        chosen_txt_dev = wx.StaticText(self.main_panel, wx.ID_ANY,
-                                       f"{_('Device chosen')}: {self.device_chosen}")
+        chosen_txt_dev = wx.StaticText(
+            self.main_panel, wx.ID_ANY,
+            f"{_('Device chosen')}: {self.device_chosen}")
         chosen_txt_dev.SetFont(self.font)
 
         # add text to state chosen qualifier if relevant
@@ -351,8 +366,8 @@ class DeviceMenu(wx.Dialog):
         name_prompt = wx.StaticText(self.main_panel, wx.ID_ANY,
                                     _('Enter device name:'))
         name_input = wx.TextCtrl(self.main_panel, wx.ID_ANY, size=(100, 40))
-        confirm_button_name = wx.Button(
-            self.main_panel, wx.ID_ANY, _("Confirm"))
+        confirm_button_name = wx.Button(self.main_panel, wx.ID_ANY,
+                                        _("Confirm"))
         back_button_name = wx.Button(self.main_panel, wx.ID_ANY, _("Back"))
         confirm_button_name.Bind(wx.EVT_BUTTON, self.on_confirm_name)
         back_button_name.Bind(wx.EVT_BUTTON, self.on_back_name)
