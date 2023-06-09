@@ -16,4 +16,6 @@ gui_components.py       - Contains four classes that are used for custom windows
 gui_interactive_canvas.py - Implements the interactive graphical user interface for the Logic Simulator.
 gui_linux.py            - Contains the framework for the GUI.
 gui_plotting_canvas.py  - contains the TraceCanvas class which is used for plotting monitor traces in the GUI.
-locales                 - Folder which contains code and translations for the chosen language options
+locales                 - Folder which contains the .po translation files for the chosen language options
+circuit_files           -Folder containing a number of text files which were used for testing the GUI. 
+                         This folder is also designed for the user to be able to save their built circuits into.
