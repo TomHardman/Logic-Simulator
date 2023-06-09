@@ -90,7 +90,7 @@ def main(arg_list):
     # Initialise an instance of the gui.Gui() class
     app = wx.App()
     gui = GuiLinux("Logic Simulator", names, devices, network,
-                    monitors)
+                   monitors)
     gui.Show(True)
     app.MainLoop()
     sys.exit()

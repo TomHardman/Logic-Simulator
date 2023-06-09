@@ -355,7 +355,8 @@ class Network:
             device = self.devices.get_device(device_id)
             output_signal = self.get_output_signal(device_id,
                                                    output_id=None)
-            if output_signal == self.devices.HIGH and device.clock_counter == device.high_period:
+            if output_signal == self.devices.HIGH and\
+                    device.clock_counter == device.high_period:
                 device.outputs[None] = self.devices.FALLING
             device.clock_counter += 1
 

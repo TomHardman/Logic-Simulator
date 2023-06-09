@@ -75,10 +75,12 @@ class Scanner:
                                  self.KEYWORD, self.NUMBER,
                                  self.NAME, self.EOF] = range(8)
         self.keywords_list = ["CONNECT", "SWITCH", "MONITOR", "CLOCK",
-                              "AND", "NAND", "OR", "NOR", "DTYPE", "XOR", "RC", "SIGGEN"]
+                              "AND", "NAND", "OR", "NOR", "DTYPE",
+                              "XOR", "RC", "SIGGEN"]
         [self.CONNECT_ID, self.SWITCH_ID, self.MONITOR_ID, self.CLOCK_ID,
          self.AND_ID, self.NAND_ID, self.OR_ID, self.NOR_ID,
-            self.DTYPE_ID, self.XOR_ID, self.RC_ID, self.SIGGEN_ID] = self.names.lookup(self.keywords_list)
+         self.DTYPE_ID, self.XOR_ID, self.RC_ID,
+         self.SIGGEN_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
         self.input_file = self.open_file(path)
         self.current_character = self.input_file.read(1)
