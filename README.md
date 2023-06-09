@@ -12,7 +12,7 @@ devices.py              - Contains the devices class which creates and stores de
 network.py              - Contains the network class which has operations to make connections and execute the network.
 monitors.py             - Contains the monitors class which can add/remove and read monitors points.
 userint.py              - Command line interface (untouched).
-gui_components.py       - Contains three classes that are used for custom windows in the GUI and a function for raising error pop up messages.
+gui_components.py       - Contains four classes that are used for custom windows in the GUI and a function for raising error pop up messages.
 gui_interactive_canvas.py - Implements the interactive graphical user interface for the Logic Simulator.
 gui_linux.py            - Contains the framework for the GUI.
 gui_plotting_canvas.py  - contains the TraceCanvas class which is used for plotting monitor traces in the GUI.
