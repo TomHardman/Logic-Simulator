@@ -14,6 +14,7 @@ from gui_interactive_canvas import InteractiveCanvas
 from gui_components import error_pop_up, DeviceMenu, RoundedScrollWindow, \
     CustomDialog, WarningDialog
 
+
 class GuiLinux(wx.Frame):
     """
     Class that contains the framework for the Gui
@@ -118,8 +119,7 @@ class GuiLinux(wx.Frame):
         themeMenu = wx.Menu()
         langMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        
-    
+
         # set up locale for language options
         self.locale = wx.Locale(lang)
         builtins.__dict__['_'] = wx.GetTranslation
@@ -176,7 +176,7 @@ class GuiLinux(wx.Frame):
                            self.on_sash_position_change_side)
         self.main_splitter = main_splitter
 
-        # Set up panels for splitting canvas UI into circuit display and 
+        # Set up panels for splitting canvas UI into circuit display and
         # monitor trace display and make instance variables for access
         plotting_ui = wx.Panel(canvas_window)  # panel for plotting traces
         plotting_ui.SetBackgroundColour(wx.Colour(200, 200, 200))
@@ -308,7 +308,8 @@ class GuiLinux(wx.Frame):
         add_button_d.SetFont(self.font_buttons)
         add_button_d.SetInitialSize(wx.Size(150, 60))
 
-        add_button_c = wx.Button(panel_devices, wx.ID_ANY, _("Add\nConnections"))
+        add_button_c = wx.Button(
+            panel_devices, wx.ID_ANY, _("Add\nConnections"))
         add_button_c.SetFont(self.font_buttons)
         add_button_c.SetInitialSize(wx.Size(160, 60))
 
@@ -335,8 +336,8 @@ class GuiLinux(wx.Frame):
         # Add canvas widgets - include as instance variables for method access
         self.trace_canvas = TraceCanvas(self.plotting_ui, devices, monitors)
         self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self,
-                                                    devices, monitors, names,
-                                                    network)
+                                                devices, monitors, names,
+                                                network)
 
         # Add canvases to respective panels
         self.plotting_sizer.Add(self.trace_canvas, 1, wx.EXPAND, 5)
@@ -384,19 +385,19 @@ class GuiLinux(wx.Frame):
             dialog = wx.FileDialog(
                 self, message=wx.GetTranslation("Choose a file location"),
                 style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-            
+
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
                 text_file = open(file_path, 'w')
                 text_file.write(circuit_string)
-            
+
             dialog.Destroy()
-            
+
         if Id == self.load_id:
             dialog = wx.FileDialog(
-                self, message= wx.GetTranslation("Choose a file to load"),
+                self, message=wx.GetTranslation("Choose a file to load"),
                 style=wx.FD_OPEN)
-            
+
             if dialog.ShowModal() == wx.ID_OK:
                 file_path = dialog.GetPath()
                 _, file_extension = os.path.splitext(file_path)
@@ -404,7 +405,7 @@ class GuiLinux(wx.Frame):
                     error_pop_up(
                         wx.GetTranslation('Circuit file must be .txt'))
                     return
-                #text_file = open(file_path)
+                # text_file = open(file_path)
 
                 names = Names()
                 devices = Devices(names)
@@ -412,16 +413,16 @@ class GuiLinux(wx.Frame):
                 monitors = Monitors(names, devices, network)
                 scanner = Scanner(file_path, names)
                 parser = Parser(names, devices, network, monitors, scanner)
-                
+
                 if parser.parse_network():
                     self.load_circuit(names, devices, network, monitors)
                 else:
                     error_pop_up(
                         wx.GetTranslation(
                             'Circuit could not be loaded from file'))
-            
+
             dialog.Destroy()
-        
+
         # if light mode or dark mode selected
         if Id == self.light_id or Id == self.dark_id:
             if Id == self.light_id:
@@ -459,11 +460,11 @@ class GuiLinux(wx.Frame):
 
         if Id == self.german_id or Id == self.eng_id or Id == self.chinese_id:
             dlg = WarningDialog(
-                None, 
-                wx.GetTranslation('Changing language will reset the circuit \n' 
-                'canvas and any devices that have been repositioned will be \n' 
-                'reset to their default positions. Are you sure you want to \n'
-                'continue?'), 
+                None,
+                wx.GetTranslation('Changing language will reset the circuit \n'
+                                  'canvas and any devices that have been repositioned will be \n'
+                                  'reset to their default positions. Are you sure you want to \n'
+                                  'continue?'),
                 wx.GetTranslation('Warning'))
             if dlg.ShowModal():
                 dlg.Destroy()
@@ -518,7 +519,7 @@ class GuiLinux(wx.Frame):
 
             # execute run for specified no. cycles
             for i in range(self.cycles):
-                error_code = self.network.execute_network() 
+                error_code = self.network.execute_network()
                 if error_code == self.network.NO_ERROR:
                     self.monitors.record_signals()
                     self.cycles_completed += 1
@@ -526,7 +527,8 @@ class GuiLinux(wx.Frame):
                 # show error messages if run fails
                 elif error_code == \
                         self.network.OSCILLATING:
-                    error_pop_up(_('Run failed to execute - network oscillating'))
+                    error_pop_up(
+                        _('Run failed to execute - network oscillating'))
                     return
                 elif error_code == \
                         self.network.INPUTS_NOT_CONNECTED:
@@ -540,7 +542,8 @@ class GuiLinux(wx.Frame):
                 run_sizer = self.run_sizer
                 panel_control = self.panel_control
 
-                cont_button = wx.Button(panel_control, wx.ID_ANY, _("Continue"))
+                cont_button = wx.Button(
+                    panel_control, wx.ID_ANY, _("Continue"))
                 cont_button.SetFont(self.font_buttons)
                 cont_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
                 self.cont_button = cont_button  # to allow deletion of button
@@ -682,7 +685,7 @@ class GuiLinux(wx.Frame):
         min_sash_pos = current_width - 400  # set displayed position of sidebar
         max_sash_pos = current_width - 15   # set retracted position of sidebar
 
-        # sidebar set back to displayed position if sash dragged out any 
+        # sidebar set back to displayed position if sash dragged out any
         # further than displayed position or dragged to left when retracted
         if current_position < min_sash_pos \
                 or current_position < current_width-20 \
@@ -861,7 +864,7 @@ class GuiLinux(wx.Frame):
         self.circuit_sizer.Detach(self.circuit_canvas)
         self.trace_canvas.Destroy()
         self.circuit_canvas.Destroy()
-        
+
         self.trace_canvas = TraceCanvas(self.plotting_ui, devices, monitors)
         self.circuit_canvas = InteractiveCanvas(self.circuit_ui, self, devices,
                                                 monitors, names, network)
