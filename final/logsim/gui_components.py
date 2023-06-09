@@ -38,6 +38,7 @@ class WarningDialog(wx.GenericMessageDialog):
     message: the message to be displayed in the dialog box
     caption: the caption for the dialog box
     """
+
     def __init__(self, parent, message, caption):
         super().__init__(parent, message, caption, style=wx.YES_NO |
                          wx.ICON_WARNING)
@@ -61,6 +62,7 @@ class CustomDialog(wx.Dialog):
     caption: the caption for the dialog box
     bitmap: custom bitmap icon to be displayed in the dialog box
     """
+
     def __init__(self, parent, message, caption, bitmap):
         super().__init__(parent, title=caption)
 
